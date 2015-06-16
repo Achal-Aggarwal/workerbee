@@ -1,4 +1,4 @@
-package com.workerbee.ddl;
+package com.workerbee;
 
 public interface Query {
   public String generate();

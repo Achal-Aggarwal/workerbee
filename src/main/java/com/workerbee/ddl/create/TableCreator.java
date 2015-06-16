@@ -1,7 +1,15 @@
 package com.workerbee.ddl.create;
 
+import com.workerbee.Column;
 import com.workerbee.Table;
-import com.workerbee.ddl.Query;
+import com.workerbee.Query;
+import com.workerbee.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.workerbee.Utils.joinList;
+import static com.workerbee.Utils.quoteString;
 
 public class TableCreator implements Query {
   Table table;
@@ -32,23 +40,41 @@ public class TableCreator implements Query {
       result.append(" IF NOT EXISTS");
     }
 
-    result.append(" " + table.getDatabaseName() + "." + table.getName());
+    result.append(" ");
+
+    if (table.isNotTemporary()){
+      result.append(table.getDatabaseName() + ".");
+    }
+
+    result.append(table.getName());
+
+    if (!table.getColumns().isEmpty()){
+      result.append(" ( ");
+      List<String> columnsDef = new ArrayList<String>(table.getColumns().size());
+
+      for (Column column : table.getColumns()) {
+        columnsDef.add(column.getName() + " " + column.getType());
+      }
+
+      result.append(joinList(columnsDef, ", "));
+      result.append(" )");
+    }
 
     if (table.getComment() != null){
-      result.append(" COMMENT " + table.getComment());
+      result.append(" COMMENT " + quoteString(table.getComment()));
     }
 
     if(table.getLocation() != null){
-      result.append(" LOCATION " + table.getLocation());
+      result.append(" LOCATION " + quoteString(table.getLocation()));
     }
 
     if(!table.getProperties().isEmpty()){
-      result.append(" TBLPROPERTIES (");
+      result.append(" TBLPROPERTIES ( ");
       for (String property : table.getProperties()) {
-        result.append(property + " = " + table.getProperty(property) + ", ");
+        result.append(quoteString(property) + " = " + quoteString(table.getProperty(property)) + ", ");
       }
       result.delete(result.lastIndexOf(", "), result.length());
-      result.append(")");
+      result.append(" )");
     }
 
     result.append(" ;");

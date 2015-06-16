@@ -1,7 +1,13 @@
 package com.workerbee.ddl.create;
 
 import com.workerbee.Database;
-import com.workerbee.ddl.Query;
+import com.workerbee.Query;
+import com.workerbee.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.workerbee.Utils.quoteString;
 
 public class DatabaseCreator implements Query {
   Database database;
@@ -29,20 +35,23 @@ public class DatabaseCreator implements Query {
     result.append(" " + database.getName());
 
     if (database.getComment() != null){
-      result.append(" COMMENT " + database.getComment());
+      result.append(" COMMENT " + quoteString(database.getComment()));
     }
 
     if(database.getLocation() != null){
-      result.append(" LOCATION " + database.getLocation());
+      result.append(" LOCATION " + quoteString(database.getLocation()));
     }
 
     if(!database.getProperties().isEmpty()){
-      result.append(" WITH DBPROPERTIES (");
+      result.append(" WITH DBPROPERTIES ( ");
+      List<String> keyValues = new ArrayList<String>(database.getProperties().size());
+
       for (String property : database.getProperties()) {
-        result.append(property + " = " + database.getProperty(property) + ", ");
+        keyValues.add(quoteString(property) + " = " + quoteString(database.getProperty(property)));
       }
-      result.delete(result.lastIndexOf(", "), result.length());
-      result.append(")");
+
+      result.append(Utils.joinList(keyValues, ", "));
+      result.append(" )");
     }
 
     result.append(" ;");
