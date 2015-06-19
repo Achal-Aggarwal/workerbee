@@ -2,12 +2,11 @@ package com.workerbee.dr;
 
 import com.workerbee.Column;
 import com.workerbee.Database;
-import com.workerbee.QueryGenerator;
 import com.workerbee.Table;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.workerbee.Column.Type.SMALLINT;
+import static com.workerbee.Column.Type.INT;
 import static com.workerbee.QueryGenerator.select;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,7 +19,7 @@ public class SelectQueryTest {
   public static final String ALIAS = "ALIAS";
 
   private Table table;
-  Column column = new Column(COLUMN_NAME, SMALLINT);
+  Column column = new Column(COLUMN_NAME, INT);
 
   @Before
   public void setup(){

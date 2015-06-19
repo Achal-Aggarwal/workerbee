@@ -1,11 +1,10 @@
 package com.workerbee;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Table {
+  public static final String COLUMN_SEPARATOR = ":";
+  public static final String HIVE_NULL = "NULL";
   private  Database database;
 
   private String name;
@@ -75,6 +74,10 @@ public class Table {
     return columns;
   }
 
+  public Row getNewRow(){
+    return parseRecordUsing("");
+  }
+
   public String getDatabaseName(){
     return database.getName();
   }
@@ -105,5 +108,30 @@ public class Table {
 
   public boolean isNotTemporary() {
     return database != null;
+  }
+
+  public Row parseRecordUsing(String record) {
+    Map<Column, Object> map = new HashMap<Column, Object>(columns.size());
+    RecordParser recordParser = new RecordParser(record, COLUMN_SEPARATOR, HIVE_NULL);
+    int index = 0;
+    for (Column column : columns) {
+      map.put(column, column.readValueUsing(recordParser, index++));
+    }
+
+    return new Row(map);
+  }
+
+  public String generateRecordFor(Row row) {
+    StringBuilder result = new StringBuilder();
+
+    for (Column column : columns) {
+      Object value = row.get(column);
+      result.append(value == null ? HIVE_NULL : value.toString());
+      result.append(COLUMN_SEPARATOR);
+    }
+
+    result.delete(result.lastIndexOf(COLUMN_SEPARATOR), result.length());
+
+    return result.toString();
   }
 }

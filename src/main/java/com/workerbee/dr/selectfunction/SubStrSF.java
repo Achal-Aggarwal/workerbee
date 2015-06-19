@@ -20,6 +20,7 @@ public class SubStrSF extends SelectFunction {
   @Override
   public String generate() {
     String result = "SUBSTR(" + columnName + ", " + start + ", " + end + ")";
+
     if (alias == null){
       return result;
     }

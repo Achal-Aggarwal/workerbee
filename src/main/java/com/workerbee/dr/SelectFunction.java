@@ -1,6 +1,5 @@
 package com.workerbee.dr;
 
-import com.workerbee.Column;
 import com.workerbee.Column.Type;
 
 public abstract class SelectFunction {

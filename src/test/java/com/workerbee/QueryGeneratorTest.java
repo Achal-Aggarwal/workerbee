@@ -1,4 +1,4 @@
-package com.workerbee.ddl;
+package com.workerbee;
 
 import com.workerbee.Column;
 import com.workerbee.Database;

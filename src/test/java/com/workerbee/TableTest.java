@@ -5,10 +5,12 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static com.workerbee.Column.Type.INT;
 import static com.workerbee.Column.Type.STRING;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class TableTest {
@@ -87,5 +89,38 @@ public class TableTest {
     Column column = new Column(COLUMN_NAME, STRING);
     table.havingColumn(column);
     assertThat(table.getColumns(), contains(column));
+  }
+
+  @Test
+  public void shouldGetNewRowOfTable(){
+    Column column = new Column(COLUMN_NAME, STRING);
+    table.havingColumn(column);
+    Row newRow = table.getNewRow();
+    assertThat(newRow.get(column), nullValue());
+  }
+
+  @Test
+  public void shouldParseRecordAndReturnCorrespondingRowOfTable(){
+    Column integer = new Column("INT_COLUMN_NAME", INT);
+    Column string = new Column("STRING_COLUMN_NAME", STRING);
+
+    table.havingColumn(integer);
+    table.havingColumn(string);
+
+    Row row = table.parseRecordUsing("1:ASD");
+    assertThat((Integer) row.get(integer), is(1));
+    assertThat((String) row.get(string), is("ASD"));
+  }
+
+  @Test
+  public void shouldGenerateRecordStringForCorrespondingRowOfTable(){
+    Column integer = new Column("INT_COLUMN_NAME", INT);
+    Column string = new Column("STRING_COLUMN_NAME", STRING);
+
+    table.havingColumn(integer);
+    table.havingColumn(string);
+
+    Row row = table.getNewRow().set(integer, 1).set(string, "ASD");
+    assertThat(table.generateRecordFor(row), is("1:ASD"));
   }
 }
