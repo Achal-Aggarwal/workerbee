@@ -3,8 +3,9 @@ package com.workerbee;
 import java.util.*;
 
 public class Table {
-  public static final String COLUMN_SEPARATOR = ":";
-  public static final String HIVE_NULL = "NULL";
+  private String columnSeparator = "\1";
+  private String hiveNull = "\\N";
+
   private  Database database;
 
   private String name;
@@ -109,13 +110,20 @@ public class Table {
   public boolean isNotTemporary() {
     return database != null;
   }
+  public String getHiveNull() {
+    return hiveNull;
+  }
+
+  public String getColumnSeparator() {
+    return columnSeparator;
+  }
 
   public Row parseRecordUsing(String record) {
     Map<Column, Object> map = new HashMap<Column, Object>(columns.size());
-    RecordParser recordParser = new RecordParser(record, COLUMN_SEPARATOR, HIVE_NULL);
+    RecordParser recordParser = new RecordParser(record, columnSeparator, hiveNull);
     int index = 0;
     for (Column column : columns) {
-      map.put(column, column.readValueUsing(recordParser, index++));
+      map.put(column, column.parseValueUsing(recordParser, index++));
     }
 
     return new Row(map);
@@ -126,11 +134,11 @@ public class Table {
 
     for (Column column : columns) {
       Object value = row.get(column);
-      result.append(value == null ? HIVE_NULL : value.toString());
-      result.append(COLUMN_SEPARATOR);
+      result.append(value == null ? hiveNull : value.toString());
+      result.append(columnSeparator);
     }
 
-    result.delete(result.lastIndexOf(COLUMN_SEPARATOR), result.length());
+    result.delete(result.lastIndexOf(columnSeparator), result.length());
 
     return result.toString();
   }

@@ -43,7 +43,7 @@ public class Column {
     return comment;
   }
 
-  public Object readValueUsing(RecordParser recordParser, int index) {
+  public Object parseValueUsing(RecordParser recordParser, int index) {
     return type.parseValue(recordParser, index);
   }
 }

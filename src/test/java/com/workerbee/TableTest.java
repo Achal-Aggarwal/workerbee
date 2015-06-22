@@ -107,7 +107,7 @@ public class TableTest {
     table.havingColumn(integer);
     table.havingColumn(string);
 
-    Row row = table.parseRecordUsing("1:ASD");
+    Row row = table.parseRecordUsing("1" + table.getColumnSeparator() + "ASD");
     assertThat((Integer) row.get(integer), is(1));
     assertThat((String) row.get(string), is("ASD"));
   }
@@ -121,6 +121,6 @@ public class TableTest {
     table.havingColumn(string);
 
     Row row = table.getNewRow().set(integer, 1).set(string, "ASD");
-    assertThat(table.generateRecordFor(row), is("1:ASD"));
+    assertThat(table.generateRecordFor(row), is("1"+ table.getColumnSeparator() +"ASD"));
   }
 }

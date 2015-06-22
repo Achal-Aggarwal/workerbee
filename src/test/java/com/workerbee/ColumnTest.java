@@ -31,7 +31,7 @@ public class ColumnTest {
 
     when(mockRecordParser.readInt(INDEX)).thenReturn(INT_VALUE);
 
-    assertThat((Integer) column.readValueUsing(mockRecordParser, INDEX), is(INT_VALUE));
+    assertThat((Integer) column.parseValueUsing(mockRecordParser, INDEX), is(INT_VALUE));
 
     verify(mockRecordParser).readInt(INDEX);
   }
@@ -43,7 +43,7 @@ public class ColumnTest {
 
     when(mockRecordParser.readString(INDEX)).thenReturn(STRING_VALUE);
 
-    assertThat((String) column.readValueUsing(mockRecordParser, INDEX), is(STRING_VALUE));
+    assertThat((String) column.parseValueUsing(mockRecordParser, INDEX), is(STRING_VALUE));
 
     verify(mockRecordParser).readString(INDEX);
   }
