@@ -18,17 +18,21 @@ public class Column {
     public abstract Object parseValue(RecordParser rowParser, int index);
   }
 
-  private String name;
-  private Type type;
-  private String comment;
+  private final String name;
+  private final Type type;
+  private final String comment;
 
-  public Column(String name, Type type) {
-    this(name, type, null);
+  private final Table belongsTo;
+
+  public Column(Table belongsTo, String name, Type type) {
+    this(belongsTo, name, type, null);
   }
-  public Column(String name, Type type, String comment) {
+
+  public Column(Table belongsTo, String name, Type type, String comment) {
     this.name = name;
     this.type = type;
     this.comment = comment;
+    this.belongsTo = belongsTo;
   }
 
   public Type getType() {
@@ -41,6 +45,14 @@ public class Column {
 
   public String getComment() {
     return comment;
+  }
+
+  public Table getBelongsTo() {
+    return belongsTo;
+  }
+
+  public String getFqColumnName(){
+    return Utils.fqColumnName(belongsTo, this);
   }
 
   public Object parseValueUsing(RecordParser recordParser, int index) {

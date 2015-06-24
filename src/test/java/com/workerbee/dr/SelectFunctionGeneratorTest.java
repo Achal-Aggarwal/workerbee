@@ -19,6 +19,6 @@ public class SelectFunctionGeneratorTest {
 
   @Test
   public void shouldReturnSunStrSFWhenSubstrIsUsed(){
-    assertThat(substr(new Column("", STRING), 1 ,2), instanceOf(SubStrSF.class));
+    assertThat(substr(new Column(null, "", STRING), 1 ,2), instanceOf(SubStrSF.class));
   }
 }

@@ -37,7 +37,7 @@ public class Table {
   }
 
   public Table havingColumn(String name, Column.Type type, String comment){
-    return havingColumn(new Column(name, type, comment));
+    return havingColumn(new Column(this, name, type, comment));
   }
 
   public Table havingColumn(String name, Column.Type type){

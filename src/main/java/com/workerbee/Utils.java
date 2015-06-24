@@ -26,10 +26,13 @@ public class Utils {
   public static String fqColumnName(Table table, Column column){
     StringBuilder result = new StringBuilder();
 
-    result
-      .append(table.getName())
-      .append(".")
-      .append(column.getName());
+    if (table != null){
+      result
+        .append(table.getName())
+        .append(".");
+    }
+
+    result.append(column.getName());
 
     return result.toString();
   }

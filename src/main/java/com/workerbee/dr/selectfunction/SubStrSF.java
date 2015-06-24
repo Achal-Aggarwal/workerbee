@@ -11,7 +11,8 @@ public class SubStrSF extends SelectFunction {
   private int end;
 
   public SubStrSF(Column column, int start, int end){
-    columnName = column.getName();
+    columnName = column.getFqColumnName();
+    alias = column.getName();
     type = STRING;
     this.start = start;
     this.end = end;

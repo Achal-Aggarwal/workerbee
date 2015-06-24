@@ -3,6 +3,7 @@ package com.workerbee;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.workerbee.Column.Type.INT;
@@ -86,14 +87,14 @@ public class TableTest {
 
   @Test
   public void shouldAddGivenColumnToTable(){
-    Column column = new Column(COLUMN_NAME, STRING);
+    Column column = new Column(table, COLUMN_NAME, STRING);
     table.havingColumn(column);
     assertThat(table.getColumns(), contains(column));
   }
 
   @Test
   public void shouldGetNewRowOfTable(){
-    Column column = new Column(COLUMN_NAME, STRING);
+    Column column = new Column(table, COLUMN_NAME, STRING);
     table.havingColumn(column);
     Row newRow = table.getNewRow();
     assertThat(newRow.get(column), nullValue());
@@ -101,11 +102,10 @@ public class TableTest {
 
   @Test
   public void shouldParseRecordAndReturnCorrespondingRowOfTable(){
-    Column integer = new Column("INT_COLUMN_NAME", INT);
-    Column string = new Column("STRING_COLUMN_NAME", STRING);
+    Column integer = new Column(table, "INT_COLUMN_NAME", INT);
+    Column string = new Column(table, "STRING_COLUMN_NAME", STRING);
 
-    table.havingColumn(integer);
-    table.havingColumn(string);
+    table.havingColumns(Arrays.asList(integer, string));
 
     Row row = table.parseRecordUsing("1" + table.getColumnSeparator() + "ASD");
     assertThat((Integer) row.get(integer), is(1));
@@ -114,8 +114,8 @@ public class TableTest {
 
   @Test
   public void shouldGenerateRecordStringForCorrespondingRowOfTable(){
-    Column integer = new Column("INT_COLUMN_NAME", INT);
-    Column string = new Column("STRING_COLUMN_NAME", STRING);
+    Column integer = new Column(table, "INT_COLUMN_NAME", INT);
+    Column string = new Column(table, "STRING_COLUMN_NAME", STRING);
 
     table.havingColumn(integer);
     table.havingColumn(string);

@@ -15,7 +15,7 @@ public class RowTest {
   public static final Integer INT_VALUE = 1;
   public static final Integer ANOTHER_INT_VALUE = 2;
   private  Row row;
-  private final Column column = new Column("COLUMN_NAME", INT);
+  private final Column column = new Column(null, "COLUMN_NAME", INT);
   @Before
   public void setup(){
     HashMap<Column, Object> columnValueMap = new HashMap<Column, Object>() {{
@@ -42,7 +42,7 @@ public class RowTest {
 
   @Test
   public void shouldNotSetValueOfNonExistingColumnInTheRow(){
-    final Column anotherColumn = new Column("COLUMN_NAME", INT);
+    final Column anotherColumn = new Column(null, "COLUMN_NAME", INT);
     assertThat(row.set(anotherColumn, ANOTHER_INT_VALUE), is(row));
     assertThat(row.get(anotherColumn), nullValue());
   }

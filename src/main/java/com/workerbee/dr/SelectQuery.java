@@ -55,7 +55,7 @@ public class SelectQuery implements Query {
     Table table = new Table(alias);
 
     for (SelectFunction selectFunction : selectFunctions) {
-      table.havingColumn(new Column(selectFunction.getAlias(), selectFunction.getType()));
+      table.havingColumn(new Column(table, selectFunction.getAlias(), selectFunction.getType()));
     }
 
     return table;

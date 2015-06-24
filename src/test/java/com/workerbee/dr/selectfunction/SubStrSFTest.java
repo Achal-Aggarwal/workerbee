@@ -14,10 +14,10 @@ public class SubStrSFTest {
 
   @Test
   public void shouldGenerateSubStr(){
-    assertThat(new SubStrSF(new Column(COLUMN_NAME, STRING), 1,2).generate(),
-      is("SUBSTR(" + COLUMN_NAME + ", 1, 2)"));
+    assertThat(new SubStrSF(new Column(null, COLUMN_NAME, STRING), 1,2).generate(),
+      is("SUBSTR(" + COLUMN_NAME + ", 1, 2) AS " + COLUMN_NAME));
 
-    assertThat(new SubStrSF(new Column(COLUMN_NAME, STRING), 1,2).as(ALIAS_NAME).generate(),
+    assertThat(new SubStrSF(new Column(null, COLUMN_NAME, STRING), 1,2).as(ALIAS_NAME).generate(),
       is("SUBSTR(" + COLUMN_NAME + ", 1, 2) AS " + ALIAS_NAME));
   }
 }

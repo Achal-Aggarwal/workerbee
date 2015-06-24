@@ -19,31 +19,31 @@ public class SelectQueryTest {
   public static final String ALIAS = "ALIAS";
 
   private Table table;
-  Column column = new Column(COLUMN_NAME, INT);
+  private Column column;
 
   @Before
   public void setup(){
     table = new Table(new Database(DATABASE_NAME), TABLE_NAME);
+    column = new Column(table, COLUMN_NAME, INT);
     table.havingColumn(column);
-
   }
 
   @Test
   public void shouldGenerateBasicSelectQuery(){
     assertThat(select(column).from(table).generate(),
-      is("SELECT " + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME + " ;"));
+      is("SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME + " ;"));
   }
 
   @Test
   public void shouldGenerateSelectQueryWithTableAlias(){
     assertThat(select(column).from(table).as(ALIAS).generate(),
-      is("SELECT " + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME + " AS " + ALIAS + " ;"));
+      is("SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME + " AS " + ALIAS + " ;"));
   }
 
   @Test
   public void shouldGenerateSelectQueryHavingJoin(){
     assertThat(select(column).from(table).join(table).on(column, column).generate(),
-      is("SELECT " + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME
+      is("SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME
         + " JOIN " + DATABASE_NAME + "." + TABLE_NAME
         + " ON " + TABLE_NAME + "." + COLUMN_NAME + " = " + TABLE_NAME + "." + COLUMN_NAME
         + " ;"));

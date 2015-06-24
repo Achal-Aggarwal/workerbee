@@ -39,15 +39,10 @@ public class UtilsTest {
 
   @Test
   public void shouldReturnFullyQualifiedColumnName(){
-    assertThat(fqTableName(
-        new Table(new Database(DATABASE_NAME), TABLE_NAME)),
-      is(DATABASE_NAME + "." + TABLE_NAME));
+    Column aColumn = new Column(null, COLUMN_NAME, Column.Type.STRING);
 
-    Column aColumn = new Column(COLUMN_NAME, Column.Type.STRING);
-    Table aTable = new Table(TABLE_NAME)
-      .havingColumn(aColumn);
-
-    assertThat(fqColumnName(aTable, aColumn), is(TABLE_NAME + "." + COLUMN_NAME));
+    assertThat(fqColumnName(null, aColumn), is(COLUMN_NAME));
+    assertThat(fqColumnName(new Table(TABLE_NAME), aColumn), is(TABLE_NAME + "." + COLUMN_NAME));
   }
 
   @Test

@@ -4,18 +4,20 @@ import com.workerbee.Column;
 import com.workerbee.dr.SelectFunction;
 
 public class ColumnSF extends SelectFunction {
-  private String columnName;
+  private Column column;
+
   public ColumnSF(Column column){
-    columnName = column.getName();
+    this.column = column;
+    alias = column.getName();
     type = column.getType();
   }
 
   @Override
   public String generate() {
-    if (alias == null){
-      return columnName;
+    if (alias == column.getName()){
+      return column.getFqColumnName();
     }
 
-    return columnName + " AS " + alias;
+    return column.getFqColumnName() + " AS " + alias;
   }
 }
