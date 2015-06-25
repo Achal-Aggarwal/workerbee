@@ -17,6 +17,7 @@ public class Table {
   HashMap<String, String> properties = new HashMap<String, String>();
 
   List<Column> columns = new ArrayList<Column>();
+  List<Column> partitionedOn = new ArrayList<Column>();
 
   public Table(String name) {
     this(null, name, null);
@@ -49,6 +50,16 @@ public class Table {
     return this;
   }
 
+  public Table partitionedOnColumn(Column column){
+    partitionedOn.add(column);
+    return this;
+  }
+
+  public Table partitionedOnColumns(List<Column> columns) {
+    partitionedOn.addAll(columns);
+    return this;
+  }
+
   public Table withComment(String comment){
     this.comment = comment;
     return this;
@@ -73,6 +84,10 @@ public class Table {
 
   public List<Column> getColumns() {
     return columns;
+  }
+
+  public List<Column> getPartitions() {
+    return partitionedOn;
   }
 
   public Row getNewRow(){
@@ -122,7 +137,12 @@ public class Table {
     Map<Column, Object> map = new HashMap<Column, Object>(columns.size());
     RecordParser recordParser = new RecordParser(record, columnSeparator, hiveNull);
     int index = 0;
+
     for (Column column : columns) {
+      map.put(column, column.parseValueUsing(recordParser, index++));
+    }
+
+    for (Column column : partitionedOn) {
       map.put(column, column.parseValueUsing(recordParser, index++));
     }
 
@@ -133,6 +153,12 @@ public class Table {
     StringBuilder result = new StringBuilder();
 
     for (Column column : columns) {
+      Object value = row.get(column);
+      result.append(value == null ? hiveNull : value.toString());
+      result.append(columnSeparator);
+    }
+
+    for (Column column : partitionedOn) {
       Object value = row.get(column);
       result.append(value == null ? hiveNull : value.toString());
       result.append(columnSeparator);

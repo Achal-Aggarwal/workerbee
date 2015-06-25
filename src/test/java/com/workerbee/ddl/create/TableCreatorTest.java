@@ -86,4 +86,13 @@ public class TableCreatorTest {
         + " ) ;"
     ));
   }
+
+  @Test
+  public void shouldGenerateCorrectCreateHqlOfTableWithPartitionColumnInfo(){
+    assertThat(create(table.partitionedOnColumn(new Column(table, COLUMN_NAME, STRING))).generate(), is(
+      "CREATE TABLE " + DATABASE_NAME + "." + TABLE_NAME + " PARTITIONED BY ( "
+        + COLUMN_NAME + " " + STRING
+        + " ) ;"
+    ));
+  }
 }

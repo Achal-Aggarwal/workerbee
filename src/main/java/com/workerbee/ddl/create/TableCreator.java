@@ -64,6 +64,18 @@ public class TableCreator implements Query {
       result.append(" COMMENT " + quoteString(table.getComment()));
     }
 
+    if (!table.getPartitions().isEmpty()){
+      result.append(" PARTITIONED BY ( ");
+      List<String> columnsDef = new ArrayList<String>(table.getPartitions().size());
+
+      for (Column column : table.getPartitions()) {
+        columnsDef.add(column.getName() + " " + column.getType());
+      }
+
+      result.append(joinList(columnsDef, ", "));
+      result.append(" )");
+    }
+
     if(table.getLocation() != null){
       result.append(" LOCATION " + quoteString(table.getLocation()));
     }

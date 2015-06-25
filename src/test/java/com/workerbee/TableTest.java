@@ -86,6 +86,18 @@ public class TableTest {
   }
 
   @Test
+  public void shouldAddPartitionsColumnsToTable(){
+    assertThat(table.getPartitions().isEmpty(), is(EMPTY));
+    table.partitionedOnColumn(new Column(table, COLUMN_NAME, STRING));
+
+    List<Column> columns = table.getPartitions();
+    assertThat(columns.isEmpty(), is(NOT_EMPTY));
+    assertThat(columns.get(0), instanceOf(Column.class));
+    assertThat(columns.get(0).getName(), is(COLUMN_NAME));
+    assertThat(columns.get(0).getType(), is(STRING));
+  }
+
+  @Test
   public void shouldAddGivenColumnToTable(){
     Column column = new Column(table, COLUMN_NAME, STRING);
     table.havingColumn(column);
