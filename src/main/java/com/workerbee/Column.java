@@ -1,6 +1,6 @@
 package com.workerbee;
 
-public class Column {
+public class Column implements Operand {
   public static enum Type {
     INT {
       @Override
@@ -16,12 +16,12 @@ public class Column {
     };
 
     public abstract Object parseValue(RecordParser rowParser, int index);
-  }
 
+  }
   private final String name;
+
   private final Type type;
   private final String comment;
-
   private final Table belongsTo;
 
   public Column(Table belongsTo, String name, Type type) {
@@ -57,5 +57,15 @@ public class Column {
 
   public Object parseValueUsing(RecordParser recordParser, int index) {
     return type.parseValue(recordParser, index);
+  }
+
+  @Override
+  public Expression eq(Operand rightOperand) {
+    return new Expression(this, "=", rightOperand);
+  }
+
+  @Override
+  public String operandName() {
+    return getFqColumnName();
   }
 }

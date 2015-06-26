@@ -42,7 +42,7 @@ public class SelectQueryTest {
 
   @Test
   public void shouldGenerateSelectQueryHavingJoin(){
-    assertThat(select(column).from(table).join(table).on(column, column).generate(),
+    assertThat(select(column).from(table).join(table).on(column.eq(column)).generate(),
       is("SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME
         + " JOIN " + DATABASE_NAME + "." + TABLE_NAME
         + " ON " + TABLE_NAME + "." + COLUMN_NAME + " = " + TABLE_NAME + "." + COLUMN_NAME

@@ -1,9 +1,6 @@
 package com.workerbee.dr;
 
-import com.workerbee.Column;
-import com.workerbee.Query;
-import com.workerbee.Table;
-import com.workerbee.Utils;
+import com.workerbee.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,8 +13,7 @@ public class SelectQuery implements Query {
   private List<SelectFunction> selectFunctions = new ArrayList<SelectFunction>();
   private String alias;
   private Table joinTable;
-  private Column tableAColumn;
-  private Column tableBColumn;
+  private Expression onExpression;
 
   public SelectQuery(SelectFunction... selectFunctions){
     this.selectFunctions.addAll(Arrays.asList(selectFunctions));
@@ -38,10 +34,8 @@ public class SelectQuery implements Query {
     return this;
   }
 
-  public SelectQuery on(Column tableAColumn, Column tableBColumn){
-    this.tableAColumn = tableAColumn;
-    this.tableBColumn = tableBColumn;
-
+  public SelectQuery on(Expression expression){
+    onExpression = expression;
     return this;
   }
 
@@ -78,13 +72,13 @@ public class SelectQuery implements Query {
 
     result.append(Utils.fqTableName(table));
 
-    if (joinTable != null && tableAColumn != null && tableBColumn != null){
+    if (joinTable != null && onExpression != null){
       result.append(" JOIN ");
 
       result.append(Utils.fqTableName(joinTable));
 
       result.append(" ON ");
-      result.append(fqColumnName(table, tableAColumn) + " = " + fqColumnName(joinTable, tableBColumn));
+      result.append(onExpression.generate());
     }
 
     if (alias != null){

@@ -1,7 +1,6 @@
 package com.workerbee.dml.insert;
 
 import com.workerbee.Column;
-import com.workerbee.QueryGenerator;
 import com.workerbee.Table;
 import com.workerbee.dr.SelectQuery;
 import org.junit.Before;
