@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.workerbee.Utils.fqColumnName;
-
 public class SelectQuery implements Query {
   private Table table;
   private List<SelectFunction> selectFunctions = new ArrayList<SelectFunction>();
   private String alias;
   private Table joinTable;
-  private Expression onExpression;
+  private BooleanExpression onBooleanExpression;
 
   public SelectQuery(SelectFunction... selectFunctions){
     this.selectFunctions.addAll(Arrays.asList(selectFunctions));
@@ -34,8 +32,8 @@ public class SelectQuery implements Query {
     return this;
   }
 
-  public SelectQuery on(Expression expression){
-    onExpression = expression;
+  public SelectQuery on(BooleanExpression booleanExpression){
+    onBooleanExpression = booleanExpression;
     return this;
   }
 
@@ -72,13 +70,13 @@ public class SelectQuery implements Query {
 
     result.append(Utils.fqTableName(table));
 
-    if (joinTable != null && onExpression != null){
+    if (joinTable != null && onBooleanExpression != null){
       result.append(" JOIN ");
 
       result.append(Utils.fqTableName(joinTable));
 
       result.append(" ON ");
-      result.append(onExpression.generate());
+      result.append(onBooleanExpression.generate());
     }
 
     if (alias != null){

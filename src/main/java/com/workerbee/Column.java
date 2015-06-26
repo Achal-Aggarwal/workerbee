@@ -1,6 +1,6 @@
 package com.workerbee;
 
-public class Column implements Operand {
+public class Column implements Comparable {
   public static enum Type {
     INT {
       @Override
@@ -60,8 +60,33 @@ public class Column implements Operand {
   }
 
   @Override
-  public Expression eq(Operand rightOperand) {
-    return new Expression(this, "=", rightOperand);
+  public BooleanExpression eq(Comparable rightComparable) {
+    return new BooleanExpression(this, "=", rightComparable);
+  }
+
+  @Override
+  public BooleanExpression notEq(Comparable rightComparable) {
+    return new BooleanExpression(this, "<>", rightComparable);
+  }
+
+  @Override
+  public BooleanExpression gt(Comparable rightComparable) {
+    return new BooleanExpression(this, ">", rightComparable);
+  }
+
+  @Override
+  public BooleanExpression lt(Comparable rightComparable) {
+    return new BooleanExpression(this, "<", rightComparable);
+  }
+
+  @Override
+  public BooleanExpression gte(Comparable rightComparable) {
+    return new BooleanExpression(this, ">=", rightComparable);
+  }
+
+  @Override
+  public BooleanExpression lte(Comparable rightComparable) {
+    return new BooleanExpression(this, "<=", rightComparable);
   }
 
   @Override
