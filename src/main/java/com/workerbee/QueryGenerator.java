@@ -2,6 +2,7 @@ package com.workerbee;
 
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
+import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
 import com.workerbee.dr.selectfunction.ColumnSF;
@@ -30,5 +31,13 @@ public class QueryGenerator {
     }
 
     return new SelectQuery(selectFunctions);
+  }
+
+  public static InsertQuery insert() {
+    return new InsertQuery(InsertQuery.DONT_OVERWRITE);
+  }
+
+  public static InsertQuery insert(boolean overwrite) {
+    return new InsertQuery(overwrite);
   }
 }
