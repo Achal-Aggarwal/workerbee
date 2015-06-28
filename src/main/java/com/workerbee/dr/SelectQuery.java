@@ -1,6 +1,7 @@
 package com.workerbee.dr;
 
 import com.workerbee.*;
+import com.workerbee.expression.BooleanExpression;
 
 import java.util.ArrayList;
 import java.util.Arrays;

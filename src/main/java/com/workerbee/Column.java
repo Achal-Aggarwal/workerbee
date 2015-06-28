@@ -1,6 +1,6 @@
 package com.workerbee;
 
-public class Column implements Comparable {
+public class Column extends com.workerbee.expression.Comparable {
   public static enum Type {
     INT {
       @Override
@@ -18,8 +18,8 @@ public class Column implements Comparable {
     public abstract Object parseValue(RecordParser rowParser, int index);
 
   }
-  private final String name;
 
+  private final String name;
   private final Type type;
   private final String comment;
   private final Table belongsTo;
@@ -47,46 +47,12 @@ public class Column implements Comparable {
     return comment;
   }
 
-  public Table getBelongsTo() {
-    return belongsTo;
-  }
-
   public String getFqColumnName(){
     return Utils.fqColumnName(belongsTo, this);
   }
 
   public Object parseValueUsing(RecordParser recordParser, int index) {
     return type.parseValue(recordParser, index);
-  }
-
-  @Override
-  public BooleanExpression eq(Comparable rightComparable) {
-    return new BooleanExpression(this, "=", rightComparable);
-  }
-
-  @Override
-  public BooleanExpression notEq(Comparable rightComparable) {
-    return new BooleanExpression(this, "<>", rightComparable);
-  }
-
-  @Override
-  public BooleanExpression gt(Comparable rightComparable) {
-    return new BooleanExpression(this, ">", rightComparable);
-  }
-
-  @Override
-  public BooleanExpression lt(Comparable rightComparable) {
-    return new BooleanExpression(this, "<", rightComparable);
-  }
-
-  @Override
-  public BooleanExpression gte(Comparable rightComparable) {
-    return new BooleanExpression(this, ">=", rightComparable);
-  }
-
-  @Override
-  public BooleanExpression lte(Comparable rightComparable) {
-    return new BooleanExpression(this, "<=", rightComparable);
   }
 
   @Override
