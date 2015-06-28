@@ -17,6 +17,7 @@ public class SelectQueryTest {
   public static final String DATABASE_NAME = "DATABASE_NAME";
   public static final String COLUMN_NAME = "COLUMN_NAME";
   public static final String ALIAS = "ALIAS";
+  public static final int LIMIT = 5;
 
   private Table table;
   private Column column;
@@ -32,6 +33,15 @@ public class SelectQueryTest {
   public void shouldGenerateBasicSelectQuery(){
     assertThat(select(column).from(table).generate(),
       is("SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME + " ;"));
+  }
+
+  @Test
+  public void shouldGenerateSelectQueryWithLimit(){
+    assertThat(select(column).from(table).limit(LIMIT).generate(),
+      is("SELECT " + TABLE_NAME + "." + COLUMN_NAME
+        + " FROM " + DATABASE_NAME + "." + TABLE_NAME
+        + " LIMIT " + LIMIT
+        + " ;"));
   }
 
   @Test

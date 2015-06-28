@@ -13,6 +13,7 @@ public class SelectQuery implements Query {
   private String alias;
   private Table joinTable;
   private BooleanExpression onBooleanExpression;
+  private Integer limit;
 
   public SelectQuery(SelectFunction... selectFunctions){
     this.selectFunctions.addAll(Arrays.asList(selectFunctions));
@@ -41,6 +42,11 @@ public class SelectQuery implements Query {
   public SelectQuery as(String alias){
     this.alias = alias;
 
+    return this;
+  }
+
+  public SelectQuery limit(Integer limit){
+    this.limit = limit;
     return this;
   }
 
@@ -82,6 +88,10 @@ public class SelectQuery implements Query {
 
     if (alias != null){
       result.append(" AS " + alias);
+    }
+
+    if (limit != null){
+      result.append(" LIMIT " + limit);
     }
 
     result.append(" ;");
