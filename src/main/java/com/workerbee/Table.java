@@ -37,6 +37,12 @@ public class Table {
     return this;
   }
 
+  public static Column HavingColumn(Table table, String name, Column.Type type) {
+    Column column = new Column(table, name, type);
+    table.havingColumn(column);
+    return column;
+  }
+
   public Table havingColumn(String name, Column.Type type, String comment){
     return havingColumn(new Column(this, name, type, comment));
   }
@@ -53,6 +59,12 @@ public class Table {
   public Table partitionedOnColumn(Column column){
     partitionedOn.add(column);
     return this;
+  }
+
+  public static Column PartitionedOnColumn(Table table, String name, Column.Type type) {
+    Column column = new Column(table, name, type);
+    table.partitionedOnColumn(column);
+    return column;
   }
 
   public Table partitionedOnColumns(List<Column> columns) {
