@@ -14,6 +14,7 @@ public class SelectQuery implements Query {
   private Table joinTable;
   private BooleanExpression onBooleanExpression;
   private Integer limit;
+  private List<ColumnOrder> orderBy = new ArrayList<ColumnOrder>();
 
   public SelectQuery(SelectFunction... selectFunctions){
     this.selectFunctions.addAll(Arrays.asList(selectFunctions));
@@ -48,6 +49,19 @@ public class SelectQuery implements Query {
   public SelectQuery limit(Integer limit){
     this.limit = limit;
     return this;
+  }
+
+  private SelectQuery orderBy(Column column, String order){
+    this.orderBy.add(new ColumnOrder(column, order));
+    return this;
+  }
+
+  public SelectQuery descOrderOf(Column column){
+    return orderBy(column, ColumnOrder.DESC_ORDER);
+  }
+
+  public SelectQuery ascOrderOf(Column column){
+    return orderBy(column, ColumnOrder.ASC_ORDER);
   }
 
   public Table table(){
@@ -90,6 +104,17 @@ public class SelectQuery implements Query {
       result.append(" AS " + alias);
     }
 
+    if (!orderBy.isEmpty()){
+      result.append(" ORDER BY ");
+
+      List<String> orderByColumns = new ArrayList<String>(orderBy.size());
+      for (ColumnOrder columnOrder : orderBy) {
+        orderByColumns.add(columnOrder.column.getFqColumnName() + " " + columnOrder.order);
+      }
+
+      result.append(Utils.joinList(orderByColumns, ", "));
+    }
+
     if (limit != null){
       result.append(" LIMIT " + limit);
     }
@@ -97,5 +122,18 @@ public class SelectQuery implements Query {
     result.append(" ;");
 
     return result.toString();
+  }
+
+  private class ColumnOrder {
+    public static final String DESC_ORDER = "DESC";
+    public static final String ASC_ORDER = "ASC";
+
+    private Column column;
+    private String order;
+
+    public ColumnOrder(Column column, String order) {
+      this.column = column;
+      this.order = order;
+    }
   }
 }
