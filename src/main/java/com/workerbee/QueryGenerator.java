@@ -3,6 +3,7 @@ package com.workerbee;
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.drop.DatabaseDropper;
+import com.workerbee.ddl.drop.TableDropper;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
@@ -15,12 +16,17 @@ public class QueryGenerator {
   public static DatabaseCreator create(Database database){
     return new DatabaseCreator(database);
   }
+
   public static DatabaseDropper drop(Database database) {
     return new DatabaseDropper(database);
   }
 
   public static TableCreator create(Table table){
     return new TableCreator(table);
+  }
+
+  public static TableDropper drop(Table table) {
+    return new TableDropper(table);
   }
 
   public static SelectQuery select(SelectFunction... selectFunctions) {
