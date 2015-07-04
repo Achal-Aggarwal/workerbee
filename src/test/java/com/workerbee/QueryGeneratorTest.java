@@ -3,6 +3,8 @@ package com.workerbee;
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.drop.DatabaseDropper;
+import com.workerbee.ddl.drop.TableDropper;
+import com.workerbee.ddl.misc.RecoverPartition;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
 import org.junit.Test;
@@ -28,6 +30,18 @@ public class QueryGeneratorTest {
 
   @Test
   public void shouldReturnTableCreatorObjectForTableObjectOnCreate(){
+    assertThat(drop(new Table(new Database("DatabaseName"), "TableName")),
+      instanceOf(TableDropper.class));
+  }
+
+  @Test
+  public void shouldReturnRecoverPartitionObjectForTableObjectOnRecover(){
+    assertThat(recover(new Table(new Database("DatabaseName"), "TableName")),
+      instanceOf(RecoverPartition.class));
+  }
+
+  @Test
+  public void shouldReturnTableDropperObjectForTableObjectOnCreate(){
     assertThat(create(new Table(new Database("DatabaseName"), "TableName")),
       instanceOf(TableCreator.class));
   }

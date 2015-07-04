@@ -4,6 +4,7 @@ import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.ddl.drop.TableDropper;
+import com.workerbee.ddl.misc.RecoverPartition;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
@@ -27,6 +28,10 @@ public class QueryGenerator {
 
   public static TableDropper drop(Table table) {
     return new TableDropper(table);
+  }
+
+  public static RecoverPartition recover(Table table) {
+    return new RecoverPartition(table);
   }
 
   public static SelectQuery select(SelectFunction... selectFunctions) {
