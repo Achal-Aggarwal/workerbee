@@ -2,6 +2,7 @@ package com.workerbee;
 
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
+import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
@@ -13,6 +14,9 @@ import java.util.List;
 public class QueryGenerator {
   public static DatabaseCreator create(Database database){
     return new DatabaseCreator(database);
+  }
+  public static DatabaseDropper drop(Database database) {
+    return new DatabaseDropper(database);
   }
 
   public static TableCreator create(Table table){

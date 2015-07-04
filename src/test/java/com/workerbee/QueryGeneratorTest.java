@@ -2,14 +2,13 @@ package com.workerbee;
 
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
+import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
 import org.junit.Test;
 
 import static com.workerbee.Column.Type.STRING;
-import static com.workerbee.QueryGenerator.create;
-import static com.workerbee.QueryGenerator.insert;
-import static com.workerbee.QueryGenerator.select;
+import static com.workerbee.QueryGenerator.*;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -20,6 +19,11 @@ public class QueryGeneratorTest {
   @Test
   public void shouldReturnDatabaseCreatorObjectForDatabaseObjectOnCreate(){
     assertThat(create(new Database("DatabaseName")), instanceOf(DatabaseCreator.class));
+  }
+
+  @Test
+  public void shouldReturnDatabaseDropperObjectForDatabaseObjectOnDrop(){
+    assertThat(drop(new Database("DatabaseName")), instanceOf(DatabaseDropper.class));
   }
 
   @Test
