@@ -18,10 +18,7 @@ public class RowTest {
   private final Column column = new Column(null, "COLUMN_NAME", INT);
   @Before
   public void setup(){
-    HashMap<Column, Object> columnValueMap = new HashMap<Column, Object>() {{
-      put(column, INT_VALUE);
-    }};
-    row = new Row(columnValueMap);
+    row = new Row<Table>(new Table("TABLE_NAME").havingColumn(column), "1");
   }
 
   @Test

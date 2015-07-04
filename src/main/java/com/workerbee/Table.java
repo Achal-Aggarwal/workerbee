@@ -5,8 +5,6 @@ import org.apache.hadoop.io.Text;
 import java.util.*;
 
 public class Table {
-  private String columnSeparator = "\1";
-  private String hiveNull = "\\N";
 
   private  Database database;
 
@@ -104,10 +102,6 @@ public class Table {
     return partitionedOn;
   }
 
-  public Row getNewRow(){
-    return parseRecordUsing("");
-  }
-
   public String getDatabaseName(){
     return database.getName();
   }
@@ -141,27 +135,19 @@ public class Table {
   }
 
   public String getHiveNull() {
-    return hiveNull;
+    return "\\N";
   }
 
   public String getColumnSeparator() {
-    return columnSeparator;
+    return "\1";
+  }
+
+  public Row getNewRow(){
+    return parseRecordUsing("");
   }
 
   public Row parseRecordUsing(String record) {
-    Map<Column, Object> map = new HashMap<Column, Object>(columns.size());
-    RecordParser recordParser = new RecordParser(record, columnSeparator, hiveNull);
-    int index = 0;
-
-    for (Column column : columns) {
-      map.put(column, column.parseValueUsing(recordParser, index++));
-    }
-
-    for (Column column : partitionedOn) {
-      map.put(column, column.parseValueUsing(recordParser, index++));
-    }
-
-    return new Row(map);
+    return new Row<Table>(this, record);
   }
 
   public Row parseTextRecordUsing(Text record) {
@@ -169,23 +155,7 @@ public class Table {
   }
 
   public String generateRecordFor(Row row) {
-    StringBuilder result = new StringBuilder();
-
-    for (Column column : columns) {
-      Object value = row.get(column);
-      result.append(value == null ? hiveNull : value.toString());
-      result.append(columnSeparator);
-    }
-
-    for (Column column : partitionedOn) {
-      Object value = row.get(column);
-      result.append(value == null ? hiveNull : value.toString());
-      result.append(columnSeparator);
-    }
-
-    result.delete(result.lastIndexOf(columnSeparator), result.length());
-
-    return result.toString();
+    return Row.generateRecordFor(this, row);
   }
 
   public Text generateTextRecordFor(Row row) {
