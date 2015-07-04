@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Achal-Aggarwal/workerbee.svg?branch=master)](https://travis-ci.org/Achal-Aggarwal/workerbee)
 # workerbee
 A worker bee for your hive.
 
