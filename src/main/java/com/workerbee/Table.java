@@ -1,5 +1,7 @@
 package com.workerbee;
 
+import org.apache.hadoop.io.Text;
+
 import java.util.*;
 
 public class Table {
@@ -137,6 +139,7 @@ public class Table {
   public boolean isNotTemporary() {
     return database != null;
   }
+
   public String getHiveNull() {
     return hiveNull;
   }
@@ -161,6 +164,10 @@ public class Table {
     return new Row(map);
   }
 
+  public Row parseTextRecordUsing(Text record) {
+    return parseRecordUsing(record.toString());
+  }
+
   public String generateRecordFor(Row row) {
     StringBuilder result = new StringBuilder();
 
@@ -179,5 +186,9 @@ public class Table {
     result.delete(result.lastIndexOf(columnSeparator), result.length());
 
     return result.toString();
+  }
+
+  public Text generateTextRecordFor(Row row) {
+    return new Text(generateRecordFor(row));
   }
 }

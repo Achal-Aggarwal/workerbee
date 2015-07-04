@@ -13,6 +13,14 @@ public class Row {
     return map.get(column);
   }
 
+  public String getString(Column column) {
+    return (String) get(column);
+  }
+
+  public Integer getInt(Column column) {
+    return (Integer) get(column);
+  }
+
   public Row set(Column column, Object value) {
     if (map.containsKey(column)){
       map.put(column, value);

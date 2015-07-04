@@ -43,19 +43,23 @@ public class DatabaseCreator implements Query {
     }
 
     if(!database.getProperties().isEmpty()){
-      result.append(" WITH DBPROPERTIES ( ");
-      List<String> keyValues = new ArrayList<String>(database.getProperties().size());
-
-      for (String property : database.getProperties()) {
-        keyValues.add(quoteString(property) + " = " + quoteString(database.getProperty(property)));
-      }
-
-      result.append(Utils.joinList(keyValues, ", "));
-      result.append(" )");
+      tablePropertiesPart(result);
     }
 
     result.append(" ;");
 
     return result.toString();
+  }
+
+  private void tablePropertiesPart(StringBuilder result) {
+    result.append(" WITH DBPROPERTIES ( ");
+    List<String> keyValues = new ArrayList<String>(database.getProperties().size());
+
+    for (String property : database.getProperties()) {
+      keyValues.add(quoteString(property) + " = " + quoteString(database.getProperty(property)));
+    }
+
+    result.append(Utils.joinList(keyValues, ", "));
+    result.append(" )");
   }
 }

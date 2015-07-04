@@ -81,10 +81,7 @@ public class SelectQuery implements Query {
     result.append("SELECT");
 
     if (!selectFunctions.isEmpty()){
-      for (SelectFunction selectFunction : selectFunctions) {
-        result.append(" " + selectFunction.generate() + ",");
-      }
-      result.delete(result.lastIndexOf(","), result.length());
+      selectFuncPart(result);
     }
 
     result.append(" FROM ");
@@ -92,12 +89,7 @@ public class SelectQuery implements Query {
     result.append(Utils.fqTableName(table));
 
     if (joinTable != null && onBooleanExpression != null){
-      result.append(" JOIN ");
-
-      result.append(Utils.fqTableName(joinTable));
-
-      result.append(" ON ");
-      result.append(onBooleanExpression.generate());
+      joinTablePart(result);
     }
 
     if (alias != null){
@@ -105,14 +97,7 @@ public class SelectQuery implements Query {
     }
 
     if (!orderBy.isEmpty()){
-      result.append(" ORDER BY ");
-
-      List<String> orderByColumns = new ArrayList<String>(orderBy.size());
-      for (ColumnOrder columnOrder : orderBy) {
-        orderByColumns.add(columnOrder.column.getFqColumnName() + " " + columnOrder.order);
-      }
-
-      result.append(Utils.joinList(orderByColumns, ", "));
+      orderByPart(result);
     }
 
     if (limit != null){
@@ -122,6 +107,33 @@ public class SelectQuery implements Query {
     result.append(" ;");
 
     return result.toString();
+  }
+
+  private void selectFuncPart(StringBuilder result) {
+    for (SelectFunction selectFunction : selectFunctions) {
+      result.append(" " + selectFunction.generate() + ",");
+    }
+    result.delete(result.lastIndexOf(","), result.length());
+  }
+
+  private void joinTablePart(StringBuilder result) {
+    result.append(" JOIN ");
+
+    result.append(Utils.fqTableName(joinTable));
+
+    result.append(" ON ");
+    result.append(onBooleanExpression.generate());
+  }
+
+  private void orderByPart(StringBuilder result) {
+    result.append(" ORDER BY ");
+
+    List<String> orderByColumns = new ArrayList<String>(orderBy.size());
+    for (ColumnOrder columnOrder : orderBy) {
+      orderByColumns.add(columnOrder.column.getFqColumnName() + " " + columnOrder.order);
+    }
+
+    result.append(Utils.joinList(orderByColumns, ", "));
   }
 
   private class ColumnOrder {

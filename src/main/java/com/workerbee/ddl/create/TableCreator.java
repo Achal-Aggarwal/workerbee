@@ -49,15 +49,7 @@ public class TableCreator implements Query {
     result.append(table.getName());
 
     if (!table.getColumns().isEmpty()){
-      result.append(" ( ");
-      List<String> columnsDef = new ArrayList<String>(table.getColumns().size());
-
-      for (Column column : table.getColumns()) {
-        columnsDef.add(column.getName() + " " + column.getType());
-      }
-
-      result.append(joinList(columnsDef, ", "));
-      result.append(" )");
+      columnDefPart(result);
     }
 
     if (table.getComment() != null){
@@ -65,15 +57,7 @@ public class TableCreator implements Query {
     }
 
     if (!table.getPartitions().isEmpty()){
-      result.append(" PARTITIONED BY ( ");
-      List<String> columnsDef = new ArrayList<String>(table.getPartitions().size());
-
-      for (Column column : table.getPartitions()) {
-        columnsDef.add(column.getName() + " " + column.getType());
-      }
-
-      result.append(joinList(columnsDef, ", "));
-      result.append(" )");
+      partitionedByPart(result);
     }
 
     if(table.getLocation() != null){
@@ -81,16 +65,44 @@ public class TableCreator implements Query {
     }
 
     if(!table.getProperties().isEmpty()){
-      result.append(" TBLPROPERTIES ( ");
-      for (String property : table.getProperties()) {
-        result.append(quoteString(property) + " = " + quoteString(table.getProperty(property)) + ", ");
-      }
-      result.delete(result.lastIndexOf(", "), result.length());
-      result.append(" )");
+      tablePropertiesPart(result);
     }
 
     result.append(" ;");
 
     return result.toString();
+  }
+
+  private void tablePropertiesPart(StringBuilder result) {
+    result.append(" TBLPROPERTIES ( ");
+    for (String property : table.getProperties()) {
+      result.append(quoteString(property) + " = " + quoteString(table.getProperty(property)) + ", ");
+    }
+    result.delete(result.lastIndexOf(", "), result.length());
+    result.append(" )");
+  }
+
+  private void partitionedByPart(StringBuilder result) {
+    result.append(" PARTITIONED BY ( ");
+    List<String> columnsDef = new ArrayList<String>(table.getPartitions().size());
+
+    for (Column column : table.getPartitions()) {
+      columnsDef.add(column.getName() + " " + column.getType());
+    }
+
+    result.append(joinList(columnsDef, ", "));
+    result.append(" )");
+  }
+
+  private void columnDefPart(StringBuilder result) {
+    result.append(" ( ");
+    List<String> columnsDef = new ArrayList<String>(table.getColumns().size());
+
+    for (Column column : table.getColumns()) {
+      columnsDef.add(column.getName() + " " + column.getType());
+    }
+
+    result.append(joinList(columnsDef, ", "));
+    result.append(" )");
   }
 }

@@ -64,28 +64,32 @@ public class InsertQuery implements Query {
     result.append(" TABLE " + table.getName());
 
     if (!partitionMap.isEmpty()){
-      result.append(" PARTITION ( ");
-      List<String> columnsDef = new ArrayList<String>(partitionMap.size());
-
-      for (Column column : partitionMap.keySet()) {
-        String def = column.getName();
-        Object value = partitionMap.get(column);
-
-        if (value instanceof String){
-          def += " = " + Utils.quoteString((String) partitionMap.get(column));
-        } else if(value != null) {
-          def += " = " + partitionMap.get(column);
-        }
-
-        columnsDef.add(def);
-      }
-
-      result.append(joinList(columnsDef, ", "));
-      result.append(" )");
+      partitionPart(result);
     }
 
     result.append(" " + selectQuery.generate());
 
     return result.toString();
+  }
+
+  private void partitionPart(StringBuilder result) {
+    result.append(" PARTITION ( ");
+    List<String> columnsDef = new ArrayList<String>(partitionMap.size());
+
+    for (Column column : partitionMap.keySet()) {
+      String def = column.getName();
+      Object value = partitionMap.get(column);
+
+      if (value instanceof String){
+        def += " = " + Utils.quoteString((String) partitionMap.get(column));
+      } else if(value != null) {
+        def += " = " + partitionMap.get(column);
+      }
+
+      columnsDef.add(def);
+    }
+
+    result.append(joinList(columnsDef, ", "));
+    result.append(" )");
   }
 }
