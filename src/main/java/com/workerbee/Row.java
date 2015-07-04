@@ -62,6 +62,9 @@ public class Row<T extends Table> {
   public String generateRecord() {
     return Row.generateRecordFor(table, this);
   }
+  public Text generateTextRecord() {
+    return new Text(Row.generateRecordFor(table, this));
+  }
 
   public static String generateRecordFor(Table table, Row row) {
     StringBuilder result = new StringBuilder();
