@@ -21,9 +21,13 @@ public class Row {
     return (Integer) get(column);
   }
 
+  public Float getFloat(Column column) {
+    return (Float) get(column);
+  }
+
   public Row set(Column column, Object value) {
     if (map.containsKey(column)){
-      map.put(column, value);
+      map.put(column, column.convert(value));
     }
 
     return this;

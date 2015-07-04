@@ -113,7 +113,7 @@ public class TableTest {
   }
 
   @Test
-  public void shouldParseRecordAndReturnCorrespondingRowOfTable(){
+  public void shouldParseRecordAndReturnCorrespondingRowOfTable() {
     Column integer = new Column(table, "INT_COLUMN_NAME", INT);
     Column string = new Column(table, "STRING_COLUMN_NAME", STRING);
 

@@ -4,6 +4,7 @@ package com.workerbee;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 
 public class RecordParser {
@@ -28,6 +29,11 @@ public class RecordParser {
   public String readString(int index) {
     String value = at(index);
     return isValid(value) ? value : null;
+  }
+
+  public Object readFloat(int index) {
+    String value = at(index);
+    return isValid(value) ?  parseFloat(value): null;
   }
 
   private String at(int index) {

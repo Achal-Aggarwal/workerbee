@@ -7,23 +7,44 @@ public class Column extends com.workerbee.expression.Comparable {
       public Object parseValue(RecordParser recordParser, int index) {
         return recordParser.readInt(index);
       }
+
+      @Override
+      public Integer convert(Object value) {
+        return value == null ? null : Integer.parseInt(String.valueOf(value));
+      }
+    },
+    FLOAT {
+      @Override
+      public Object parseValue(RecordParser recordParser, int index) {
+        return recordParser.readFloat(index);
+      }
+
+      @Override
+      public Float convert(Object value) {
+        return value == null ? null : Float.valueOf(String.valueOf(value));
+      }
     },
     STRING {
       @Override
       public Object parseValue(RecordParser recordParser, int index) {
         return recordParser.readString(index);
       }
+
+      @Override
+      public String convert(Object value) {
+        return value == null ? null : (String) value;
+      }
     };
 
     public abstract Object parseValue(RecordParser rowParser, int index);
 
+    public abstract Object convert(Object value);
   }
-
   private final String name;
+
   private final Type type;
   private final String comment;
   private final Table belongsTo;
-
   public Column(Table belongsTo, String name, Type type) {
     this(belongsTo, name, type, null);
   }
@@ -52,7 +73,17 @@ public class Column extends com.workerbee.expression.Comparable {
   }
 
   public Object parseValueUsing(RecordParser recordParser, int index) {
-    return type.parseValue(recordParser, index);
+    try{
+      return type.parseValue(recordParser, index);
+    } catch (NumberFormatException nfe){
+      throw new RuntimeException(
+        "Couldn't parse value '" + recordParser.readString(index) + "' for "
+          + getFqColumnName() + " of type '" + type + "'.");
+    }
+  }
+
+  public Object convert(Object value) {
+    return type.convert(value);
   }
 
   @Override

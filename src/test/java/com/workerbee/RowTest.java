@@ -37,7 +37,7 @@ public class RowTest {
   @Test
   public void shouldSetValueOfAnExistingColumnInTheRow(){
     assertThat(row.set(column, ANOTHER_INT_VALUE), is(row));
-    assertThat((Integer) row.get(column), is(ANOTHER_INT_VALUE));
+    assertThat(row.getInt(column), is(ANOTHER_INT_VALUE));
   }
 
   @Test
