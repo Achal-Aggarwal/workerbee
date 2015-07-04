@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.HashMap;
 
 import static com.workerbee.Column.Type.INT;
+import static com.workerbee.Column.Type.STRING;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
@@ -38,9 +39,17 @@ public class RowTest {
   }
 
   @Test
-  public void shouldNotSetValueOfNonExistingColumnInTheRow(){
-    final Column anotherColumn = new Column(null, "COLUMN_NAME", INT);
-    assertThat(row.set(anotherColumn, ANOTHER_INT_VALUE), is(row));
-    assertThat(row.get(anotherColumn), nullValue());
+  public void shouldNotSetValueOfColumnWithDifferentCombinationOfNameAndTypeInTheRow(){
+    final Column differentTypeColumn = new Column(null, "COLUMN_NAME", STRING);
+    row.set(differentTypeColumn, "SOME_STRING_VALUE");
+    assertThat(row.get(differentTypeColumn), nullValue());
+
+    final Column differentNameColumn = new Column(null, "COLUMN_NAME_", INT);
+    row.set(differentNameColumn, ANOTHER_INT_VALUE);
+    assertThat(row.get(differentNameColumn), nullValue());
+
+    final Column sameNameAndTypeColumn = new Column(null, "COLUMN_NAME", INT);
+    row.set(sameNameAndTypeColumn, ANOTHER_INT_VALUE);
+    assertThat(row.getInt(sameNameAndTypeColumn), is(ANOTHER_INT_VALUE));
   }
 }

@@ -18,7 +18,7 @@ public class InsertQuery implements Query {
   public static final boolean DONT_OVERWRITE = false;
 
   private boolean overwrite;
-  private Table table;
+  private Table<? extends Table> table;
   private SelectQuery selectQuery;
   private Map<Column, Object> partitionMap;
 
@@ -26,7 +26,7 @@ public class InsertQuery implements Query {
     this.overwrite = overwrite;
   }
 
-  public InsertQuery intoTable(Table table) {
+  public InsertQuery intoTable(Table<? extends Table> table) {
     this.table = table;
     partitionMap = new HashMap<Column, Object>(table.getPartitions().size());
     for (Column column : table.getPartitions()) {

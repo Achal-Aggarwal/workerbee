@@ -4,8 +4,7 @@ import org.apache.hadoop.io.Text;
 
 import java.util.*;
 
-public class Table {
-
+public class Table<T extends Table> {
   private  Database database;
 
   private String name;
@@ -142,23 +141,23 @@ public class Table {
     return "\1";
   }
 
-  public Row getNewRow(){
+  public Row<T> getNewRow(){
     return parseRecordUsing("");
   }
 
-  public Row parseRecordUsing(String record) {
-    return new Row<Table>(this, record);
+  public Row<T> parseRecordUsing(String record) {
+    return new Row<T>(this, record);
   }
 
-  public Row parseTextRecordUsing(Text record) {
+  public Row<T> parseTextRecordUsing(Text record) {
     return parseRecordUsing(record.toString());
   }
 
-  public String generateRecordFor(Row row) {
+  public String generateRecordFor(Row<T> row) {
     return Row.generateRecordFor(this, row);
   }
 
-  public Text generateTextRecordFor(Row row) {
+  public Text generateTextRecordFor(Row<T> row) {
     return new Text(generateRecordFor(row));
   }
 }

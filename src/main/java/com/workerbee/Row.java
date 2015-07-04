@@ -9,17 +9,17 @@ public class Row<T extends Table> {
   private Map<Column, Object> map;
   private Table table;
 
-  protected Row(T table, String record){
+  protected Row(Table<T> table, String record){
     this.table = table;
     this.map = parseRecordUsing(table, record);
   }
 
-  protected Row(T table, Text record){
+  protected Row(Table<T> table, Text record){
     this.table = table;
     this.map = parseRecordUsing(table, record.toString());
   }
 
-  private static Map<Column, Object> parseRecordUsing(Table table, String record) {
+  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
     Map<Column, Object> map = new HashMap<Column, Object>(table.getColumns().size());
     RecordParser recordParser = new RecordParser(record, table.getColumnSeparator(), table.getHiveNull());
     int index = 0;
@@ -62,11 +62,12 @@ public class Row<T extends Table> {
   public String generateRecord() {
     return Row.generateRecordFor(table, this);
   }
+
   public Text generateTextRecord() {
     return new Text(Row.generateRecordFor(table, this));
   }
 
-  public static String generateRecordFor(Table table, Row row) {
+  public static String generateRecordFor(Table<? extends Table> table, Row row) {
     StringBuilder result = new StringBuilder();
 
     for (Column column : table.getColumns()) {

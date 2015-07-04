@@ -12,10 +12,10 @@ import static com.workerbee.Utils.joinList;
 import static com.workerbee.Utils.quoteString;
 
 public class TableCreator implements Query {
-  Table table;
+  Table<? extends Table> table;
   boolean overwrite = true;
 
-  public TableCreator(Table table) {
+  public TableCreator(Table<? extends Table> table) {
     this.table = table;
   }
 

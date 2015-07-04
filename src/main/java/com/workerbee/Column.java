@@ -1,5 +1,7 @@
 package com.workerbee;
 
+import java.util.Objects;
+
 public class Column extends com.workerbee.expression.Comparable {
   public static enum Type {
     INT {
@@ -89,5 +91,21 @@ public class Column extends com.workerbee.expression.Comparable {
   @Override
   public String operandName() {
     return getFqColumnName();
+  }
+
+  @Override
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Column)){
+      return false;
+    }
+
+    Column column = (Column) obj;
+
+    return getName().equals(column.getName()) && getType() == column.getType();
   }
 }
