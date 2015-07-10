@@ -9,14 +9,17 @@ public class Row<T extends Table> {
   private Map<Column, Object> map;
   private Table table;
 
-  protected Row(Table<T> table, String record){
+  public Row(Table<T> table, String record){
     this.table = table;
     this.map = parseRecordUsing(table, record);
   }
 
-  protected Row(Table<T> table, Text record){
-    this.table = table;
-    this.map = parseRecordUsing(table, record.toString());
+  public Row(Table<T> table, Text record){
+    this(table, record.toString());
+  }
+
+  public Row(Table<T> table){
+    this(table, "");
   }
 
   private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
@@ -51,7 +54,7 @@ public class Row<T extends Table> {
     return (Float) get(column);
   }
 
-  public Row set(Column column, Object value) {
+  public Row<T> set(Column column, Object value) {
     if (map.containsKey(column)){
       map.put(column, column.convert(value));
     }
