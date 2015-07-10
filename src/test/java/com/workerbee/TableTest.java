@@ -26,7 +26,7 @@ public class TableTest {
   public static final boolean EMPTY = true;
   public static final boolean NOT_EMPTY = false;
 
-  private Table<? extends Table> table;
+  private Table table;
 
   @Before
   public void setup(){
