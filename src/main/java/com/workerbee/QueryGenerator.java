@@ -4,6 +4,7 @@ import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.ddl.drop.TableDropper;
+import com.workerbee.ddl.misc.LoadData;
 import com.workerbee.ddl.misc.RecoverPartition;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
@@ -54,5 +55,9 @@ public class QueryGenerator {
 
   public static InsertQuery insert(boolean overwrite) {
     return new InsertQuery(overwrite);
+  }
+
+  public static LoadData loadData() {
+    return new LoadData();
   }
 }

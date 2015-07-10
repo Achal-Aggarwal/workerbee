@@ -4,6 +4,7 @@ import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.ddl.drop.TableDropper;
+import com.workerbee.ddl.misc.LoadData;
 import com.workerbee.ddl.misc.RecoverPartition;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
@@ -19,42 +20,55 @@ public class QueryGeneratorTest {
   public static final String COLUMN_NAME = "COLUMN_NAME";
 
   @Test
-  public void shouldReturnDatabaseCreatorObjectForDatabaseObjectOnCreate(){
+  public void shouldReturnDatabaseCreatorObjectForDatabaseObjectOnCreate() {
     assertThat(create(new Database("DatabaseName")), instanceOf(DatabaseCreator.class));
   }
 
   @Test
-  public void shouldReturnDatabaseDropperObjectForDatabaseObjectOnDrop(){
+  public void shouldReturnDatabaseDropperObjectForDatabaseObjectOnDrop() {
     assertThat(drop(new Database("DatabaseName")), instanceOf(DatabaseDropper.class));
   }
 
   @Test
-  public void shouldReturnTableCreatorObjectForTableObjectOnCreate(){
-    assertThat(drop(new Table(new Database("DatabaseName"), "TableName")),
-      instanceOf(TableDropper.class));
+  public void shouldReturnTableCreatorObjectForTableObjectOnCreate() {
+    assertThat(
+      drop(new Table(new Database("DatabaseName"), "TableName")),
+      instanceOf(TableDropper.class)
+    );
   }
 
   @Test
-  public void shouldReturnRecoverPartitionObjectForTableObjectOnRecover(){
-    assertThat(recover(new Table(new Database("DatabaseName"), "TableName")),
-      instanceOf(RecoverPartition.class));
+  public void shouldReturnRecoverPartitionObjectForTableObjectOnRecover() {
+    assertThat(
+      recover(new Table(new Database("DatabaseName"), "TableName")),
+      instanceOf(RecoverPartition.class)
+    );
   }
 
   @Test
-  public void shouldReturnTableDropperObjectForTableObjectOnCreate(){
-    assertThat(create(new Table(new Database("DatabaseName"), "TableName")),
-      instanceOf(TableCreator.class));
+  public void shouldReturnTableDropperObjectForTableObjectOnCreate() {
+    assertThat(
+      create(new Table(new Database("DatabaseName"), "TableName")),
+      instanceOf(TableCreator.class)
+    );
   }
 
   @Test
-  public void shouldReturnSelectQueryObjectForSelectQuery(){
-    assertThat(select(new Column(null, COLUMN_NAME, STRING)),
-      instanceOf(SelectQuery.class));
+  public void shouldReturnSelectQueryObjectForSelectQuery() {
+    assertThat(
+      select(new Column(null, COLUMN_NAME, STRING)),
+      instanceOf(SelectQuery.class)
+    );
   }
 
   @Test
-  public void shouldReturnInsertQueryObjectForInsertQuery(){
+  public void shouldReturnInsertQueryObjectForInsertQuery() {
     assertThat(insert(), instanceOf(InsertQuery.class));
     assertThat(insert(InsertQuery.OVERWRITE), instanceOf(InsertQuery.class));
+  }
+
+  @Test
+  public void shouldReturnLoadDataObjectForLoadDataQuery() {
+    assertThat(loadData(), instanceOf(LoadData.class));
   }
 }
