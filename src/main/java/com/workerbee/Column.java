@@ -1,7 +1,5 @@
 package com.workerbee;
 
-import java.util.Objects;
-
 public class Column extends com.workerbee.expression.Comparable {
   public static enum Type {
     INT {
