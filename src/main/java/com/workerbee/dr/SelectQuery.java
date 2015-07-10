@@ -27,7 +27,11 @@ public class SelectQuery implements Query {
 
   public SelectQuery from(Table table){
     this.table = table;
-    as(table.getDatabaseName() + "_" + table.getName());
+
+    as(table.isNotTemporary()
+      ? table.getDatabaseName() + "_" + table.getName()
+      : "_" + table.getName()
+    );
 
     return this;
   }
