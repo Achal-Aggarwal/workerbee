@@ -19,6 +19,7 @@ public class TableCreatorTest {
   public static final String PROP_VALUE = "PROP_VALUE";
   public static final String PROP_KEY = "PROP_KEY";
   public static final String COLUMN_NAME = "COLUMN_NAME";
+  public static final String NEW_DATABASE_NAME = "NEW_DATABASE_NAME";
 
   Table table;
 
@@ -93,6 +94,13 @@ public class TableCreatorTest {
       "CREATE TABLE " + DATABASE_NAME + "." + TABLE_NAME + " PARTITIONED BY ( "
         + COLUMN_NAME + " " + STRING
         + " ) ;"
+    ));
+  }
+
+  @Test
+  public void shouldAllowToCreateTableInDifferentDatabase(){
+    assertThat(create(table).inDatabase(new Database(NEW_DATABASE_NAME)).generate(), is(
+      "CREATE TABLE " + NEW_DATABASE_NAME + "." + TABLE_NAME + " ;"
     ));
   }
 }

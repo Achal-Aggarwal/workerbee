@@ -57,7 +57,8 @@ public class TableTest {
   @Test
   public void shouldAddPropertyToTable(){
     table.havingProperty(PROP_KEY, PROP_VALUE);
-    assertThat(table.getProperties(), contains(PROP_KEY));
+    assertThat(table.getProperties().size(), is(1));
+    assertThat(table.getProperties().contains(PROP_KEY), is(true));
     assertThat(table.getProperty(PROP_KEY), is(PROP_VALUE));
   }
 
@@ -101,7 +102,8 @@ public class TableTest {
   public void shouldAddGivenColumnToTable(){
     Column column = new Column(table, COLUMN_NAME, STRING);
     table.havingColumn(column);
-    assertThat(table.getColumns(), contains(column));
+    assertThat(table.getColumns().size(), is(1));
+    assertThat(table.getColumns().contains(column), is(true));
   }
 
   @Test

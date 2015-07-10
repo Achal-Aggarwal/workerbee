@@ -1,9 +1,9 @@
 package com.workerbee.ddl.create;
 
 import com.workerbee.Column;
-import com.workerbee.Table;
+import com.workerbee.Database;
 import com.workerbee.Query;
-import com.workerbee.Utils;
+import com.workerbee.Table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ import static com.workerbee.Utils.quoteString;
 public class TableCreator implements Query {
   Table<? extends Table> table;
   boolean overwrite = true;
+  private Database database;
 
   public TableCreator(Table<? extends Table> table) {
     this.table = table;
@@ -21,6 +22,12 @@ public class TableCreator implements Query {
 
   public TableCreator ifNotExist(){
     overwrite = false;
+    return this;
+  }
+
+  public TableCreator inDatabase(Database database) {
+    this.database = database;
+
     return this;
   }
 
@@ -42,7 +49,10 @@ public class TableCreator implements Query {
 
     result.append(" ");
 
-    if (table.isNotTemporary()){
+    if (database != null) {
+      result.append(database.getName() + ".");
+    }
+    else if (table.isNotTemporary()){
       result.append(table.getDatabaseName() + ".");
     }
 
