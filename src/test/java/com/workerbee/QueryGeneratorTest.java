@@ -62,12 +62,6 @@ public class QueryGeneratorTest {
   }
 
   @Test
-  public void shouldReturnInsertQueryObjectForInsertQuery() {
-    assertThat(insert(), instanceOf(InsertQuery.class));
-    assertThat(insert(InsertQuery.OVERWRITE), instanceOf(InsertQuery.class));
-  }
-
-  @Test
   public void shouldReturnLoadDataObjectForLoadDataQuery() {
     assertThat(loadData(), instanceOf(LoadData.class));
   }

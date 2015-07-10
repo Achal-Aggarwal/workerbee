@@ -50,11 +50,7 @@ public class QueryGenerator {
   }
 
   public static InsertQuery insert() {
-    return new InsertQuery(InsertQuery.DONT_OVERWRITE);
-  }
-
-  public static InsertQuery insert(boolean overwrite) {
-    return new InsertQuery(overwrite);
+    return new InsertQuery();
   }
 
   public static LoadData loadData() {

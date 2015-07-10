@@ -14,21 +14,15 @@ import java.util.Map;
 import static com.workerbee.Utils.joinList;
 
 public class InsertQuery implements Query {
-  public static final boolean OVERWRITE = true;
-  public static final boolean DONT_OVERWRITE = false;
-
-  private boolean overwrite;
+  private boolean overwrite = false;
   private Table<? extends Table> table;
   private SelectQuery selectQuery;
   private Map<Column, Object> partitionMap;
 
-  public InsertQuery(boolean overwrite) {
-    this.overwrite = overwrite;
-  }
-
   public InsertQuery intoTable(Table<? extends Table> table) {
     this.table = table;
-    partitionMap = new HashMap<Column, Object>(table.getPartitions().size());
+
+    partitionMap = new HashMap<>(table.getPartitions().size());
     for (Column column : table.getPartitions()) {
       partitionMap.put(column, null);
     }
@@ -38,6 +32,11 @@ public class InsertQuery implements Query {
 
   public InsertQuery using(SelectQuery selectQuery) {
     this.selectQuery = selectQuery;
+    return this;
+  }
+
+  public InsertQuery overwrite() {
+    overwrite = true;
     return this;
   }
 
@@ -61,7 +60,13 @@ public class InsertQuery implements Query {
       result.append(" INTO");
     }
 
-    result.append(" TABLE " + table.getName());
+    result.append(" TABLE ");
+
+    if (table.isNotTemporary()){
+      result.append(table.getDatabaseName() + ".");
+    }
+
+    result.append(table.getName());
 
     if (!partitionMap.isEmpty()){
       partitionPart(result);
@@ -74,7 +79,7 @@ public class InsertQuery implements Query {
 
   private void partitionPart(StringBuilder result) {
     result.append(" PARTITION ( ");
-    List<String> columnsDef = new ArrayList<String>(partitionMap.size());
+    List<String> columnsDef = new ArrayList<>(partitionMap.size());
 
     for (Column column : partitionMap.keySet()) {
       String def = column.getName();

@@ -7,12 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.workerbee.Column.Type.STRING;
-import static com.workerbee.QueryGenerator.*;
-import static com.workerbee.dml.insert.InsertQuery.DONT_OVERWRITE;
-import static com.workerbee.dml.insert.InsertQuery.OVERWRITE;
+import static com.workerbee.QueryGenerator.select;
 import static com.workerbee.dr.SelectFunctionGenerator.star;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class InsertQueryTest {
   public static final String TABLE_NAME = "TABLE_NAME";
@@ -29,7 +27,7 @@ public class InsertQueryTest {
   @Test
   public void shouldGenerateInsertQueryForInsertingIntoUnPartitionedTable(){
     assertThat(
-      new InsertQuery(DONT_OVERWRITE).intoTable(table).using(selectQuery).generate(),
+      new InsertQuery().intoTable(table).using(selectQuery).generate(),
       is("INSERT INTO TABLE " + TABLE_NAME + " " + selectQuery.generate())
     );
   }
@@ -37,7 +35,7 @@ public class InsertQueryTest {
   @Test
   public void shouldGenerateInsertQueryForOverwritingIntoUnPartitionedTable(){
     assertThat(
-      new InsertQuery(OVERWRITE).intoTable(table).using(selectQuery).generate(),
+      new InsertQuery().overwrite().intoTable(table).using(selectQuery).generate(),
       is("INSERT OVERWRITE TABLE " + TABLE_NAME + " " + selectQuery.generate())
     );
   }
@@ -48,12 +46,12 @@ public class InsertQueryTest {
     table.partitionedOnColumn(column);
 
     assertThat(
-      new InsertQuery(DONT_OVERWRITE).intoTable(table).using(selectQuery).generate(),
+      new InsertQuery().intoTable(table).using(selectQuery).generate(),
       is("INSERT INTO TABLE " + TABLE_NAME + " PARTITION ( " + COLUMN_NAME + " ) " + selectQuery.generate())
     );
 
     assertThat(
-      new InsertQuery(DONT_OVERWRITE).intoTable(table).partitionOn(column, "VALUE").using(selectQuery).generate(),
+      new InsertQuery().intoTable(table).partitionOn(column, "VALUE").using(selectQuery).generate(),
       is("INSERT INTO TABLE " + TABLE_NAME
         + " PARTITION ( " + COLUMN_NAME + " = 'VALUE' ) "
         + selectQuery.generate())
