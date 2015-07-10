@@ -1,8 +1,19 @@
 package com.workerbee;
 
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class Utils {
+  private static final String SILENT = "--silent";
+  private static final String VERBOSE = "--verbose";
+  private static final String QUERY_FILENAME = "-f";
+  private static final String HIVE_CLI_BIN_NAME = "hive";
+  private static final String HIVECONF = "-hiveconf";
+
   public static String escapeQuote(String string){
     return string.replaceAll("'","''");
   }
@@ -41,11 +52,79 @@ public class Utils {
     StringBuilder result = new StringBuilder();
 
     for (Object o : list) {
+      if (o == null)
+        continue;
       result.append(o.toString() + separator);
     }
 
     result.delete(result.lastIndexOf(separator), result.length());
 
     return result.toString();
+  }
+
+  public static int execHiveCLI(
+    final Path queryFile, final Map<String, String> hiveConf, Logger LOGGER
+  )
+    throws IOException, InterruptedException
+  {
+    List<String> commands = makeHiveCLICommand(
+      new HashMap<String, String>() {{
+        put(QUERY_FILENAME, queryFile.toAbsolutePath().toString());
+      }}, hiveConf
+    );
+
+    return execCommand(commands, LOGGER
+    );
+  }
+
+  private static List<String> makeHiveCLICommand(Map<String, String> config, final Map<String, String> hiveConf){
+    List<String> result = new ArrayList<>();
+
+    result.add(HIVE_CLI_BIN_NAME);
+
+    for (String hiveVar : hiveConf.keySet()) {
+      result.add(HIVECONF);
+      result.add(hiveVar + "=" + hiveConf.get(hiveVar));
+    }
+
+    result.add(getConfig(config, QUERY_FILENAME, false));
+
+    result.add(getConfig(config, SILENT, true));
+    result.add(getConfig(config, VERBOSE, true));
+
+    return result;
+  }
+
+  private static String getConfig(Map<String, String> config, final String property, boolean isBoolean){
+    if (config.containsKey(property)){
+      return isBoolean ? property : property + config.get(property);
+    }
+
+    return "";
+  }
+
+  private static int execCommand(List<String> commands, Logger LOGGER) throws InterruptedException, IOException {
+    String command = joinList(commands, " ");
+    LOGGER.info("Running command : " + command);
+
+    Process p = new ProcessBuilder(commands).start();
+    p.waitFor();
+
+    BufferedReader reader =
+      new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+    String line = reader.readLine();
+    while (line != null) {
+      LOGGER.info(line);
+      line = reader.readLine();
+    }
+
+    return p.exitValue();
+  }
+
+  private static Random random = new Random();
+
+  public static int getRandomPositiveNumber() {
+    return (random.nextInt() & Integer.MAX_VALUE);
   }
 }

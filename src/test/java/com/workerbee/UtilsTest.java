@@ -9,9 +9,7 @@ import static com.workerbee.Utils.*;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-
 public class UtilsTest {
-
   public static final String DATABASE_NAME = "DATABASE_NAME";
   public static final String TABLE_NAME = "TABLE_NAME";
   public static final String COLUMN_NAME = "COLUMN_NAME";
