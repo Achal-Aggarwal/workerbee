@@ -1,6 +1,7 @@
 package com.workerbee.dr;
 
 import com.workerbee.*;
+import com.workerbee.dr.selectfunction.AllStartSF;
 import com.workerbee.expression.BooleanExpression;
 
 import java.util.ArrayList;
@@ -16,16 +17,17 @@ public class SelectQuery implements Query {
   private Integer limit;
   private List<ColumnOrder> orderBy = new ArrayList<ColumnOrder>();
 
-  public SelectQuery(SelectFunction... selectFunctions){
-    this.selectFunctions.addAll(Arrays.asList(selectFunctions));
-  }
-
   public SelectQuery(List<SelectFunction> selectFunctions) {
     this.selectFunctions.addAll(selectFunctions);
   }
 
+  public SelectQuery(SelectFunction... selectFunctions){
+    this(Arrays.asList(selectFunctions));
+  }
+
   public SelectQuery from(Table table){
     this.table = table;
+    as(table.getDatabaseName() + "_" + table.getName());
 
     return this;
   }
@@ -64,14 +66,24 @@ public class SelectQuery implements Query {
     return orderBy(column, ColumnOrder.ASC_ORDER);
   }
 
-  public Table table(){
-    Table table = new Table(alias);
+  public Table table(Database database){
+    Table table = new Table(database, alias);
 
     for (SelectFunction selectFunction : selectFunctions) {
-      table.havingColumn(new Column(table, selectFunction.getAlias(), selectFunction.getType()));
+      if (selectFunction instanceof AllStartSF){
+        for (Column column : (List<Column>) this.table.getColumns()) {
+          table.havingColumn(new Column(table, column.getName(), column.getType()));
+        }
+      } else {
+        table.havingColumn(new Column(table, selectFunction.getAlias(), selectFunction.getType()));
+      }
     }
 
     return table;
+  }
+
+  public Table table(){
+    return table(null);
   }
 
   @Override
@@ -90,10 +102,6 @@ public class SelectQuery implements Query {
 
     if (joinTable != null && onBooleanExpression != null){
       joinTablePart(result);
-    }
-
-    if (alias != null){
-      result.append(" AS " + alias);
     }
 
     if (!orderBy.isEmpty()){
@@ -117,9 +125,14 @@ public class SelectQuery implements Query {
   }
 
   private void joinTablePart(StringBuilder result) {
+
+    result.append(" AS " + table.getDatabaseName() + "_" + table.getName());
+
     result.append(" JOIN ");
 
     result.append(Utils.fqTableName(joinTable));
+
+    result.append(" AS " + joinTable.getDatabaseName() + "_" + joinTable.getName());
 
     result.append(" ON ");
     result.append(onBooleanExpression.generate());
