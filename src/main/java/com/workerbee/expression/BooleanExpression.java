@@ -14,7 +14,7 @@ public class BooleanExpression {
   private Comparable left, right;
   private String operator;
   private BooleanExpression expression;
-  private String type;
+  private String expressionType;
 
   public BooleanExpression(Comparable left, String operator, Comparable right) {
     this.left = left;
@@ -22,10 +22,10 @@ public class BooleanExpression {
     this.operator = operator;
   }
 
-  private BooleanExpression(BooleanExpression leftExpression, String type, BooleanExpression rightExpression) {
+  private BooleanExpression(BooleanExpression leftExpression, String expressionType, BooleanExpression rightExpression) {
     this(leftExpression.left, leftExpression.operator, leftExpression.right);
     this.expression = rightExpression;
-    this.type = type;
+    this.expressionType = expressionType;
   }
 
   public String generate(){
@@ -33,7 +33,7 @@ public class BooleanExpression {
 
 
     if(expression != null){
-      result.append("( " + expression.generate() + " " + type + " ");
+      result.append("( " + expression.generate() + " " + expressionType + " ");
     }
 
     result.append(left.operandName() + " " + operator + " " + right.operandName());

@@ -1,7 +1,7 @@
 package com.workerbee.dr;
 
 import com.workerbee.Column;
-import com.workerbee.dr.selectfunction.AllStartSF;
+import com.workerbee.dr.selectfunction.AllStarSF;
 import com.workerbee.dr.selectfunction.SubStrSF;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 public class SelectFunctionGeneratorTest {
   @Test
   public void shouldReturnAllStarSFWhenStarIsUsed(){
-    assertThat(star(), instanceOf(AllStartSF.class));
+    assertThat(star(), instanceOf(AllStarSF.class));
   }
 
   @Test

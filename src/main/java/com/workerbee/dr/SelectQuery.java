@@ -1,7 +1,7 @@
 package com.workerbee.dr;
 
 import com.workerbee.*;
-import com.workerbee.dr.selectfunction.AllStartSF;
+import com.workerbee.dr.selectfunction.AllStarSF;
 import com.workerbee.expression.BooleanExpression;
 
 import java.util.ArrayList;
@@ -70,11 +70,11 @@ public class SelectQuery implements Query {
     return orderBy(column, ColumnOrder.ASC_ORDER);
   }
 
-  public Table table(Database database){
-    Table table = new Table(database, alias);
+  public Table<Table> table(Database database){
+    Table<Table> table = new Table<>(database, alias);
 
     for (SelectFunction selectFunction : selectFunctions) {
-      if (selectFunction instanceof AllStartSF){
+      if (selectFunction instanceof AllStarSF){
         for (Column column : (List<Column>) this.table.getColumns()) {
           table.havingColumn(new Column(table, column.getName(), column.getType()));
         }
@@ -86,7 +86,7 @@ public class SelectQuery implements Query {
     return table;
   }
 
-  public Table table(){
+  public Table<Table> table(){
     return table(null);
   }
 
@@ -123,9 +123,16 @@ public class SelectQuery implements Query {
 
   private void selectFuncPart(StringBuilder result) {
     for (SelectFunction selectFunction : selectFunctions) {
-      result.append(" " + selectFunction.generate() + ",");
+      if (selectFunction instanceof AllStarSF){
+        for (Column column : (List<Column>) this.table.getColumns()) {
+          result.append(" " + column.getFqColumnName() + ",");
+        }
+      } else {
+        result.append(" " + selectFunction.generate() + ",");
+      }
     }
     result.delete(result.lastIndexOf(","), result.length());
+
   }
 
   private void joinTablePart(StringBuilder result) {

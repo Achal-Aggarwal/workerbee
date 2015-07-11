@@ -7,28 +7,30 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.workerbee.Column.Type.STRING;
-import static com.workerbee.QueryGenerator.select;
-import static com.workerbee.dr.SelectFunctionGenerator.star;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InsertQueryTest {
   public static final String TABLE_NAME = "TABLE_NAME";
   public static final String COLUMN_NAME = "COLUMN_NAME";
+  public static final String SELECT_QUERY_GENERATE = "SELECT_QUERY_GENERATE";
   Table table;
   SelectQuery selectQuery;
 
   @Before
   public void setup(){
     table = new Table(TABLE_NAME);
-    selectQuery = select(star()).from(table);
+    selectQuery = mock(SelectQuery.class);
+    when(selectQuery.generate()).thenReturn(SELECT_QUERY_GENERATE);
   }
 
   @Test
   public void shouldGenerateInsertQueryForInsertingIntoUnPartitionedTable(){
     assertThat(
       new InsertQuery().intoTable(table).using(selectQuery).generate(),
-      is("INSERT INTO TABLE " + TABLE_NAME + " " + selectQuery.generate())
+      is("INSERT INTO TABLE " + TABLE_NAME + " " + SELECT_QUERY_GENERATE)
     );
   }
 
@@ -36,7 +38,7 @@ public class InsertQueryTest {
   public void shouldGenerateInsertQueryForOverwritingIntoUnPartitionedTable(){
     assertThat(
       new InsertQuery().overwrite().intoTable(table).using(selectQuery).generate(),
-      is("INSERT OVERWRITE TABLE " + TABLE_NAME + " " + selectQuery.generate())
+      is("INSERT OVERWRITE TABLE " + TABLE_NAME + " " + SELECT_QUERY_GENERATE)
     );
   }
 
@@ -47,14 +49,14 @@ public class InsertQueryTest {
 
     assertThat(
       new InsertQuery().intoTable(table).using(selectQuery).generate(),
-      is("INSERT INTO TABLE " + TABLE_NAME + " PARTITION ( " + COLUMN_NAME + " ) " + selectQuery.generate())
+      is("INSERT INTO TABLE " + TABLE_NAME + " PARTITION ( " + COLUMN_NAME + " ) " + SELECT_QUERY_GENERATE)
     );
 
     assertThat(
       new InsertQuery().intoTable(table).partitionOn(column, "VALUE").using(selectQuery).generate(),
       is("INSERT INTO TABLE " + TABLE_NAME
         + " PARTITION ( " + COLUMN_NAME + " = 'VALUE' ) "
-        + selectQuery.generate())
+        + SELECT_QUERY_GENERATE)
     );
   }
 }
