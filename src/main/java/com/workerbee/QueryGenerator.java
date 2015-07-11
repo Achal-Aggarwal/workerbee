@@ -53,6 +53,10 @@ public class QueryGenerator {
     return new InsertQuery();
   }
 
+  public static InsertQuery insert(Row<? extends Table> row) {
+    return new InsertQuery().using(select(row.getConstants()).from(Table.DUAL));
+  }
+
   public static LoadData loadData() {
     return new LoadData();
   }

@@ -1,8 +1,11 @@
 package com.workerbee;
 
+import com.workerbee.dr.selectfunction.Constant;
 import org.apache.hadoop.io.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Row<T extends Table> {
@@ -88,5 +91,23 @@ public class Row<T extends Table> {
     result.delete(result.lastIndexOf(table.getColumnSeparator()), result.length());
 
     return result.toString();
+  }
+
+  public Constant getC(Column column) {
+    return new Constant(map.get(column));
+  }
+
+  public Constant[] getConstants() {
+    List<Constant> constants = new ArrayList<>();
+
+    for (Column column : (List<Column>) table.getColumns()) {
+      constants.add(getC(column));
+    }
+
+    for (Column column : (List<Column>) table.getPartitions()) {
+      constants.add(getC(column));
+    }
+
+    return constants.toArray(new Constant[constants.size()]);
   }
 }
