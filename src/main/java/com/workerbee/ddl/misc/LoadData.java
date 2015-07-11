@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.workerbee.Utils.fqTableName;
 import static com.workerbee.Utils.joinList;
 
 public class LoadData implements Query {
@@ -53,11 +54,7 @@ public class LoadData implements Query {
 
     result.append(" INTO TABLE ");
 
-    if (table.isNotTemporary()){
-      result.append(table.getDatabaseName() + ".");
-    }
-
-    result.append(table.getName());
+    result.append(fqTableName(table));
 
     if (!table.getPartitions().isEmpty()){
       partitionedByPart(result);

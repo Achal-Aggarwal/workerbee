@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.lang.String.format;
+
 public class Utils {
   private static final String SILENT = "--silent";
   private static final String VERBOSE = "--verbose";
@@ -23,13 +25,19 @@ public class Utils {
   }
 
   public static String fqTableName(Table table){
+    return fqTableName(table, null);
+  }
+
+  public static String fqTableName(Table table, Database database){
     StringBuilder result = new StringBuilder();
 
-    if (table.isNotTemporary()){
-      result.append(table.getDatabaseName()).append(".");
+    if (database != null) {
+      result.append(format("%s.%s", database.getName(), table.getName()));
+    } else if (table.isNotTemporary()){
+      result.append(format("%s.%s", table.getDatabaseName(), table.getName()));
+    } else {
+      result.append(format("%s",table.getName()));
     }
-
-    result.append(table.getName());
 
     return result.toString();
   }

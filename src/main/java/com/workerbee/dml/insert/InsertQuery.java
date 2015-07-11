@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.workerbee.Utils.fqTableName;
 import static com.workerbee.Utils.joinList;
 
 public class InsertQuery implements Query {
@@ -62,11 +63,7 @@ public class InsertQuery implements Query {
 
     result.append(" TABLE ");
 
-    if (table.isNotTemporary()){
-      result.append(table.getDatabaseName() + ".");
-    }
-
-    result.append(table.getName());
+    result.append(fqTableName(table));
 
     if (!partitionMap.isEmpty()){
       partitionPart(result);

@@ -1,13 +1,11 @@
 package com.workerbee.ddl.create;
 
-import com.workerbee.Column;
-import com.workerbee.Database;
-import com.workerbee.Query;
-import com.workerbee.Table;
+import com.workerbee.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.workerbee.Utils.fqTableName;
 import static com.workerbee.Utils.joinList;
 import static com.workerbee.Utils.quoteString;
 
@@ -47,16 +45,7 @@ public class TableCreator implements Query {
       result.append(" IF NOT EXISTS");
     }
 
-    result.append(" ");
-
-    if (database != null) {
-      result.append(database.getName() + ".");
-    }
-    else if (table.isNotTemporary()){
-      result.append(table.getDatabaseName() + ".");
-    }
-
-    result.append(table.getName());
+    result.append(" ").append(fqTableName(table, database));
 
     if (!table.getColumns().isEmpty()){
       columnDefPart(result);

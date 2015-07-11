@@ -2,6 +2,9 @@ package com.workerbee.ddl.drop;
 
 import com.workerbee.Query;
 import com.workerbee.Table;
+import com.workerbee.Utils;
+
+import static com.workerbee.Utils.fqTableName;
 
 public class TableDropper implements Query {
   private Table table;
@@ -26,13 +29,9 @@ public class TableDropper implements Query {
       result.append(" IF EXISTS");
     }
 
-    result.append(" ");
+    result.append(" ").append(fqTableName(table));
 
-    if (table.isNotTemporary()){
-      result.append(table.getDatabaseName() + ".");
-    }
-
-    result.append(table.getName() + " ;");
+    result.append(" ;");
 
     return result.toString();
   }
