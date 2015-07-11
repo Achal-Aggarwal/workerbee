@@ -54,4 +54,6 @@ public class Database {
 
     return this;
   }
+
+  public static Database DEFAULT = new Database("Default");
 }

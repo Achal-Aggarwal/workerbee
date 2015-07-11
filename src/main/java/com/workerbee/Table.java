@@ -5,8 +5,10 @@ import org.apache.hadoop.io.Text;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.workerbee.Column.Type.STRING;
+
 public class Table<T extends Table> {
-  private  Database database;
+  private Database database;
 
   private String name;
 
@@ -32,7 +34,7 @@ public class Table<T extends Table> {
     this.comment = comment;
   }
 
-  public Table havingColumn(Column column){
+  public Table<T> havingColumn(Column column){
     columns.add(column);
     return this;
   }
@@ -43,11 +45,11 @@ public class Table<T extends Table> {
     return column;
   }
 
-  public Table havingColumn(String name, Column.Type type, String comment){
+  public Table<T> havingColumn(String name, Column.Type type, String comment){
     return havingColumn(new Column(this, name, type, comment));
   }
 
-  public Table havingColumn(String name, Column.Type type){
+  public Table<T> havingColumn(String name, Column.Type type){
     return havingColumn(name, type, null);
   }
 
@@ -169,4 +171,7 @@ public class Table<T extends Table> {
   public Text generateTextRecordFor(Row<T> row) {
     return new Text(generateRecordFor(row));
   }
+
+  public static Table<Table> DUAL = new Table<>(Database.DEFAULT, "Dual")
+    .havingColumn("dummy", STRING);
 }
