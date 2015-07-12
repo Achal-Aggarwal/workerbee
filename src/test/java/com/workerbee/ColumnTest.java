@@ -2,6 +2,8 @@ package com.workerbee;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 import static com.workerbee.Column.Type.FLOAT;
 import static com.workerbee.Column.Type.INT;
 import static com.workerbee.Column.Type.STRING;
@@ -26,47 +28,46 @@ public class ColumnTest {
   }
 
   @Test
-  public void shouldParseIntegerValueUsingRecordParser() {
+  public void shouldParseIntegerValueUsingRecordParser() throws SQLException {
     RecordParser mockRecordParser = mock(RecordParser.class);
 
-    when(mockRecordParser.readInt(INDEX)).thenReturn(INT_VALUE);
+    when(mockRecordParser.getInt(INDEX)).thenReturn(INT_VALUE);
 
     assertThat((Integer) column.parseValueUsing(mockRecordParser, INDEX), is(INT_VALUE));
 
-    verify(mockRecordParser).readInt(INDEX);
+    verify(mockRecordParser).getInt(INDEX);
   }
 
   @Test
-  public void shouldParseFloatValueUsingRecordParser() {
+  public void shouldParseFloatValueUsingRecordParser() throws SQLException {
     Column column = new Column(null, COLUMN_NAME, FLOAT);
     RecordParser mockRecordParser = mock(RecordParser.class);
 
-    when(mockRecordParser.readFloat(INDEX)).thenReturn(FLOAT_VALUE);
+    when(mockRecordParser.getFloat(INDEX)).thenReturn(FLOAT_VALUE);
 
     assertThat((Float) column.parseValueUsing(mockRecordParser, INDEX), is(FLOAT_VALUE));
 
-    verify(mockRecordParser).readFloat(INDEX);
+    verify(mockRecordParser).getFloat(INDEX);
   }
 
   @Test
-  public void shouldParseStringValueUsingRecordParser() {
+  public void shouldParseStringValueUsingRecordParser() throws SQLException {
     Column column = new Column(null, COLUMN_NAME, STRING);
     RecordParser mockRecordParser = mock(RecordParser.class);
 
-    when(mockRecordParser.readString(INDEX)).thenReturn(STRING_VALUE);
+    when(mockRecordParser.getString(INDEX)).thenReturn(STRING_VALUE);
 
     assertThat((String) column.parseValueUsing(mockRecordParser, INDEX), is(STRING_VALUE));
 
-    verify(mockRecordParser).readString(INDEX);
+    verify(mockRecordParser).getString(INDEX);
   }
 
   @Test(expected = RuntimeException.class)
-  public void shouldThrowRuntimeExceptionIfValueCannotBeParse()
-  {
+  public void shouldThrowRuntimeExceptionIfValueCannotBeParse() throws SQLException {
     Column column = new Column(null, COLUMN_NAME, INT);
     RecordParser mockRecordParser = mock(RecordParser.class);
 
-    when(mockRecordParser.readInt(INDEX)).thenThrow(new RuntimeException());
+    when(mockRecordParser.getInt(INDEX)).thenThrow(new RuntimeException());
     column.parseValueUsing(mockRecordParser, INDEX);
   }
 

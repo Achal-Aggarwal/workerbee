@@ -7,11 +7,6 @@ public class Column extends com.workerbee.expression.Comparable {
   public static enum Type {
     INT {
       @Override
-      public Object parseValue(RecordParser recordParser, int index) {
-        return recordParser.readInt(index);
-      }
-
-      @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {
         return resultSet.getInt(index);
       }
@@ -22,11 +17,6 @@ public class Column extends com.workerbee.expression.Comparable {
       }
     },
     FLOAT {
-      @Override
-      public Object parseValue(RecordParser recordParser, int index) {
-        return recordParser.readFloat(index);
-      }
-
       @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {
         return resultSet.getFloat(index);
@@ -39,11 +29,6 @@ public class Column extends com.workerbee.expression.Comparable {
     },
     STRING {
       @Override
-      public Object parseValue(RecordParser recordParser, int index) {
-        return recordParser.readString(index);
-      }
-
-      @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {
         return resultSet.getString(index);
       }
@@ -53,8 +38,6 @@ public class Column extends com.workerbee.expression.Comparable {
         return value == null ? null : (String) value;
       }
     };
-
-    public abstract Object parseValue(RecordParser rowParser, int index);
 
     public abstract Object parseValue(ResultSet resultSet, int index) throws SQLException;
 
@@ -92,12 +75,12 @@ public class Column extends com.workerbee.expression.Comparable {
     return Utils.fqColumnName(belongsTo, this);
   }
 
-  public Object parseValueUsing(RecordParser recordParser, int index) {
+  public Object parseValueUsing(RecordParser recordParser, int index) throws SQLException {
     try{
       return type.parseValue(recordParser, index);
     } catch (NumberFormatException nfe){
       throw new RuntimeException(
-        "Couldn't parse value '" + recordParser.readString(index) + "' for "
+        "Couldn't parse value '" + recordParser.getString(index) + "' for "
           + getFqColumnName() + " of type '" + type + "'.");
     }
   }

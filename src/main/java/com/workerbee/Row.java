@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Row<T extends Table> {
+  public static final int ZERO_BASED = 0;
+  public static final int ONE_BASED = 1;
   private Map<Column, Object> map;
   private Table table;
 
@@ -19,7 +21,7 @@ public class Row<T extends Table> {
 
   public Row(Table<T> table, ResultSet resultSet){
     this.table = table;
-    this.map = parseRecordUsing(table, resultSet);
+    this.map = parseRecordUsing(table, resultSet, ONE_BASED);
   }
 
   public Row(Table<T> table, String record){
@@ -32,24 +34,18 @@ public class Row<T extends Table> {
   }
 
   private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
-    Map<Column, Object> map = new HashMap<>(table.getColumns().size());
-    RecordParser recordParser = new RecordParser(record, table.getColumnSeparator(), table.getHiveNull());
-    int index = 0;
-
-    for (Column column : table.getColumns()) {
-      map.put(column, column.parseValueUsing(recordParser, index++));
-    }
-
-    for (Column column : table.getPartitions()) {
-      map.put(column, column.parseValueUsing(recordParser, index++));
-    }
-
-    return map;
+    return parseRecordUsing(
+      table,
+      new RecordParser(record, table.getColumnSeparator(), table.getHiveNull()),
+      ZERO_BASED
+    );
   }
 
-  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, ResultSet resultSet) {
+  private static Map<Column, Object> parseRecordUsing(
+    Table<? extends Table> table, ResultSet resultSet, int startingIndex
+  ) {
     Map<Column, Object> map = new HashMap<>(table.getColumns().size());
-    int index = 1;
+    int index = startingIndex;
 
     for (Column column : table.getColumns()) {
       map.put(column, column.parseValueUsing(resultSet, index++));
