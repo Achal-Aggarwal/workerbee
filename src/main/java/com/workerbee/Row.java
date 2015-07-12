@@ -3,6 +3,7 @@ package com.workerbee;
 import com.workerbee.dr.selectfunction.Constant;
 import org.apache.hadoop.io.Text;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,15 @@ import java.util.Map;
 public class Row<T extends Table> {
   private Map<Column, Object> map;
   private Table table;
+
+  public Row(Table<T> table){
+    this(table, "");
+  }
+
+  public Row(Table<T> table, ResultSet resultSet){
+    this.table = table;
+    this.map = parseRecordUsing(table, resultSet);
+  }
 
   public Row(Table<T> table, String record){
     this.table = table;
@@ -21,12 +31,8 @@ public class Row<T extends Table> {
     this(table, record.toString());
   }
 
-  public Row(Table<T> table){
-    this(table, "");
-  }
-
   private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
-    Map<Column, Object> map = new HashMap<Column, Object>(table.getColumns().size());
+    Map<Column, Object> map = new HashMap<>(table.getColumns().size());
     RecordParser recordParser = new RecordParser(record, table.getColumnSeparator(), table.getHiveNull());
     int index = 0;
 
@@ -36,6 +42,21 @@ public class Row<T extends Table> {
 
     for (Column column : table.getPartitions()) {
       map.put(column, column.parseValueUsing(recordParser, index++));
+    }
+
+    return map;
+  }
+
+  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, ResultSet resultSet) {
+    Map<Column, Object> map = new HashMap<>(table.getColumns().size());
+    int index = 1;
+
+    for (Column column : table.getColumns()) {
+      map.put(column, column.parseValueUsing(resultSet, index++));
+    }
+
+    for (Column column : table.getPartitions()) {
+      map.put(column, column.parseValueUsing(resultSet, index++));
     }
 
     return map;

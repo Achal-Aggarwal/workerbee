@@ -3,6 +3,8 @@ package com.workerbee;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
@@ -36,7 +38,7 @@ public class Utils {
     } else if (table.isNotTemporary()){
       result.append(format("%s.%s", table.getDatabaseName(), table.getName()));
     } else {
-      result.append(format("%s",table.getName()));
+      result.append(format("%s", table.getName()));
     }
 
     return result.toString();
@@ -134,5 +136,16 @@ public class Utils {
 
   public static int getRandomPositiveNumber() {
     return (random.nextInt() & Integer.MAX_VALUE);
+  }
+
+  public static Path writeAtTempFile(String fileName, final String stringToWrite) throws IOException {
+    return writeAtTempFile(fileName, new ArrayList<String>(){{add(stringToWrite);}});
+  }
+
+  public static Path writeAtTempFile(String fileName, final List<String> stringsToWrite) throws IOException {
+    Path tempFile = Files.createTempFile(fileName, null);
+    Files.write(tempFile, stringsToWrite, Charset.defaultCharset());
+
+    return tempFile;
   }
 }

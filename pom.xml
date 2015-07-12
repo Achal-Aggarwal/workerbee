@@ -36,6 +36,9 @@
         <version>2.10</version>
         <configuration>
           <argLine>-XX:-UseSplitVerifier</argLine>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
           <systemPropertyVariables>
             <!-- Set JUL Formatting -->
             <java.util.logging.SimpleFormatter.format>
@@ -106,11 +109,51 @@
 
     <dependency>
       <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.oozie</groupId>
+      <artifactId>oozie-client</artifactId>
+      <version>4.0.0-cdh5.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <version>2.5.0-cdh5.3.3</version>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-distcp</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
+      <!--<scope>provided</scope>-->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-common</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-client</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-yarn-server-common</artifactId>
+      <version>2.5.0-cdh5.3.3</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-jdbc</artifactId>
+      <version>0.13.1-cdh5.3.3</version>
+    </dependency>
 
     <!--Testing-->
     <dependency>

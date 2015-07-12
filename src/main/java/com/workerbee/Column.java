@@ -1,11 +1,19 @@
 package com.workerbee;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Column extends com.workerbee.expression.Comparable {
   public static enum Type {
     INT {
       @Override
       public Object parseValue(RecordParser recordParser, int index) {
         return recordParser.readInt(index);
+      }
+
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getInt(index);
       }
 
       @Override
@@ -20,6 +28,11 @@ public class Column extends com.workerbee.expression.Comparable {
       }
 
       @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getFloat(index);
+      }
+
+      @Override
       public Float convert(Object value) {
         return value == null ? null : Float.valueOf(String.valueOf(value));
       }
@@ -31,12 +44,19 @@ public class Column extends com.workerbee.expression.Comparable {
       }
 
       @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getString(index);
+      }
+
+      @Override
       public String convert(Object value) {
         return value == null ? null : (String) value;
       }
     };
 
     public abstract Object parseValue(RecordParser rowParser, int index);
+
+    public abstract Object parseValue(ResultSet resultSet, int index) throws SQLException;
 
     public abstract Object convert(Object value);
   }
@@ -79,6 +99,16 @@ public class Column extends com.workerbee.expression.Comparable {
       throw new RuntimeException(
         "Couldn't parse value '" + recordParser.readString(index) + "' for "
           + getFqColumnName() + " of type '" + type + "'.");
+    }
+  }
+
+  public Object parseValueUsing(ResultSet resultSet, int index) {
+    try{
+      return type.parseValue(resultSet, index);
+    } catch (SQLException  e){
+      throw new RuntimeException(
+        "Couldn't parse value for " + getFqColumnName() + " of type '" + type + "'."
+      );
     }
   }
 
