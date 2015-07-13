@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -88,13 +89,13 @@ public class RepositoryTest {
 
     mockStatic(Utils.class);
     Path dualTempPath = mock(Path.class);
-    PowerMockito.when(Utils.writeAtTempFile(DUAL.getName(), "X")).thenReturn(dualTempPath);
+    PowerMockito.when(Utils.writeAtTempFile(DUAL.getName(), new ArrayList<String>(){{add("X");}})).thenReturn(dualTempPath);
 
     mockStatic(LoadData.class);
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(LoadData.class)
       .withNoArguments().thenReturn(mockLoadData);
-    when(mockLoadData.fromLocal(dualTempPath).into(DUAL).generate()).thenReturn(LOAD_DUAL_SQL);
+    when(mockLoadData.overwrite().fromLocal(dualTempPath).into(DUAL).generate()).thenReturn(LOAD_DUAL_SQL);
     when(mockStatement.execute(LOAD_DUAL_SQL)).thenReturn(false);
 
     repository = Repository.TemporaryRepository();

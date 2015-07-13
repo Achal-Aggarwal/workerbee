@@ -13,7 +13,7 @@ public class Row<T extends Table> {
   public static final int ZERO_BASED = 0;
   public static final int ONE_BASED = 1;
   private Map<Column, Object> map;
-  private Table table;
+  private Table<? extends Table> table;
 
   public Row(Table<T> table){
     this(table, "");
@@ -31,6 +31,17 @@ public class Row<T extends Table> {
 
   public Row(Table<T> table, Text record){
     this(table, record.toString());
+  }
+
+  public Row(Table<T> table, Row<? extends Table> record) {
+    this(table);
+    for (Column column : table.getColumns()) {
+      set(column, record.get(column));
+    }
+
+    for (Column column : table.getPartitions()) {
+      set(column, record.get(column));
+    }
   }
 
   private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
@@ -117,11 +128,11 @@ public class Row<T extends Table> {
   public Constant[] getConstants() {
     List<Constant> constants = new ArrayList<>();
 
-    for (Column column : (List<Column>) table.getColumns()) {
+    for (Column column : table.getColumns()) {
       constants.add(getC(column));
     }
 
-    for (Column column : (List<Column>) table.getPartitions()) {
+    for (Column column : table.getPartitions()) {
       constants.add(getC(column));
     }
 

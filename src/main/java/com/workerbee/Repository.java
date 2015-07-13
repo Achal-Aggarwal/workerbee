@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static com.workerbee.Table.DUAL;
+
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
 
@@ -40,18 +42,22 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Connection to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
 
-    createDefaultDatabase();
-    createDualTable();
-  }
-
-  private void createDefaultDatabase() throws IOException, SQLException {
     execute(new DatabaseCreator(Database.DEFAULT).ifNotExist().generate());
+    setUp(DUAL, new Row<>(DUAL, "X"));
   }
 
-  private void createDualTable() throws IOException, SQLException {
-    Path dualTableData = Utils.writeAtTempFile(Table.DUAL.getName(), "X");
-    execute(new TableCreator(Table.DUAL).ifNotExist().generate());
-    execute(new LoadData().fromLocal(dualTableData).into(Table.DUAL).generate());
+  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
+    List<String> records = new ArrayList<>();
+
+    for (Row row : rows) {
+      records.add(row.generateRecord());
+    }
+
+    execute(new TableCreator(table).ifNotExist().generate());
+    Path tableDirPath = Utils.writeAtTempFile(table.getName(), records);
+    execute(new LoadData().overwrite().fromLocal(tableDirPath).into(table).generate());
+
+    return this;
   }
 
   public boolean execute(DatabaseCreator databaseCreator) throws SQLException {
@@ -64,6 +70,10 @@ public class Repository implements AutoCloseable {
 
   public boolean execute(InsertQuery insertQuery) throws SQLException {
     return execute(insertQuery.generate());
+  }
+
+  public boolean execute(LoadData loadDataQuery) throws SQLException {
+    return execute(loadDataQuery.generate());
   }
 
   private boolean execute(String query) throws SQLException {
