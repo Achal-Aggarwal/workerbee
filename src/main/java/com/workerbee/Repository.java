@@ -5,7 +5,9 @@ import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.misc.LoadData;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,6 +62,11 @@ public class Repository implements AutoCloseable {
     return this;
   }
 
+  public Repository hiveVar(String var, String val) throws SQLException {
+    execute("SET hiveva:" + var + "=" + val);
+    return this;
+  }
+
   public boolean execute(DatabaseCreator databaseCreator) throws SQLException {
     return execute(databaseCreator.generate());
   }
@@ -74,6 +81,15 @@ public class Repository implements AutoCloseable {
 
   public boolean execute(LoadData loadDataQuery) throws SQLException {
     return execute(loadDataQuery.generate());
+  }
+
+  public boolean execute(File sqlScriptFile) throws IOException, SQLException {
+    String sqlScript = FileUtils.readFileToString(sqlScriptFile);
+    for (String statment : sqlScript.split(";")) {
+      execute(statment);
+    }
+
+    return false;
   }
 
   private boolean execute(String query) throws SQLException {

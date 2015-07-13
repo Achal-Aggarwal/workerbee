@@ -15,10 +15,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +30,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 
@@ -55,6 +53,7 @@ public class RepositoryTest {
   public static final String TABLE_CREATE_SQL = "TABLE_CREATE_SQL";
   public static final String INSERT_SQL = "INSERT_SQL";
   public static final String SELECT_SQL = "SELECT_SQL";
+  public static final String SET_HIVEVAR_VAR_VAL = "SET hivevar:var=val";
   private Statement mockStatement;
 
   private Repository repository;
@@ -158,5 +157,13 @@ public class RepositoryTest {
 
     assertThat(resultRows.size(), is(1));
     assertThat(resultRows.get(0), is(mockRow));
+  }
+
+
+  @Test
+  public void shouldExecuteSetHiveVarQueryToSetAHiveVar() throws SQLException {
+    when(mockStatement.execute(SET_HIVEVAR_VAR_VAL)).thenReturn(false);
+
+    assertThat(repository.hiveVar("var", "val"), instanceOf(Repository.class));
   }
 }
