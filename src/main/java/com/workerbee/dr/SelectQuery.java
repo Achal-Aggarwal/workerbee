@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SelectQuery implements Query {
-  private Table table;
+  private Table<? extends Table> table;
   private List<SelectFunction> selectFunctions = new ArrayList<SelectFunction>();
   private String alias;
-  private Table joinTable;
+  private Table<? extends Table> joinTable;
   private BooleanExpression onBooleanExpression;
   private Integer limit;
   private List<ColumnOrder> orderBy = new ArrayList<ColumnOrder>();
@@ -25,7 +25,7 @@ public class SelectQuery implements Query {
     this(Arrays.asList(selectFunctions));
   }
 
-  public SelectQuery from(Table table){
+  public SelectQuery from(Table<? extends Table> table){
     this.table = table;
 
     as(table.isNotTemporary()
@@ -36,7 +36,7 @@ public class SelectQuery implements Query {
     return this;
   }
 
-  public SelectQuery join(Table table) {
+  public SelectQuery join(Table<? extends Table> table) {
     joinTable = table;
     return this;
   }
@@ -75,7 +75,10 @@ public class SelectQuery implements Query {
 
     for (SelectFunction selectFunction : selectFunctions) {
       if (selectFunction instanceof AllStarSF){
-        for (Column column : (List<Column>) this.table.getColumns()) {
+        for (Column column : this.table.getColumns()) {
+          table.havingColumn(new Column(table, column.getName(), column.getType()));
+        }
+        for (Column column : this.table.getPartitions()) {
           table.havingColumn(new Column(table, column.getName(), column.getType()));
         }
       } else {
@@ -127,6 +130,9 @@ public class SelectQuery implements Query {
         for (Column column : (List<Column>) this.table.getColumns()) {
           result.append(" " + column.getFqColumnName() + ",");
         }
+        for (Column column : (List<Column>) this.table.getPartitions()) {
+          result.append(" " + column.getFqColumnName() + ",");
+        }
       } else {
         result.append(" " + selectFunction.generate() + ",");
       }
@@ -160,7 +166,7 @@ public class SelectQuery implements Query {
     result.append(Utils.joinList(orderByColumns, ", "));
   }
 
-  private class ColumnOrder {
+  private static class ColumnOrder {
     public static final String DESC_ORDER = "DESC";
     public static final String ASC_ORDER = "ASC";
 
