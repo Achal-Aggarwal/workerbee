@@ -6,6 +6,7 @@ import com.workerbee.ddl.drop.DatabaseDropper;
 import com.workerbee.ddl.drop.TableDropper;
 import com.workerbee.ddl.misc.LoadData;
 import com.workerbee.ddl.misc.RecoverPartition;
+import com.workerbee.ddl.misc.TruncateTable;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
@@ -59,5 +60,8 @@ public class QueryGenerator {
 
   public static LoadData loadData() {
     return new LoadData();
+  }
+  public static TruncateTable truncate(Table<? extends Table> table) {
+    return new TruncateTable(table);
   }
 }
