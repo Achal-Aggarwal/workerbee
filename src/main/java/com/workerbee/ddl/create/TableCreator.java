@@ -81,11 +81,11 @@ public class TableCreator implements Query {
     result.append(" )");
   }
 
-  private void partitionedByPart(StringBuilder result) {
-    result.append(" PARTITIONED BY ( ");
-    List<String> columnsDef = new ArrayList<String>(table.getPartitions().size());
+  private void columnDefPart(StringBuilder result) {
+    result.append(" ( ");
+    List<String> columnsDef = new ArrayList<>(table.getColumns().size());
 
-    for (Column column : table.getPartitions()) {
+    for (Column column : table.getColumns()) {
       columnsDef.add(column.getName() + " " + column.getType());
     }
 
@@ -93,11 +93,11 @@ public class TableCreator implements Query {
     result.append(" )");
   }
 
-  private void columnDefPart(StringBuilder result) {
-    result.append(" ( ");
-    List<String> columnsDef = new ArrayList<String>(table.getColumns().size());
+  private void partitionedByPart(StringBuilder result) {
+    result.append(" PARTITIONED BY ( ");
+    List<String> columnsDef = new ArrayList<>(table.getPartitions().size());
 
-    for (Column column : table.getColumns()) {
+    for (Column column : table.getPartitions()) {
       columnsDef.add(column.getName() + " " + column.getType());
     }
 

@@ -69,11 +69,6 @@ public class Table<T extends Table> {
     return column;
   }
 
-  public Table partitionedOnColumns(List<Column> columns) {
-    partitionedOn.addAll(columns);
-    return this;
-  }
-
   public Table withComment(String comment){
     this.comment = comment;
     return this;

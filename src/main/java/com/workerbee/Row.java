@@ -102,23 +102,19 @@ public class Row<T extends Table> {
   }
 
   public static String generateRecordFor(Table<? extends Table> table, Row row) {
-    StringBuilder result = new StringBuilder();
+    List<String> result = new ArrayList<>(table.getColumns().size() + table.getPartitions().size());
 
     for (Column column : table.getColumns()) {
       Object value = row.get(column);
-      result.append(value == null ? table.getHiveNull() : value.toString());
-      result.append(table.getColumnSeparator());
+      result.add(value == null ? table.getHiveNull() : value.toString());
     }
 
     for (Column column : table.getPartitions()) {
       Object value = row.get(column);
-      result.append(value == null ? table.getHiveNull() : value.toString());
-      result.append(table.getColumnSeparator());
+      result.add(value == null ? table.getHiveNull() : value.toString());
     }
 
-    result.delete(result.lastIndexOf(table.getColumnSeparator()), result.length());
-
-    return result.toString();
+    return Utils.joinList(result, table.getColumnSeparator());
   }
 
   public Constant getC(Column column) {

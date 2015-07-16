@@ -1,9 +1,6 @@
 package com.workerbee.ddl.misc;
 
-import com.workerbee.Column;
-import com.workerbee.Query;
-import com.workerbee.Table;
-import com.workerbee.Utils;
+import com.workerbee.*;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,12 +11,17 @@ import static com.workerbee.Utils.joinList;
 
 public class LoadData implements Query {
   private static final boolean LOCAL = true;
-  private static final boolean HDFS = false;
 
   private boolean pathType;
   private Path filePath;
   private boolean overwrite = false;
-  private Table table;
+  private Table<? extends Table> table;
+  private Row<Table> row;
+
+  public LoadData data(Row row) {
+    this.row = row;
+    return this;
+  }
 
   public LoadData fromLocal(Path filePath) {
     this.filePath = filePath;
@@ -33,7 +35,7 @@ public class LoadData implements Query {
     return this;
   }
 
-  public LoadData into(Table table) {
+  public LoadData into(Table<? extends Table> table) {
     this.table = table;
     return this;
   }
@@ -67,12 +69,20 @@ public class LoadData implements Query {
 
   private void partitionedByPart(StringBuilder result) {
     result.append(" PARTITION ( ");
-    List<Column> partitions = table.getPartitions();
 
-    List<String> columnsDef = new ArrayList<>(partitions.size());
+    List<String> columnsDef = new ArrayList<>(table.getPartitions().size());
 
-    for (Column column : partitions) {
-      columnsDef.add(column.getName());
+    for (Column column : table.getPartitions()) {
+      String def = column.getName();
+      Object value = row.get(column);
+
+      if (value instanceof String){
+        def += " = " + Utils.quoteString((String) row.get(column));
+      } else if(value != null) {
+        def += " = " + row.get(column);
+      }
+
+      columnsDef.add(def);
     }
 
     result.append(joinList(columnsDef, ", "));

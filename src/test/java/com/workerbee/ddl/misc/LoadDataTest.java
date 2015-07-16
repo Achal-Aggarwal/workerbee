@@ -18,6 +18,8 @@ public class LoadDataTest {
   public static final String DATABASE_NAME = "DATABASE_NAME";
   public static final String TABLE_NAME = "TABLE_NAME";
   public static final String PATH = "PATH";
+  public static final String PAT_COL_VALUE = "PAT_COL_VALUE";
+  public static final String PAT_COL_NAME = "PAT_COL_NAME";
 
   private static Table table = new Table(new Database(DATABASE_NAME), TABLE_NAME);
   private static Path path = mock(Path.class, Mockito.RETURNS_DEEP_STUBS);
@@ -53,13 +55,18 @@ public class LoadDataTest {
 
   @Test
   public void shouldGenerateCorrectStatementWithPartitionedTable(){
-    Table partitionedTable = new Table(TABLE_NAME);
-    Column column = new Column(partitionedTable, "PAT_COL_NAME", STRING);
+    Table<Table> partitionedTable = new Table<>(TABLE_NAME);
+    Column column = new Column(partitionedTable, PAT_COL_NAME, STRING);
     partitionedTable.partitionedOnColumn(column);
 
     assertThat(
-      new LoadData().into(partitionedTable).overwrite().fromLocal(path).generate(),
-      is("LOAD DATA LOCAL INPATH 'PATH' OVERWRITE INTO TABLE TABLE_NAME PARTITION ( PAT_COL_NAME ) ;")
+      new LoadData()
+        .data(partitionedTable.getNewRow().set(column, PAT_COL_VALUE))
+        .into(partitionedTable)
+        .overwrite()
+        .fromLocal(path)
+        .generate(),
+      is("LOAD DATA LOCAL INPATH 'PATH' OVERWRITE INTO TABLE TABLE_NAME PARTITION ( PAT_COL_NAME = 'PAT_COL_VALUE' ) ;")
     );
   }
 }
