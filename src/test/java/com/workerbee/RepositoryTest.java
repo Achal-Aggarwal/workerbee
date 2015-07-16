@@ -3,8 +3,10 @@ package com.workerbee;
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.misc.LoadData;
+import com.workerbee.ddl.misc.TruncateTable;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
   DatabaseCreator.class,
   TableCreator.class,
   LoadData.class,
+  TruncateTable.class,
   Utils.class,
   Row.class
 })
@@ -54,6 +57,7 @@ public class RepositoryTest {
   public static final String INSERT_SQL = "INSERT_SQL";
   public static final String SELECT_SQL = "SELECT_SQL";
   public static final String SET_HIVEVAR_VAR_VAL = "SET hivevar:var=val";
+  public static final String TRUNCATE_DUAL_TABLE = "TRUNCATE_DUAL_TABLE";
   private Statement mockStatement;
 
   private Repository repository;
@@ -86,27 +90,39 @@ public class RepositoryTest {
     when(mockStatement.execute(DUAL_TABLE_CREATE_SQL)).thenReturn(false);
 
 
+    mockStatic(TruncateTable.class);
+    TruncateTable mockTruncateTable = mock(TruncateTable.class);
+    PowerMockito.whenNew(TruncateTable.class).withArguments(DUAL).thenReturn(mockTruncateTable);
+    when(mockTruncateTable.generate()).thenReturn(TRUNCATE_DUAL_TABLE);
+
+
+    mockStatic(Row.class);
+    Row mockRow = mock(Row.class);
+    whenNew(Row.class).withArguments(DUAL, "X")
+      .thenReturn(mockRow);
+
     mockStatic(Utils.class);
     Path dualTempPath = mock(Path.class);
-    PowerMockito.when(Utils.writeAtTempFile(DUAL.getName(), new ArrayList<String>(){{add("X");}})).thenReturn(dualTempPath);
+    PowerMockito.when(Utils.writeAtTempFile(DUAL, mockRow)).thenReturn(dualTempPath);
 
     mockStatic(LoadData.class);
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(LoadData.class)
       .withNoArguments().thenReturn(mockLoadData);
-    when(mockLoadData.overwrite().fromLocal(dualTempPath).into(DUAL).generate()).thenReturn(LOAD_DUAL_SQL);
+    when(mockLoadData.data(mockRow).fromLocal(dualTempPath).into(DUAL).generate()).thenReturn(LOAD_DUAL_SQL);
     when(mockStatement.execute(LOAD_DUAL_SQL)).thenReturn(false);
 
     repository = Repository.TemporaryRepository();
+
+    verify(mockStatement).execute(DEFAULT_DATABASE_CREATE_SQL);
+    verify(mockStatement).execute(DUAL_TABLE_CREATE_SQL);
+    verify(mockStatement).execute(TRUNCATE_DUAL_TABLE);
+    verify(mockStatement).execute(LOAD_DUAL_SQL);
   }
 
   @Test
   public void shouldCreateTemporaryRepositoryWithDefaultDatabaseAndDualTable() throws Exception {
     assertThat(repository, instanceOf(Repository.class));
-
-    verify(mockStatement).execute(DEFAULT_DATABASE_CREATE_SQL);
-    verify(mockStatement).execute(DUAL_TABLE_CREATE_SQL);
-    verify(mockStatement).execute(LOAD_DUAL_SQL);
   }
 
   @Test
@@ -141,6 +157,8 @@ public class RepositoryTest {
     SelectQuery mockSelectQuery = mock(SelectQuery.class);
     when(mockSelectQuery.generate()).thenReturn(SELECT_SQL);
 
+    PowerMockito.when(Utils.rtrim(SELECT_SQL)).thenReturn(SELECT_SQL);
+
     Table mockTable = mock(Table.class);
     when(mockSelectQuery.table()).thenReturn(mockTable);
 
@@ -148,7 +166,6 @@ public class RepositoryTest {
     when(mockStatement.executeQuery(SELECT_SQL)).thenReturn(mockResultSet);
     when(mockResultSet.next()).thenReturn(true).thenReturn(false);
 
-    mockStatic(Row.class);
     Row mockRow = mock(Row.class);
     whenNew(Row.class).withArguments(mockTable, mockResultSet)
     .thenReturn(mockRow);
@@ -159,11 +176,12 @@ public class RepositoryTest {
     assertThat(resultRows.get(0), is(mockRow));
   }
 
-
   @Test
   public void shouldExecuteSetHiveVarQueryToSetAHiveVar() throws SQLException {
     when(mockStatement.execute(SET_HIVEVAR_VAR_VAL)).thenReturn(false);
 
     assertThat(repository.hiveVar("var", "val"), instanceOf(Repository.class));
+
+    verify(mockStatement).execute(SET_HIVEVAR_VAR_VAL);
   }
 }

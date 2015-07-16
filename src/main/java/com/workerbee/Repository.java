@@ -3,6 +3,7 @@ package com.workerbee;
 import com.workerbee.ddl.create.DatabaseCreator;
 import com.workerbee.ddl.create.TableCreator;
 import com.workerbee.ddl.misc.LoadData;
+import com.workerbee.ddl.misc.TruncateTable;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
 import org.apache.commons.io.FileUtils;
@@ -17,10 +18,16 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static com.workerbee.Database.DEFAULT;
 import static com.workerbee.Table.DUAL;
+import static com.workerbee.Utils.getRandomPositiveNumber;
+import static com.workerbee.Utils.rtrim;
+import static java.lang.String.valueOf;
 
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
+  public static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
+  public static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
 
   private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
 
@@ -28,8 +35,8 @@ public class Repository implements AutoCloseable {
 
   public static Repository TemporaryRepository() throws IOException, SQLException {
     return new Repository(
-      "jdbc:hive2://",
-      getHiveConfiguration(Paths.get("/", "workerbee", String.valueOf(Utils.getRandomPositiveNumber())))
+      JDBC_HIVE2_EMBEDDED_MODE_URL,
+      getHiveConfiguration(ROOT_DIR)
     );
   }
 
@@ -41,29 +48,40 @@ public class Repository implements AutoCloseable {
       System.exit(1);
     }
 
-    LOGGER.info("Connection to : " + connectionUrl);
+    LOGGER.info("Connecting to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
 
-    execute(new DatabaseCreator(Database.DEFAULT).ifNotExist().generate());
+    LOGGER.info("Initializing repository at : " + ROOT_DIR);
+
+    execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
+    execute(new TableCreator(DUAL).ifNotExist().generate());
+    clear(DUAL);
     setUp(DUAL, new Row<>(DUAL, "X"));
   }
 
-  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
-    List<String> records = new ArrayList<>();
-
-    for (Row row : rows) {
-      records.add(row.generateRecord());
+  public Repository clear(Table<? extends Table> table) throws SQLException {
+    if (table.isExternal()){
+      execute("DFS -RMR " + table.getLocation());
+    } else {
+      execute(new TruncateTable(table).generate());
     }
 
-    execute(new TableCreator(table).ifNotExist().generate());
-    Path tableDirPath = Utils.writeAtTempFile(table.getName(), records);
-    execute(new LoadData().overwrite().fromLocal(tableDirPath).into(table).generate());
+    return this;
+  }
+
+  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
+    LoadData loadData = new LoadData();
+
+    for (Row row : rows) {
+      Path tableDirPath = Utils.writeAtTempFile(table, row);
+      execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
+    }
 
     return this;
   }
 
   public Repository hiveVar(String var, String val) throws SQLException {
-    execute("SET hiveva:" + var + "=" + val);
+    execute("SET hivevar:" + var + "=" + val);
     return this;
   }
 
@@ -84,30 +102,25 @@ public class Repository implements AutoCloseable {
   }
 
   public boolean execute(File sqlScriptFile) throws IOException, SQLException {
-    String sqlScript = FileUtils.readFileToString(sqlScriptFile);
-    for (String statment : sqlScript.split(";")) {
-      execute(statment);
-    }
-
-    return false;
+    return execute(FileUtils.readFileToString(sqlScriptFile));
   }
 
   private boolean execute(String query) throws SQLException {
     Statement statement = connection.createStatement();
-    if (query.endsWith(";")){
-      query = query.substring(0, query.length()-1);
+
+    for (String sqlStatement : query.split(";")) {
+      if (sqlStatement.length() > 0) {
+        LOGGER.info("Executing query : " + sqlStatement);
+        statement.execute(sqlStatement);
+      }
     }
-    LOGGER.info("Executing query : " + query);
-    return statement.execute(query);
+    return false;
   }
 
   public List<Row<Table>> execute(SelectQuery selectQuery) throws SQLException {
     Statement statement = connection.createStatement();
 
-    String selectHQL = selectQuery.generate();
-    if (selectHQL.endsWith(";")){
-      selectHQL = selectHQL.substring(0, selectHQL.length()-1);
-    }
+    String selectHQL = rtrim(selectQuery.generate());
     LOGGER.info("Executing query : " + selectHQL);
 
     List<Row<Table>> rows = new ArrayList<>();
