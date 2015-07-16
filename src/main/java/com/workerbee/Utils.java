@@ -80,7 +80,7 @@ public class Utils {
   }
 
   public static Path writeAtTempFile(Table<? extends Table> table, Row... rows) throws IOException {
-    Path tableDataFile = Files.createTempFile(table.getDatabaseName(), table.getName());
+    Path tableDataFile = Files.createTempFile(table.getName(), null);
 
     List<String> generateRecords = new ArrayList<>(rows.length);
     for (Row row : rows) {

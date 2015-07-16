@@ -54,27 +54,33 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Initializing repository at : " + ROOT_DIR);
 
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
-    execute(new TableCreator(DUAL).ifNotExist().generate());
-    clear(DUAL);
+    setUp(DUAL);
     setUp(DUAL, new Row<>(DUAL, "X"));
   }
 
-  public Repository clear(Table<? extends Table> table) throws SQLException {
-    if (table.isExternal()){
-      execute("DFS -RMR " + table.getLocation());
-    } else {
-      execute(new TruncateTable(table).generate());
+  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
+    if (rows.length < 1) {
+      execute(new TableCreator(table).ifNotExist().generate());
+      clear(table);
+
+      return this;
     }
 
-    return this;
-  }
-
-  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
     LoadData loadData = new LoadData();
 
     for (Row row : rows) {
       Path tableDirPath = Utils.writeAtTempFile(table, row);
       execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
+    }
+
+    return this;
+  }
+
+  private Repository clear(Table<? extends Table> table) throws SQLException {
+    if (table.isExternal()){
+      execute("DFS -RMR " + table.getLocation());
+    } else {
+      execute(new TruncateTable(table).generate());
     }
 
     return this;
@@ -108,7 +114,7 @@ public class Repository implements AutoCloseable {
   private boolean execute(String query) throws SQLException {
     Statement statement = connection.createStatement();
 
-    for (String sqlStatement : query.split(";")) {
+    for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
       if (sqlStatement.length() > 0) {
         LOGGER.info("Executing query : " + sqlStatement);
         statement.execute(sqlStatement);
