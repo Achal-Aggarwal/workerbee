@@ -1,10 +1,12 @@
 package com.workerbee;
 
+import com.workerbee.ddl.create.TableCreator;
 import org.apache.hadoop.io.Text;
 
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.workerbee.Column.Type.INT;
 import static com.workerbee.Column.Type.STRING;
 
 public class Table<T extends Table> {
@@ -12,26 +14,47 @@ public class Table<T extends Table> {
 
   private String name;
 
+  private long version;
+
   private String comment;
+
   private String location;
   private boolean external = false;
 
   HashMap<String, String> properties = new HashMap<>();
 
   List<Column> columns = new ArrayList<>();
+
   List<Column> partitionedOn = new ArrayList<>();
 
   public Table(String name) {
-    this(null, name, null);
+    this(null, name, null, 0);
+  }
+  public Table(String name, long version) {
+    this(null, name, null, version);
   }
 
   public Table(Database database, String name) {
-    this(database, name, null);
+    this(database, name, null, 0);
   }
+
+  public Table(Database database, String name, long version) {
+    this(database, name, null, version);
+  }
+
   public Table(Database database, String name, String comment) {
+    this(database, name, comment, 0);
+  }
+
+  public Table(Database database, String name, String comment, long version) {
     this.database = database;
     this.name = name;
     this.comment = comment;
+    this.version = version;
+
+    if (isNotTemporary()) {
+      this.database.havingTable(this);
+    }
   }
 
   public Table<T> havingColumn(Column column){
@@ -115,6 +138,10 @@ public class Table<T extends Table> {
     return name;
   }
 
+  public long getVersion() {
+    return version;
+  }
+
   public String getComment() {
     return comment;
   }
@@ -165,6 +192,10 @@ public class Table<T extends Table> {
 
   public Text generateTextRecordFor(Row<T> row) {
     return new Text(generateRecordFor(row));
+  }
+
+  public String migration() {
+    return new TableCreator(this).ifNotExist().generate();
   }
 
   public static Table<Table> DUAL = new Table<>(Database.DEFAULT, "Dual")

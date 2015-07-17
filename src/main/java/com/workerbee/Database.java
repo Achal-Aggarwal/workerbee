@@ -1,6 +1,7 @@
 package com.workerbee;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Database {
@@ -9,6 +10,8 @@ public class Database {
   private String location;
 
   HashMap<String, String> properties = new HashMap<String, String>();
+
+  private HashSet<Table<? extends Table>> tables = new HashSet<>();
 
   public Database(String name) {
     this(name, null);
@@ -30,6 +33,16 @@ public class Database {
   public Database withComment(String comment){
     this.comment = comment;
     return this;
+  }
+
+  public Database havingTable(Table<? extends Table> table) {
+    tables.add(table);
+
+    return this;
+  }
+
+  public Table[] getTables() {
+    return tables.toArray(new Table[tables.size()]);
   }
 
   public Database havingProperty(String key, String value){

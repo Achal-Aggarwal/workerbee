@@ -19,12 +19,16 @@ public class Utils {
     return "'" + escapeQuote(string) + "'";
   }
 
-  public static String rtrim(String string) {
-    if (string.endsWith(";")){
-      string = string.substring(0, string.length()-1);
+  public static String rtrim(String string, String end) {
+    if (string.endsWith(end)){
+      string = string.substring(0, string.length()-end.length());
     }
 
     return string;
+  }
+
+  public static String rtrim(String string) {
+    return rtrim(string, ";");
   }
 
   public static String fqTableName(Table table){
