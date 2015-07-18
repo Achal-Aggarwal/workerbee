@@ -1,5 +1,7 @@
 package com.workerbee;
 
+import lombok.Getter;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -43,11 +45,18 @@ public class Column extends com.workerbee.expression.Comparable {
 
     public abstract Object convert(Object value);
   }
+
+  @Getter
   private final String name;
 
+  @Getter
   private final Type type;
+
+  @Getter
   private final String comment;
+
   private final Table belongsTo;
+
   public Column(Table belongsTo, String name, Type type) {
     this(belongsTo, name, type, null);
   }
@@ -57,18 +66,6 @@ public class Column extends com.workerbee.expression.Comparable {
     this.type = type;
     this.comment = comment;
     this.belongsTo = belongsTo;
-  }
-
-  public Type getType() {
-    return type;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getComment() {
-    return comment;
   }
 
   public String getFqColumnName(){

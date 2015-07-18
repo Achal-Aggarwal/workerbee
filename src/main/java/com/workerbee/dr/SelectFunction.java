@@ -1,9 +1,13 @@
 package com.workerbee.dr;
 
 import com.workerbee.Column.Type;
+import lombok.Getter;
 
 public abstract class SelectFunction {
+  @Getter
   protected String alias;
+
+  @Getter
   protected Type type;
 
   public abstract String generate();
@@ -12,13 +16,5 @@ public abstract class SelectFunction {
     this.alias = alias;
 
     return this;
-  }
-
-  public String getAlias() {
-    return alias;
-  }
-
-  public Type getType() {
-    return type;
   }
 }

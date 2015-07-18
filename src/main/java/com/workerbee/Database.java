@@ -1,15 +1,22 @@
 package com.workerbee;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Database {
+  @Getter
   private String name;
+
+  @Getter
   private String comment;
+
+  @Getter
   private String location;
 
-  HashMap<String, String> properties = new HashMap<String, String>();
+  private HashMap<String, String> properties = new HashMap<String, String>();
 
   private HashSet<Table<? extends Table>> tables = new HashSet<>();
 
@@ -20,14 +27,6 @@ public class Database {
   public Database(String name, String comment) {
     this.name = name;
     this.comment = comment;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getComment() {
-    return comment;
   }
 
   public Database withComment(String comment){
@@ -56,10 +55,6 @@ public class Database {
 
   public String getProperty(String property) {
     return properties.get(property);
-  }
-
-  public String getLocation() {
-    return location;
   }
 
   public Database onLocation(String location) {

@@ -61,6 +61,7 @@ public class QueryGenerator {
   public static LoadData loadData() {
     return new LoadData();
   }
+
   public static TruncateTable truncate(Table<? extends Table> table) {
     return new TruncateTable(table);
   }

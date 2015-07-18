@@ -1,6 +1,7 @@
 package com.workerbee;
 
 import com.workerbee.ddl.create.TableCreator;
+import lombok.Getter;
 import org.apache.hadoop.io.Text;
 
 import java.nio.file.Path;
@@ -10,19 +11,27 @@ import static com.workerbee.Column.Type.INT;
 import static com.workerbee.Column.Type.STRING;
 
 public class Table<T extends Table> {
+  @Getter
   private Database database;
 
+  @Getter
   private String name;
 
+  @Getter
   private long version;
 
+  @Getter
   private String comment;
 
+  @Getter
   private String location;
+
+  @Getter
   private boolean external = false;
 
   HashMap<String, String> properties = new HashMap<>();
 
+  @Getter
   List<Column> columns = new ArrayList<>();
 
   List<Column> partitionedOn = new ArrayList<>();
@@ -118,14 +127,6 @@ public class Table<T extends Table> {
     return this;
   }
 
-  public Database getDatabase() {
-    return database;
-  }
-
-  public List<Column> getColumns() {
-    return columns;
-  }
-
   public List<Column> getPartitions() {
     return partitionedOn;
   }
@@ -134,32 +135,12 @@ public class Table<T extends Table> {
     return database.getName();
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public long getVersion() {
-    return version;
-  }
-
-  public String getComment() {
-    return comment;
-  }
-
   public Set<String> getProperties(){
     return properties.keySet();
   }
 
   public String getProperty(String property) {
     return properties.get(property);
-  }
-
-  public String getLocation() {
-    return location;
-  }
-
-  public boolean isExternal() {
-    return external;
   }
 
   public boolean isNotTemporary() {
