@@ -4,9 +4,9 @@ import com.workerbee.Query;
 import com.workerbee.Table;
 
 public class RecoverPartition implements Query {
-  private Table table;
+  private Table<? extends Table> table;
 
-  public RecoverPartition(Table table) {
+  public RecoverPartition(Table<? extends Table> table) {
     this.table = table;
   }
 

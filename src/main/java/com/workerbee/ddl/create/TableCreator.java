@@ -10,8 +10,8 @@ import static com.workerbee.Utils.joinList;
 import static com.workerbee.Utils.quoteString;
 
 public class TableCreator implements Query {
-  Table<? extends Table> table;
-  boolean overwrite = true;
+  private Table<? extends Table> table;
+  private boolean overwrite = true;
   private Database database;
 
   public TableCreator(Table<? extends Table> table) {

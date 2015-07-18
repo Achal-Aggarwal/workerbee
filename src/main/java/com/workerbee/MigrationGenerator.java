@@ -87,6 +87,10 @@ public class MigrationGenerator {
 
     @Override
     public boolean equals(Object obj) {
+      if (!(obj instanceof MigrationVersion)) {
+        return false;
+      }
+
       MigrationVersion mv = (MigrationVersion) obj;
 
       return mv.tableName.equals(tableName) && mv.version <= version;

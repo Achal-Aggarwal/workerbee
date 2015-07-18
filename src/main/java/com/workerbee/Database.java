@@ -16,7 +16,7 @@ public class Database {
   @Getter
   private String location;
 
-  private HashMap<String, String> properties = new HashMap<String, String>();
+  private HashMap<String, String> properties = new HashMap<>();
 
   private HashSet<Table<? extends Table>> tables = new HashSet<>();
 

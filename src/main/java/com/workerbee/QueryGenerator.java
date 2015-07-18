@@ -24,7 +24,7 @@ public class QueryGenerator {
     return new DatabaseDropper(database);
   }
 
-  public static TableCreator create(Table table){
+  public static TableCreator create(Table<? extends Table> table){
     return new TableCreator(table);
   }
 
@@ -32,7 +32,7 @@ public class QueryGenerator {
     return new TableDropper(table);
   }
 
-  public static RecoverPartition recover(Table table) {
+  public static RecoverPartition recover(Table<? extends Table> table) {
     return new RecoverPartition(table);
   }
 
@@ -41,7 +41,7 @@ public class QueryGenerator {
   }
 
   public static SelectQuery select(Column... columns) {
-    List<SelectFunction> selectFunctions = new ArrayList<SelectFunction>(columns.length);
+    List<SelectFunction> selectFunctions = new ArrayList<>(columns.length);
 
     for (Column column : columns) {
       selectFunctions.add(new ColumnSF(column));

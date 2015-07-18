@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Row<T extends Table> {
-  public static final int ZERO_BASED = 0;
-  public static final int ONE_BASED = 1;
+  private static final int ZERO_BASED = 0;
+  private static final int ONE_BASED = 1;
   private Map<Column, Object> map;
   private Table<? extends Table> table;
 

@@ -26,8 +26,8 @@ import static java.lang.String.valueOf;
 
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
-  public static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
-  public static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
+  private static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
+  private static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
 
   private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
 

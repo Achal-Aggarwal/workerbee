@@ -10,8 +10,8 @@ import java.util.List;
 import static com.workerbee.Utils.quoteString;
 
 public class DatabaseCreator implements Query {
-  Database database;
-  boolean overwrite = true;
+  private Database database;
+  private boolean overwrite = true;
 
   public DatabaseCreator(Database database) {
     this.database = database;
@@ -53,7 +53,7 @@ public class DatabaseCreator implements Query {
 
   private void tablePropertiesPart(StringBuilder result) {
     result.append(" WITH DBPROPERTIES ( ");
-    List<String> keyValues = new ArrayList<String>(database.getProperties().size());
+    List<String> keyValues = new ArrayList<>(database.getProperties().size());
 
     for (String property : database.getProperties()) {
       keyValues.add(quoteString(property) + " = " + quoteString(database.getProperty(property)));

@@ -16,9 +16,9 @@ public class LoadData implements Query {
   private Path filePath;
   private boolean overwrite = false;
   private Table<? extends Table> table;
-  private Row<Table> row;
+  private Row<? extends Table> row;
 
-  public LoadData data(Row row) {
+  public LoadData data(Row<? extends Table> row) {
     this.row = row;
     return this;
   }

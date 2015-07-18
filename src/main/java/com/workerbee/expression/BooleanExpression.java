@@ -4,7 +4,7 @@ public class BooleanExpression {
   private static String AND = "AND";
   private static String OR = "OR";
 
-  public static String EQUALS = "=";
+  public static final String EQUALS = "=";
   public static final String NOT_EQUALS = "<>";
   public static final String GREATER_THAN = ">";
   public static final String LESSER_THAN = "<";

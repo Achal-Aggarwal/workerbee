@@ -14,7 +14,7 @@ public class ColumnSF extends SelectFunction {
 
   @Override
   public String generate() {
-    if (alias == column.getName()){
+    if (alias.equals(column.getName())) {
       return column.getFqColumnName();
     }
 

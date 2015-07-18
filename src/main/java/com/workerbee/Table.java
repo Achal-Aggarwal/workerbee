@@ -170,7 +170,7 @@ public class Table<T extends Table> {
   }
 
   public Row<T> parseRecordUsing(String record) {
-    return new Row<T>(this, record);
+    return new Row<>(this, record);
   }
 
   public Row<T> parseTextRecordUsing(Text record) {

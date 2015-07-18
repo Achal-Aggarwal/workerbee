@@ -67,9 +67,9 @@ public class Utils {
     StringBuilder result = new StringBuilder();
 
     for (Object o : list) {
-      if (o == null)
+      if (o == null || o.equals(""))
         continue;
-      result.append(o.toString() + separator);
+      result.append(o.toString()).append(separator);
     }
 
     result.delete(result.lastIndexOf(separator), result.length());

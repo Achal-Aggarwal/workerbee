@@ -10,12 +10,12 @@ import java.util.List;
 
 public class SelectQuery implements Query {
   private Table<? extends Table> table;
-  private List<SelectFunction> selectFunctions = new ArrayList<SelectFunction>();
+  private List<SelectFunction> selectFunctions = new ArrayList<>();
   private String alias;
   private Table<? extends Table> joinTable;
   private BooleanExpression onBooleanExpression;
   private Integer limit;
-  private List<ColumnOrder> orderBy = new ArrayList<ColumnOrder>();
+  private List<ColumnOrder> orderBy = new ArrayList<>();
 
   public SelectQuery(List<SelectFunction> selectFunctions) {
     this.selectFunctions.addAll(selectFunctions);
@@ -127,10 +127,10 @@ public class SelectQuery implements Query {
   private void selectFuncPart(StringBuilder result) {
     for (SelectFunction selectFunction : selectFunctions) {
       if (selectFunction instanceof AllStarSF){
-        for (Column column : (List<Column>) this.table.getColumns()) {
+        for (Column column : this.table.getColumns()) {
           result.append(" " + column.getFqColumnName() + ",");
         }
-        for (Column column : (List<Column>) this.table.getPartitions()) {
+        for (Column column : this.table.getPartitions()) {
           result.append(" " + column.getFqColumnName() + ",");
         }
       } else {
