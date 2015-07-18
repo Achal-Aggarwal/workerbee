@@ -31,10 +31,9 @@ public class Table<T extends Table> {
 
   HashMap<String, String> properties = new HashMap<>();
 
-  @Getter
-  List<Column> columns = new ArrayList<>();
+  Map<String, Column> columns = new LinkedHashMap<>();
 
-  List<Column> partitionedOn = new ArrayList<>();
+  Map<String, Column> partitionedOn = new LinkedHashMap<>();
 
   public Table(String name) {
     this(null, name, null, 0);
@@ -67,7 +66,11 @@ public class Table<T extends Table> {
   }
 
   public Table<T> havingColumn(Column column){
-    columns.add(column);
+    if (columns.containsKey(column.getName())) {
+      throw new RuntimeException("Table " + getName() + " already has a column with name " + column.getName());
+    }
+
+    columns.put(column.getName(), column);
     return this;
   }
 
@@ -86,12 +89,15 @@ public class Table<T extends Table> {
   }
 
   public Table havingColumns(List<Column> columns) {
-    this.columns.addAll(columns);
+    for (Column column : columns) {
+      havingColumn(column);
+    }
+
     return this;
   }
 
   public Table partitionedOnColumn(Column column){
-    partitionedOn.add(column);
+    partitionedOn.put(column.getName(), column);
     return this;
   }
 
@@ -127,8 +133,12 @@ public class Table<T extends Table> {
     return this;
   }
 
+  public List<Column> getColumns() {
+    return new ArrayList<>(columns.values());
+  }
+
   public List<Column> getPartitions() {
-    return partitionedOn;
+    return new ArrayList<>(partitionedOn.values());
   }
 
   public String getDatabaseName(){

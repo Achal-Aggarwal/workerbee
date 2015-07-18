@@ -25,6 +25,8 @@ public class TableTest {
   public static final String COLUMN_NAME = "COLUMN_NAME";
   public static final boolean EMPTY = true;
   public static final boolean NOT_EMPTY = false;
+  public static final String INT_COLUMN_NAME = "INT_COLUMN_NAME";
+  public static final String STRING_COLUMN_NAME = "STRING_COLUMN_NAME";
 
   private Table table;
 
@@ -116,8 +118,8 @@ public class TableTest {
 
   @Test
   public void shouldParseRecordAndReturnCorrespondingRowOfTable() {
-    Column integer = new Column(table, "INT_COLUMN_NAME", INT);
-    Column string = new Column(table, "STRING_COLUMN_NAME", STRING);
+    Column integer = new Column(table, INT_COLUMN_NAME, INT);
+    Column string = new Column(table, STRING_COLUMN_NAME, STRING);
 
     table.havingColumns(Arrays.asList(integer, string));
 
@@ -128,13 +130,22 @@ public class TableTest {
 
   @Test
   public void shouldGenerateRecordStringForCorrespondingRowOfTable(){
-    Column integer = new Column(table, "INT_COLUMN_NAME", INT);
-    Column string = new Column(table, "STRING_COLUMN_NAME", STRING);
+    Column integer = new Column(table, INT_COLUMN_NAME, INT);
+    Column string = new Column(table, STRING_COLUMN_NAME, STRING);
 
     table.havingColumn(integer);
     table.havingColumn(string);
 
     Row row = table.getNewRow().set(integer, 1).set(string, "ASD");
     assertThat(table.generateRecordFor(row), is("1"+ table.getColumnSeparator() +"ASD"));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void shouldThrowExceptionIfAnotherColumnWithSameNameIsAddedInTable() {
+    Column integer = new Column(table, INT_COLUMN_NAME, INT);
+    Column anotherInteger = new Column(table, INT_COLUMN_NAME, STRING);
+
+    table.havingColumn(integer);
+    table.havingColumn(anotherInteger);
   }
 }

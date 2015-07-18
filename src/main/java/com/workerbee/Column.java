@@ -103,7 +103,7 @@ public class Column extends com.workerbee.expression.Comparable {
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return getName().hashCode() * getType().hashCode();
   }
 
   @Override
