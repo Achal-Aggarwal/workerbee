@@ -6,6 +6,7 @@ import com.workerbee.expression.BooleanExpression;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SelectQuery implements Query {
@@ -16,6 +17,8 @@ public class SelectQuery implements Query {
   private BooleanExpression onBooleanExpression;
   private Integer limit;
   private List<ColumnOrder> orderBy = new ArrayList<>();
+  private List<Column> groupBy = new ArrayList<>();
+  private SelectQuery selectQuery;
 
   public SelectQuery(List<SelectFunction> selectFunctions) {
     this.selectFunctions.addAll(selectFunctions);
@@ -41,6 +44,11 @@ public class SelectQuery implements Query {
     return this;
   }
 
+  public SelectQuery join(SelectQuery selectQuery) {
+    this.selectQuery = selectQuery;
+    return this;
+  }
+
   public SelectQuery on(BooleanExpression booleanExpression){
     onBooleanExpression = booleanExpression;
     return this;
@@ -59,6 +67,12 @@ public class SelectQuery implements Query {
 
   private SelectQuery orderBy(Column column, String order){
     this.orderBy.add(new ColumnOrder(column, order));
+    return this;
+  }
+
+  public SelectQuery groupBy(Column column, Column... columns){
+    this.groupBy.add(column);
+    Collections.addAll(this.groupBy, columns);
     return this;
   }
 
@@ -110,6 +124,13 @@ public class SelectQuery implements Query {
     if (joinTable != null && onBooleanExpression != null){
       joinTablePart(result);
     }
+    else if (selectQuery != null && onBooleanExpression != null){
+      joinSelectQueryPart(result);
+    }
+
+    if (!groupBy.isEmpty()){
+      groupByPart(result);
+    }
 
     if (!orderBy.isEmpty()){
       orderByPart(result);
@@ -118,8 +139,6 @@ public class SelectQuery implements Query {
     if (limit != null){
       result.append(" LIMIT " + limit);
     }
-
-    result.append(" ;");
 
     return result.toString();
   }
@@ -155,15 +174,35 @@ public class SelectQuery implements Query {
     result.append(onBooleanExpression.generate());
   }
 
+  private void joinSelectQueryPart(StringBuilder result) {
+    result.append(" JOIN (");
+
+    result.append(selectQuery.generate() + ") " + selectQuery.alias);
+
+    result.append(" ON ");
+    result.append(onBooleanExpression.generate());
+  }
+
   private void orderByPart(StringBuilder result) {
     result.append(" ORDER BY ");
 
-    List<String> orderByColumns = new ArrayList<String>(orderBy.size());
+    List<String> orderByColumns = new ArrayList<>(orderBy.size());
     for (ColumnOrder columnOrder : orderBy) {
       orderByColumns.add(columnOrder.column.getFqColumnName() + " " + columnOrder.order);
     }
 
     result.append(Utils.joinList(orderByColumns, ", "));
+  }
+
+  private void groupByPart(StringBuilder result) {
+    result.append(" GROUP BY ");
+
+    List<String> groupByColumns = new ArrayList<>(groupBy.size());
+    for (Column column : groupBy) {
+      groupByColumns.add(column.getFqColumnName());
+    }
+
+    result.append(Utils.joinList(groupByColumns, ", "));
   }
 
   private static class ColumnOrder {

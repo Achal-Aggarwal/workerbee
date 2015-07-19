@@ -1,9 +1,10 @@
 package com.workerbee.dr;
 
 import com.workerbee.Column.Type;
+import com.workerbee.expression.*;
 import lombok.Getter;
 
-public abstract class SelectFunction {
+public abstract class SelectFunction extends com.workerbee.expression.Comparable {
   @Getter
   protected String alias;
 
@@ -16,5 +17,10 @@ public abstract class SelectFunction {
     this.alias = alias;
 
     return this;
+  }
+
+  @Override
+  public String operandName() {
+    return null;
   }
 }

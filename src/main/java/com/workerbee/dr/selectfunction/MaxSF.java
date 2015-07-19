@@ -3,19 +3,15 @@ package com.workerbee.dr.selectfunction;
 import com.workerbee.Column;
 import com.workerbee.dr.SelectFunction;
 
-import static com.workerbee.Column.Type.STRING;
+import static com.workerbee.Column.Type.INT;
 
-public class SubStrSF extends SelectFunction {
+public class MaxSF extends SelectFunction {
   private String columnName;
-  private int start;
-  private int end;
 
-  public SubStrSF(Column column, int start, int end){
+  public MaxSF(Column column){
     columnName = column.getFqColumnName();
     alias = column.getName();
-    type = STRING;
-    this.start = start;
-    this.end = end;
+    type = INT;
   }
 
   @Override
@@ -29,6 +25,6 @@ public class SubStrSF extends SelectFunction {
 
   @Override
   public String operandName() {
-    return "SUBSTR(" + columnName + ", " + start + ", " + end + ")";
+    return "MAX(" + columnName + ")";
   }
 }

@@ -133,6 +133,10 @@ public class Table<T extends Table> {
     return this;
   }
 
+  public Column getColumn(Column column) {
+    return columns.get(column.getName());
+  }
+
   public List<Column> getColumns() {
     return new ArrayList<>(columns.values());
   }

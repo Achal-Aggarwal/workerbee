@@ -1,11 +1,12 @@
 package com.workerbee;
 
+import com.workerbee.dr.SelectFunction;
 import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Column extends com.workerbee.expression.Comparable {
+public class Column extends SelectFunction {
   public static enum Type {
     INT {
       @Override
@@ -66,6 +67,7 @@ public class Column extends com.workerbee.expression.Comparable {
     this.type = type;
     this.comment = comment;
     this.belongsTo = belongsTo;
+    this.alias = name;
   }
 
   public String getFqColumnName(){
@@ -94,6 +96,15 @@ public class Column extends com.workerbee.expression.Comparable {
 
   public Object convert(Object value) {
     return type.convert(value);
+  }
+
+  @Override
+  public String generate() {
+    if (alias.equals(name)) {
+      return getFqColumnName();
+    }
+
+    return getFqColumnName() + " AS " + alias;
   }
 
   @Override

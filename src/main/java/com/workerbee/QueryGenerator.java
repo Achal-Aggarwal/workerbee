@@ -10,10 +10,6 @@ import com.workerbee.ddl.misc.TruncateTable;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectFunction;
 import com.workerbee.dr.SelectQuery;
-import com.workerbee.dr.selectfunction.ColumnSF;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class QueryGenerator {
   public static DatabaseCreator create(Database database){
@@ -37,16 +33,6 @@ public class QueryGenerator {
   }
 
   public static SelectQuery select(SelectFunction... selectFunctions) {
-    return new SelectQuery(selectFunctions);
-  }
-
-  public static SelectQuery select(Column... columns) {
-    List<SelectFunction> selectFunctions = new ArrayList<>(columns.length);
-
-    for (Column column : columns) {
-      selectFunctions.add(new ColumnSF(column));
-    }
-
     return new SelectQuery(selectFunctions);
   }
 

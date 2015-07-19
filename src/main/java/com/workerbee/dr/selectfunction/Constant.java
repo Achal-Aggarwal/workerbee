@@ -18,4 +18,9 @@ public class Constant extends SelectFunction {
 
     return String.valueOf(value);
   }
+
+  @Override
+  public String operandName() {
+    return generate();
+  }
 }
