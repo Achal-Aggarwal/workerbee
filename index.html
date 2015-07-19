@@ -39,7 +39,7 @@
 <p>Workerbee enables you to define schema of database and tables along side of Map - Reduce programs. Once written they can be managed by changing java code. Using MigrationGenerator, migrations can generated which can be run against the database that need to migrate.</p>
 
 <h3>
-<a id="que-ry-builder-at-disposal" class="anchor" href="#que-ry-builder-at-disposal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Que## ry Builder at disposal</h3>
+<a id="query-builder-at-disposal" class="anchor" href="#query-builder-at-disposal" aria-hidden="true"><span class="octicon octicon-link"></span></a>Query Builder at disposal</h3>
 
 <p>Workerbee comes with basic query builder that comes handy when you don’t want to commit any typos while writing queries. No need to remember or lookup tables and their schema just to check column's order and type.</p>
 
@@ -64,121 +64,126 @@
 <p>With baseball statistics like bats man name, runs scored, the year for years 1871 - 2011, find the player with the highest runs for each year.</p>
 
 <p><strong>Setting up project:</strong>
-1. Clone the repo and build with <code>mvn install</code></p>
+1. Clone the repo and build with mvn install</p>
 
 <ol>
-<li><p>Add dependency 
-<code>&lt;dependency&gt;</code>
-<code>&lt;groupId&gt;org.projectlombok&lt;/groupId&gt;</code>
-<code>&lt;artifactId&gt;lombok&lt;/artifactId&gt;</code>
-<code>&lt;version&gt;1.16.4&lt;/version&gt;</code>
-<code>&lt;scope&gt;provided&lt;/scope&gt;</code>
-<code>&lt;/dependency&gt;</code></p></li>
-<li><p>Add env variable HADOOP_HOME which points to your hadoop location</p></li>
+<li>Add dependency </li>
 </ol>
 
-<p><strong>Creating Database &amp; table:</strong>
-<code>public class BaseBall extends Database {</code>
-  <code>public static final BaseBall db = new BaseBall();</code></p>
-
-<p><code>private BaseBall() {</code>
-    <code>super("BaseBall", "BaseBall database");</code>
-  <code>}</code>
-<code>}</code></p>
-
-<p><code>public class Batting extends Table&lt;Batting&gt; {</code>
-  <code>public static final Batting tb = new Batting();</code></p>
-
-<p><code>public static final Column playerId = HavingColumn(tb, "player_id", Column.Type.STRING);</code>
-  <code>public static final Column year = HavingColumn(tb, "year", Column.Type.INT);</code>
-  <code>public static final Column runs = HavingColumn(tb, "runs", Column.Type.INT);</code></p>
-
-<p><code>private Batting() {</code>
-    <code>super(BaseBall.db, "Batting", "Batting table", 1);</code>
-  <code>}</code>
-<code>}</code></p>
-
-<p><strong>Writing Test - Using Junit4:</strong>
-<code>public class PlayerWithHighestRunForEachYear() {</code>
-  <code>public static final String PLAYER_1_ID = "PLAYER1_ID";</code>
-  <code>public static final String PLAYER_2_ID = "PLAYER2_ID";</code>
-  <code>public static final String PLAYER_3_ID = "PLAYER3_ID";</code>
-  <code>private Repository repo;</code>
-  <code>private Row&lt;Batting&gt; lowestRun</code>
-    <code>= Batting.tb.getNewRow()</code>
-    <code>.set(Batting.playerId, PLAYER_1_ID)</code>
-    <code>.set(Batting.year, 1990)</code>
-    <code>.set(Batting.runs, 10);</code></p>
-
-<p><code>private Row&lt;Batting&gt; mediumRun</code>
-    <code>= Batting.tb.getNewRow()</code>
-    <code>.set(Batting.playerId, PLAYER_2_ID)</code>
-    <code>.set(Batting.year, 1990)</code>
-    <code>.set(Batting.runs, 100);</code></p>
-
-<p><code>private Row&lt;Batting&gt; maximumRun</code>
-    <code>= Batting.tb.getNewRow()</code>
-    <code>.set(Batting.playerId, PLAYER_3_ID)</code>
-    <code>.set(Batting.year, 2000)</code>
-    <code>.set(Batting.runs, 50);</code></p>
-
-<p><code>public BaseBallTest() throws IOException, SQLException {</code>
-    <code>repo = Repository.TemporaryRepository();</code>
-    <code>repo.execute(create(BaseBall.db).ifNotExist());</code>
-  <code>}</code></p>
-
-<p><code>@Test</code>
-  <code>public void shouldReturnPlayerWithHighestScoreForEachYear() throws IOException, SQLException {</code>
-    <code>repo.setUp(Batting.tb);</code>
-    <code>repo.setUp(Batting.tb)</code>
-      <code>.setUp(Batting.tb, lowestRun, mediumRun, maximumRun);</code></p>
-
-<pre><code>`SelectQuery selectQuery = select(Batting.year, max(Batting.runs))`
-  `.from(Batting.tb)`
-  `.groupBy(Batting.year)`
-  `.ascOrderOf(Batting.year)`
-  `.as("MaxRunsForEachYear");`
-
-`Table&lt;Table&gt; maxRunsForEachYear = selectQuery.table();`
-
-`List&lt;Row&lt;Table&gt;&gt; years = repo.execute(QUERY_TO_TEST);`
-
-`assertThat(years.size(), is(2));`
-
-`assertThat(years.get(0).getString(Batting.playerId), is(PLAYER_2_ID));`
-`assertThat(years.get(0).getInt(Batting.year), is(1990));`
-`assertThat(years.get(0).getInt(Batting.runs), is(100));`
-
-`assertThat(years.get(1).getString(Batting.playerId), is(PLAYER_3_ID));`
-`assertThat(years.get(1).getInt(Batting.year), is(2000));`
-`assertThat(years.get(1).getInt(Batting.runs), is(50));`
+<pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+   &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+   &lt;version&gt;1.16.4&lt;/version&gt;
+   &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;
 </code></pre>
 
-<p><code>}</code>
-<code>}</code></p>
+<ol>
+<li>Add env variable HADOOP_HOME which points to your hadoop location</li>
+</ol>
+
+<p><strong>Creating Database &amp; table:</strong></p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">BaseBall</span> <span class="pl-k">extends</span> <span class="pl-e">Database</span> {
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">BaseBall</span> db <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">BaseBall</span>();
+
+  <span class="pl-k">private</span> <span class="pl-en">BaseBall</span>() {
+    <span class="pl-v">super</span>(<span class="pl-s"><span class="pl-pds">"</span>BaseBall<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>BaseBall database<span class="pl-pds">"</span></span>);
+  }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Batting</span> <span class="pl-k">extends</span> <span class="pl-e">Table&lt;<span class="pl-smi">Batting</span>&gt;</span> {
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Batting</span> tb <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Batting</span>();
+
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> playerId <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>player_id<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>STRING</span>);
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> year <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> runs <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>runs<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
+
+  <span class="pl-k">private</span> <span class="pl-en">Batting</span>() {
+    <span class="pl-v">super</span>(<span class="pl-smi">BaseBall</span><span class="pl-k">.</span>db, <span class="pl-s"><span class="pl-pds">"</span>Batting<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Batting table<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>);
+  }
+}</pre></div>
+
+<p><strong>Writing Test - Using Junit4:</strong></p>
+
+<div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">PlayerWithHighestRunForEachYear</span>() {
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-c1">PLAYER_1_ID</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>PLAYER1_ID<span class="pl-pds">"</span></span>;
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-c1">PLAYER_2_ID</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>PLAYER2_ID<span class="pl-pds">"</span></span>;
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">String</span> <span class="pl-c1">PLAYER_3_ID</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>PLAYER3_ID<span class="pl-pds">"</span></span>;
+  <span class="pl-k">private</span> <span class="pl-smi">Repository</span> repo;
+  <span class="pl-k">private</span> <span class="pl-k">Row&lt;<span class="pl-smi">Batting</span>&gt;</span> lowestRun
+    <span class="pl-k">=</span> <span class="pl-smi">Batting</span><span class="pl-k">.</span>tb<span class="pl-k">.</span>getNewRow()
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId, <span class="pl-c1">PLAYER_1_ID</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, <span class="pl-c1">1990</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs, <span class="pl-c1">10</span>);
+
+  <span class="pl-k">private</span> <span class="pl-k">Row&lt;<span class="pl-smi">Batting</span>&gt;</span> mediumRun
+    <span class="pl-k">=</span> <span class="pl-smi">Batting</span><span class="pl-k">.</span>tb<span class="pl-k">.</span>getNewRow()
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId, <span class="pl-c1">PLAYER_2_ID</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, <span class="pl-c1">1990</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs, <span class="pl-c1">100</span>);
+
+  <span class="pl-k">private</span> <span class="pl-k">Row&lt;<span class="pl-smi">Batting</span>&gt;</span> maximumRun
+    <span class="pl-k">=</span> <span class="pl-smi">Batting</span><span class="pl-k">.</span>tb<span class="pl-k">.</span>getNewRow()
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId, <span class="pl-c1">PLAYER_3_ID</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, <span class="pl-c1">2000</span>)
+    .set(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs, <span class="pl-c1">50</span>);
+
+  <span class="pl-k">public</span> <span class="pl-en">BaseBallTest</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span>, <span class="pl-smi">SQLException</span> {
+    repo <span class="pl-k">=</span> <span class="pl-smi">Repository</span><span class="pl-k">.</span>TemporaryRepository();
+    repo<span class="pl-k">.</span>execute(create(<span class="pl-smi">BaseBall</span><span class="pl-k">.</span>db)<span class="pl-k">.</span>ifNotExist());
+  }
+
+  <span class="pl-k">@Test</span>
+  <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">shouldReturnPlayerWithHighestScoreForEachYear</span>() <span class="pl-k">throws</span> <span class="pl-smi">IOException</span>, <span class="pl-smi">SQLException</span> {
+    repo<span class="pl-k">.</span>setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb);
+    repo<span class="pl-k">.</span>setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
+      .setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb, lowestRun, mediumRun, maximumRun);
+
+    <span class="pl-smi">SelectQuery</span> selectQuery <span class="pl-k">=</span> select(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, max(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs))
+      .from(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
+      .groupBy(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
+      .ascOrderOf(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
+      .as(<span class="pl-s"><span class="pl-pds">"</span>MaxRunsForEachYear<span class="pl-pds">"</span></span>);
+
+    <span class="pl-k">Table&lt;<span class="pl-smi">Table</span>&gt;</span> maxRunsForEachYear <span class="pl-k">=</span> selectQuery<span class="pl-k">.</span>table();
+
+    <span class="pl-k">List&lt;<span class="pl-k">Row&lt;<span class="pl-smi">Table</span>&gt;</span>&gt;</span> years <span class="pl-k">=</span> repo<span class="pl-k">.</span>execute(<span class="pl-c1">QUERY_TO_TEST</span>);
+
+    assertThat(years<span class="pl-k">.</span>size(), is(<span class="pl-c1">2</span>));
+
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">0</span>)<span class="pl-k">.</span>getString(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId), is(<span class="pl-c1">PLAYER_2_ID</span>));
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">0</span>)<span class="pl-k">.</span>getInt(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year), is(<span class="pl-c1">1990</span>));
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">0</span>)<span class="pl-k">.</span>getInt(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs), is(<span class="pl-c1">100</span>));
+
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">1</span>)<span class="pl-k">.</span>getString(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId), is(<span class="pl-c1">PLAYER_3_ID</span>));
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">1</span>)<span class="pl-k">.</span>getInt(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year), is(<span class="pl-c1">2000</span>));
+    assertThat(years<span class="pl-k">.</span>get(<span class="pl-c1">1</span>)<span class="pl-k">.</span>getInt(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs), is(<span class="pl-c1">50</span>));
+  }
+}</pre></div>
 
 <p><strong>Writing queries</strong>
 The next step is to group the data by year so we can find the highest score for each year. This query first groups all the records by year and then selects the player with the highest runs from each year.</p>
 
-<p><code>select(Batting.year, max(Batting.runs))</code>
-  <code>.from(Batting.tb)</code>
-  <code>.groupBy(Batting.year)</code></p>
+<div class="highlight highlight-java"><pre>select(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, max(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs))
+  .from(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
+  .groupBy(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)</pre></div>
 
 <p>Now we need to go back and get the player_id(s) so we know who the player(s) was. We know that for a given year we can use the runs to find the player(s) for that year. So we can take the previous query and join it with the batting records to get the final table.</p>
 
-<p><code>SelectQuery selectQuery = select(Batting.year, max(Batting.runs))</code>
-  <code>.from(Batting.tb)</code>
-  <code>.groupBy(Batting.year)</code>
-  <code>.ascOrderOf(Batting.year)</code>
-  <code>.as("MaxRunsForEachYear");</code></p>
+<div class="highlight highlight-java"><pre><span class="pl-smi">SelectQuery</span> selectQuery <span class="pl-k">=</span> select(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, max(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs))
+  .from(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
+  .groupBy(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
+  .ascOrderOf(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
+  .as(<span class="pl-s"><span class="pl-pds">"</span>MaxRunsForEachYear<span class="pl-pds">"</span></span>);
 
-<p><code>Table&lt;Table&gt; maxRunsForEachYear = selectQuery.table();</code></p>
+<span class="pl-k">Table&lt;<span class="pl-smi">Table</span>&gt;</span> maxRunsForEachYear <span class="pl-k">=</span> selectQuery<span class="pl-k">.</span>table();
 
-<p><code>select(Batting.playerId, Batting.year, Batting.runs).from(Batting.tb)</code>
-  <code>.join(selectQuery)</code>
-  <code>.on(Batting.year.eq(maxRunsForEachYear.getColumn(Batting.year))</code>
-      <code>.and(Batting.runs.eq(maxRunsForEachYear.getColumn(Batting.runs)))</code>
-  <code>)</code></p>
+select(<span class="pl-smi">Batting</span><span class="pl-k">.</span>playerId, <span class="pl-smi">Batting</span><span class="pl-k">.</span>year, <span class="pl-smi">Batting</span><span class="pl-k">.</span>runs)<span class="pl-k">.</span>from(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
+  .join(selectQuery)
+  .on(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year<span class="pl-k">.</span>eq(maxRunsForEachYear<span class="pl-k">.</span>getColumn(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year))
+      .and(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs<span class="pl-k">.</span>eq(maxRunsForEachYear<span class="pl-k">.</span>getColumn(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs)))
+  )</pre></div>
       </section>
     </div>
 
