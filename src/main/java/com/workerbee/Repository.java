@@ -7,6 +7,10 @@ import com.workerbee.ddl.misc.TruncateTable;
 import com.workerbee.dml.insert.InsertQuery;
 import com.workerbee.dr.SelectQuery;
 import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.MiniMRCluster;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,14 +37,45 @@ public class Repository implements AutoCloseable {
 
   private Connection connection;
 
+  protected MiniMRCluster miniMR;
+
   public static Repository TemporaryRepository() throws IOException, SQLException {
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
-      getHiveConfiguration(ROOT_DIR)
+      getHiveConfiguration(ROOT_DIR),
+      false
     );
   }
 
-  private Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
+  public static Repository InMemoryRepository() throws IOException, SQLException {
+    return new Repository(
+      JDBC_HIVE2_EMBEDDED_MODE_URL,
+      getHiveConfiguration(ROOT_DIR),
+      true
+    );
+  }
+
+  private Repository(String connectionUrl, Properties properties, boolean isInMemory) throws SQLException, IOException {
+    if (isInMemory) {
+      Configuration conf = new Configuration();
+      int numTaskTrackers = 1;
+      int numTaskTrackerDirectories = 1;
+
+      System.setProperty("hadoop.log.dir", Paths.get(ROOT_DIR.toString(), "hive-log").toString());
+
+      MiniDFSCluster miniDFS = new MiniDFSCluster.Builder(conf).build();
+      miniMR = new MiniMRCluster(numTaskTrackers, miniDFS.getFileSystem().getUri().toString(),
+        numTaskTrackerDirectories, null, null, new JobConf(conf));
+
+      JobConf jobConf = miniMR.createJobConf(new JobConf(conf));
+      String jobTracker = jobConf.get("mapred.job.tracker");
+
+      LOGGER.info("Job tracker started at : " + jobTracker);
+      properties.setProperty("hiveconf:mapred.job.tracker", jobTracker);
+
+      properties.setProperty("hiveconf:mapreduce.framework.name", "classic");
+    }
+
     try {
       Class.forName(DRIVER_NAME);
     } catch (ClassNotFoundException e) {
@@ -141,6 +176,7 @@ public class Repository implements AutoCloseable {
   @Override
   public void close() throws SQLException {
     connection.close();
+    miniMR.shutdown();
   }
 
   private static Properties getHiveConfiguration(Path baseDir) {
