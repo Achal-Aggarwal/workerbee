@@ -3,6 +3,7 @@ package com.workerbee.dr;
 import com.workerbee.Column;
 import com.workerbee.Database;
 import com.workerbee.Table;
+import com.workerbee.dr.selectfunction.Constant;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +42,17 @@ public class SelectQueryTest {
     assertThat(select(column).from(table).groupBy(column).generate(),
       is(
         "SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME
-        + " GROUP BY " + TABLE_NAME + "." + COLUMN_NAME
+          + " GROUP BY " + TABLE_NAME + "." + COLUMN_NAME
+      )
+    );
+  }
+
+  @Test
+  public void shouldGenerateSelectQueryWithWhereClause(){
+    assertThat(select(column).from(table).where(column.eq(new Constant(1))).generate(),
+      is(
+        "SELECT " + TABLE_NAME + "." + COLUMN_NAME + " FROM " + DATABASE_NAME + "." + TABLE_NAME
+        + " WHERE " + TABLE_NAME + "." + COLUMN_NAME + " = " + 1
       )
     );
   }

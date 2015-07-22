@@ -4,10 +4,7 @@ import com.workerbee.*;
 import com.workerbee.dr.selectfunction.AllStarSF;
 import com.workerbee.expression.BooleanExpression;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class SelectQuery implements Query {
   private Table<? extends Table> table;
@@ -19,6 +16,7 @@ public class SelectQuery implements Query {
   private List<ColumnOrder> orderBy = new ArrayList<>();
   private List<Column> groupBy = new ArrayList<>();
   private SelectQuery selectQuery;
+  private BooleanExpression where;
 
   public SelectQuery(List<SelectFunction> selectFunctions) {
     this.selectFunctions.addAll(selectFunctions);
@@ -56,6 +54,12 @@ public class SelectQuery implements Query {
 
   public SelectQuery as(String alias){
     this.alias = alias;
+
+    return this;
+  }
+
+  public SelectQuery where(BooleanExpression booleanExpression){
+    this.where = booleanExpression;
 
     return this;
   }
@@ -128,6 +132,10 @@ public class SelectQuery implements Query {
       joinSelectQueryPart(result);
     }
 
+    if (where != null){
+      wherePart(result);
+    }
+
     if (!groupBy.isEmpty()){
       groupByPart(result);
     }
@@ -141,6 +149,11 @@ public class SelectQuery implements Query {
     }
 
     return result.toString();
+  }
+
+  private void wherePart(StringBuilder result) {
+    result.append(" WHERE ");
+    result.append(where.generate());
   }
 
   private void selectFuncPart(StringBuilder result) {
