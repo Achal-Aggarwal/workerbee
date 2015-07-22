@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class Column extends SelectFunction {
   public static enum Type {
@@ -30,6 +31,17 @@ public class Column extends SelectFunction {
         return value == null ? null : Float.valueOf(String.valueOf(value));
       }
     },
+    DOUBLE {
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getDouble(index);
+      }
+
+      @Override
+      public Double convert(Object value) {
+        return value == null ? null : Double.valueOf(String.valueOf(value));
+      }
+    },
     STRING {
       @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {
@@ -39,6 +51,17 @@ public class Column extends SelectFunction {
       @Override
       public String convert(Object value) {
         return value == null ? null : (String) value;
+      }
+    },
+    TIMESTAMP {
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getTimestamp(index);
+      }
+
+      @Override
+      public Timestamp convert(Object value) {
+        return value == null ? null : (Timestamp) (value);
       }
     };
 

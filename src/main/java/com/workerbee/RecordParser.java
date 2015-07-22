@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
 
@@ -90,7 +91,8 @@ public class RecordParser implements ResultSet {
 
   @Override
   public double getDouble(int columnIndex) throws SQLException {
-    throw new SQLException("Method not supported");
+    String value = at(columnIndex);
+    return isValid(value) ? parseDouble(value) : 0d;
   }
 
   @Override
@@ -115,7 +117,8 @@ public class RecordParser implements ResultSet {
 
   @Override
   public Timestamp getTimestamp(int columnIndex) throws SQLException {
-    throw new SQLException("Method not supported");
+      String value = at(columnIndex);
+      return isValid(value) ? Timestamp.valueOf(value) : null;
   }
 
   @Override
