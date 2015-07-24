@@ -58,6 +58,13 @@ public class Batting extends Table<Batting> {
 }
 ```
 
+**Genrating migration files**
+```java
+MigrationGenerator.generateFilesFor(BaseBall.db, new File("PATH_TO_MIGRATION_FOLDER"));
+```
+Above statement will generate file with filename "TIMESTAMP_TABLE_VERSION_TABLE_NAME.hql" and contents
+```CREATE TABLE IF NOT EXISTS BaseBall.Batting ( player_id STRING, year INT, runs INT ) COMMENT 'Batting table' ;```
+
 **Writing Test - Using Junit4:**
 ```java
 public class PlayerWithHighestRunForEachYear() {
