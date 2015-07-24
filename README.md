@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/Achal-Aggarwal/workerbee.svg?branch=master)](https://travis-ci.org/Achal-Aggarwal/workerbee)
 ### Workerbee
 It’s a bee that could be used to perform various task with Apache Hive. Inspired from tools like Beetest, HiveRunner, hive_test.
 
@@ -15,7 +14,7 @@ TDD is a wonderful approach to write minimal code required to do the work at han
 When requirements gets complex and hive query could not handle it, writing map reduce program is a good option. But to read data and construct objects on which operations could be performed, knowledge of raw format or schema of the table is needed. Workerbee take care of this requirement, by extending Row of a table its behaviour could be extended.
 
 ### Supported Hive version
-Currently workerbee supports hive version 0.13, query builder doesn’t support everything that is in it, yet.
+Currently workerbee supports hive version 0.13, but query builder doesn’t support everything that is in it, yet.
 
 ### Example scenario
 With baseball statistics like bats man name, runs scored, the year for years 1871 - 2011, find the player with the highest runs for each year.
@@ -24,7 +23,7 @@ With baseball statistics like bats man name, runs scored, the year for years 187
 
 I. Clone the repo and build with mvn install
 
-II. Add dependency
+II. Add dependency 
 ```xml
 <dependency>
    <groupId>com.workerbee</groupId>
@@ -32,7 +31,9 @@ II. Add dependency
    <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
-III. Add env variable HADOOP_HOME which points to your hadoop location
+III. Add env variable HADOOP_HOME which points to your hadoop location.
+
+IV. Make sure hive-exec*.jar is present at HADOOP_HOME/share/hadoop/common/lib
 
 **Creating Database & table:**
 ```java
@@ -48,8 +49,8 @@ public class Batting extends Table<Batting> {
   public static final Batting tb = new Batting();
 
   public static final Column playerId = HavingColumn(tb, "player_id", Column.Type.STRING);
-  public static final Column year = HavingColumn(tb, "year", Column.Type.INT);
-  public static final Column runs = HavingColumn(tb, "runs", Column.Type.INT);
+  public static final Column year     = HavingColumn(tb, "year",      Column.Type.INT);
+  public static final Column runs     = HavingColumn(tb, "runs",      Column.Type.INT);
 
   private Batting() {
     super(BaseBall.db, "Batting", "Batting table", 1);
@@ -92,14 +93,6 @@ public class PlayerWithHighestRunForEachYear() {
     repo.setUp(Batting.tb);
     repo.setUp(Batting.tb)
       .setUp(Batting.tb, lowestRun, mediumRun, maximumRun);
-
-    SelectQuery selectQuery = select(Batting.year, max(Batting.runs))
-      .from(Batting.tb)
-      .groupBy(Batting.year)
-      .ascOrderOf(Batting.year)
-      .as("MaxRunsForEachYear");
-
-    Table<Table> maxRunsForEachYear = selectQuery.table();
 
     List<Row<Table>> years = repo.execute(QUERY_TO_TEST);
 
