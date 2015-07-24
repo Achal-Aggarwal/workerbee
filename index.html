@@ -101,6 +101,13 @@
   }
 }</pre></div>
 
+<p><strong>Genrating migration files</strong></p>
+
+<div class="highlight highlight-java"><pre><span class="pl-smi">MigrationGenerator</span><span class="pl-k">.</span>generateFilesFor(<span class="pl-smi">BaseBall</span><span class="pl-k">.</span>db, <span class="pl-k">new</span> <span class="pl-smi">File</span>(<span class="pl-s"><span class="pl-pds">"</span>PATH_TO_MIGRATION_FOLDER<span class="pl-pds">"</span></span>));</pre></div>
+
+<p>Above statement will generate file with filename "TIMESTAMP_TABLE_VERSION_TABLE_NAME.hql" and contents
+<code>CREATE TABLE IF NOT EXISTS BaseBall.Batting ( player_id STRING, year INT, runs INT ) COMMENT 'Batting table' ;</code></p>
+
 <p><strong>Writing Test - Using Junit4:</strong></p>
 
 <div class="highlight highlight-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">PlayerWithHighestRunForEachYear</span>() {
