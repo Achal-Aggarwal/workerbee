@@ -56,7 +56,7 @@
 <h3>
 <a id="supported-hive-version" class="anchor" href="#supported-hive-version" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported Hive version</h3>
 
-<p>Currently workerbee supports hive version 0.13, query builder doesn’t support everything that is in it, yet.</p>
+<p>Currently workerbee supports hive version 0.13, but query builder doesn’t support everything that is in it, yet.</p>
 
 <h3>
 <a id="example-scenario" class="anchor" href="#example-scenario" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example scenario</h3>
@@ -75,7 +75,9 @@
    &lt;<span class="pl-ent">version</span>&gt;1.0-SNAPSHOT&lt;/<span class="pl-ent">version</span>&gt;
 &lt;/<span class="pl-ent">dependency</span>&gt;</pre></div>
 
-<p>III. Add env variable HADOOP_HOME which points to your hadoop location</p>
+<p>III. Add env variable HADOOP_HOME which points to your hadoop location.</p>
+
+<p>IV. Make sure hive-exec*.jar is present at HADOOP_HOME/share/hadoop/common/lib</p>
 
 <p><strong>Creating Database &amp; table:</strong></p>
 
@@ -91,8 +93,8 @@
   <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Batting</span> tb <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">Batting</span>();
 
   <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> playerId <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>player_id<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>STRING</span>);
-  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> year <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
-  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> runs <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>runs<span class="pl-pds">"</span></span>, <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> year     <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>,      <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
+  <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Column</span> runs     <span class="pl-k">=</span> HavingColumn(tb, <span class="pl-s"><span class="pl-pds">"</span>runs<span class="pl-pds">"</span></span>,      <span class="pl-smi">Column</span><span class="pl-k">.</span><span class="pl-smi">Type</span><span class="pl-c1"><span class="pl-k">.</span>INT</span>);
 
   <span class="pl-k">private</span> <span class="pl-en">Batting</span>() {
     <span class="pl-v">super</span>(<span class="pl-smi">BaseBall</span><span class="pl-k">.</span>db, <span class="pl-s"><span class="pl-pds">"</span>Batting<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Batting table<span class="pl-pds">"</span></span>, <span class="pl-c1">1</span>);
@@ -134,14 +136,6 @@
     repo<span class="pl-k">.</span>setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb);
     repo<span class="pl-k">.</span>setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
       .setUp(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb, lowestRun, mediumRun, maximumRun);
-
-    <span class="pl-smi">SelectQuery</span> selectQuery <span class="pl-k">=</span> select(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year, max(<span class="pl-smi">Batting</span><span class="pl-k">.</span>runs))
-      .from(<span class="pl-smi">Batting</span><span class="pl-k">.</span>tb)
-      .groupBy(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
-      .ascOrderOf(<span class="pl-smi">Batting</span><span class="pl-k">.</span>year)
-      .as(<span class="pl-s"><span class="pl-pds">"</span>MaxRunsForEachYear<span class="pl-pds">"</span></span>);
-
-    <span class="pl-k">Table&lt;<span class="pl-smi">Table</span>&gt;</span> maxRunsForEachYear <span class="pl-k">=</span> selectQuery<span class="pl-k">.</span>table();
 
     <span class="pl-k">List&lt;<span class="pl-k">Row&lt;<span class="pl-smi">Table</span>&gt;</span>&gt;</span> years <span class="pl-k">=</span> repo<span class="pl-k">.</span>execute(<span class="pl-c1">QUERY_TO_TEST</span>);
 
