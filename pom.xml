@@ -46,11 +46,15 @@
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <artifactId>hadoop-mapreduce-client-common</artifactId>
       <version>${cdh.hadoop.version}</version>
-      <!--<scope>provided</scope>-->
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.hive</groupId>
+      <artifactId>hive-exec</artifactId>
+      <version>${cdh.hive.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-jdbc</artifactId>
