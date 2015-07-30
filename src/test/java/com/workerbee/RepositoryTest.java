@@ -131,7 +131,7 @@ public class RepositoryTest {
     when(mockDatabaseCreator.generate()).thenReturn(DATABASE_CREATE_SQL);
     when(mockStatement.execute(DATABASE_CREATE_SQL)).thenReturn(false);
 
-    assertThat(repository.execute(mockDatabaseCreator), is(false));
+    assertThat(repository.execute(mockDatabaseCreator), instanceOf(Repository.class));
   }
 
   @Test
@@ -140,7 +140,7 @@ public class RepositoryTest {
     when(mockTableCreator.generate()).thenReturn(TABLE_CREATE_SQL);
     when(mockStatement.execute(TABLE_CREATE_SQL)).thenReturn(false);
 
-    assertThat(repository.execute(mockTableCreator), is(false));
+    assertThat(repository.execute(mockTableCreator), instanceOf(Repository.class));
   }
 
   @Test
@@ -149,7 +149,7 @@ public class RepositoryTest {
     when(mockInsertQuery.generate()).thenReturn(INSERT_SQL);
     when(mockStatement.execute(INSERT_SQL)).thenReturn(false);
 
-    assertThat(repository.execute(mockInsertQuery), is(false));
+    assertThat(repository.execute(mockInsertQuery), instanceOf(Repository.class));
   }
 
   @Test

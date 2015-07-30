@@ -78,40 +78,37 @@ public class Repository implements AutoCloseable {
 
   private Repository clear(Table<? extends Table> table) throws SQLException {
     if (table.isExternal()){
-      execute("DFS -RMR " + table.getLocation());
-    } else {
-      execute(new TruncateTable(table).generate());
+      return execute("DFS -RMR " + table.getLocation());
     }
 
-    return this;
+    return execute(new TruncateTable(table).generate());
   }
 
   public Repository hiveVar(String var, String val) throws SQLException {
-    execute("SET hivevar:" + var + "=" + val);
-    return this;
+    return execute("SET hivevar:" + var + "=" + val);
   }
 
-  public boolean execute(DatabaseCreator databaseCreator) throws SQLException {
+  public Repository execute(DatabaseCreator databaseCreator) throws SQLException {
     return execute(databaseCreator.generate());
   }
 
-  public boolean execute(TableCreator tableCreator) throws SQLException {
+  public Repository execute(TableCreator tableCreator) throws SQLException {
     return execute(tableCreator.generate());
   }
 
-  public boolean execute(InsertQuery insertQuery) throws SQLException {
+  public Repository execute(InsertQuery insertQuery) throws SQLException {
     return execute(insertQuery.generate());
   }
 
-  public boolean execute(LoadData loadDataQuery) throws SQLException {
+  public Repository execute(LoadData loadDataQuery) throws SQLException {
     return execute(loadDataQuery.generate());
   }
 
-  public boolean execute(File sqlScriptFile) throws IOException, SQLException {
+  public Repository execute(File sqlScriptFile) throws IOException, SQLException {
     return execute(FileUtils.readFileToString(sqlScriptFile));
   }
 
-  private boolean execute(String query) throws SQLException {
+  public Repository execute(String query) throws SQLException {
     Statement statement = connection.createStatement();
 
     for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
@@ -120,7 +117,8 @@ public class Repository implements AutoCloseable {
         statement.execute(sqlStatement);
       }
     }
-    return false;
+
+    return this;
   }
 
   public List<Row<Table>> execute(SelectQuery selectQuery) throws SQLException {
