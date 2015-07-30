@@ -33,8 +33,6 @@ II. Add dependency
 ```
 III. Add env variable HADOOP_HOME which points to your hadoop location.
 
-IV. Make sure hive-exec*.jar is present at HADOOP_HOME/share/hadoop/common/lib
-
 **Creating Database & table:**
 ```java
 public class BaseBall extends Database {
