@@ -1,7 +1,7 @@
-package com.workerbee.baseball;
+package com.workerbee.example.baseball;
 
 
-import com.workerbee.BaseBall;
+import com.workerbee.example.BaseBall;
 import com.workerbee.Column;
 import com.workerbee.Table;
 

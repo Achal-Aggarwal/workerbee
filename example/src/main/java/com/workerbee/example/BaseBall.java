@@ -1,6 +1,9 @@
-package com.workerbee;
+package com.workerbee.example;
 
-import com.workerbee.baseball.Batting;
+import com.workerbee.Database;
+import com.workerbee.MigrationGenerator;
+import com.workerbee.Table;
+import com.workerbee.example.baseball.Batting;
 import com.workerbee.dr.SelectQuery;
 
 import java.io.File;

@@ -1,6 +1,9 @@
-package com.workerbee;
+package com.workerbee.example;
 
-import com.workerbee.baseball.Batting;
+import com.workerbee.Repository;
+import com.workerbee.Row;
+import com.workerbee.Table;
+import com.workerbee.example.baseball.Batting;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,8 +12,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.workerbee.BaseBall.highestScoreForEachYear;
-import static com.workerbee.BaseBall.playerWithHighestScoreForEachYear;
 import static com.workerbee.QueryGenerator.create;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -54,7 +55,7 @@ public class BaseBallTest {
     repo.setUp(Batting.tb)
       .setUp(Batting.tb, lowestRun, mediumRuns, maximumRun);
 
-    List<Row<Table>> years = repo.execute(highestScoreForEachYear());
+    List<Row<Table>> years = repo.execute(BaseBall.highestScoreForEachYear());
 
     assertThat(years.size(), is(2));
 
@@ -70,7 +71,7 @@ public class BaseBallTest {
     repo.setUp(Batting.tb)
       .setUp(Batting.tb, lowestRun, mediumRuns, maximumRun);
 
-    List<Row<Table>> years = repo.execute(playerWithHighestScoreForEachYear());
+    List<Row<Table>> years = repo.execute(BaseBall.playerWithHighestScoreForEachYear());
 
     assertThat(years.size(), is(2));
 
