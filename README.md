@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Achal-Aggarwal/workerbee.svg?branch=master)](https://travis-ci.org/Achal-Aggarwal/workerbee)
 ### Workerbee
 It’s a bee that could be used to perform various task with Apache Hive. Inspired from tools like Beetest, HiveRunner, hive_test.
 
