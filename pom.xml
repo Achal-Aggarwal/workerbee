@@ -5,8 +5,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.workerbee</groupId>
-  <artifactId>workerbee-core</artifactId>
+  <artifactId>workerbee</artifactId>
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>core</module>
+  </modules>
   <repositories>
     <repository>
       <id>central</id>
@@ -14,16 +18,7 @@
       <layout>default</layout>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
-    <repository>
-      <id>cloudera</id>
-      <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-    </repository>
   </repositories>
-
-  <properties>
-    <cdh.hadoop.version>2.5.0-cdh5.3.3</cdh.hadoop.version>
-    <cdh.hive.version>0.13.1-cdh5.3.3</cdh.hive.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -37,28 +32,6 @@
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-invoker</artifactId>
       <version>2.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>${cdh.hadoop.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-common</artifactId>
-      <version>${cdh.hadoop.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.hive</groupId>
-      <artifactId>hive-exec</artifactId>
-      <version>${cdh.hive.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hive</groupId>
-      <artifactId>hive-jdbc</artifactId>
-      <version>${cdh.hive.version}</version>
     </dependency>
 
     <!--Testing-->
