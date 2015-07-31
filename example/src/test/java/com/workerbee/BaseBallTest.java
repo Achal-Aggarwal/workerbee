@@ -2,6 +2,7 @@ package com.workerbee;
 
 import com.workerbee.baseball.Batting;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import static com.workerbee.QueryGenerator.create;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+@Ignore
 public class BaseBallTest {
   public static final String PLAYER_1_ID = "PLAYER1_ID";
   public static final String PLAYER_2_ID = "PLAYER2_ID";
