@@ -3,6 +3,7 @@ package com.workerbee.example;
 import com.workerbee.Database;
 import com.workerbee.MigrationGenerator;
 import com.workerbee.Table;
+import com.workerbee.annotation.WBDatabase;
 import com.workerbee.example.baseball.Batting;
 import com.workerbee.dr.SelectQuery;
 
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import static com.workerbee.QueryGenerator.select;
 import static com.workerbee.dr.SelectFunctionGenerator.max;
 
+@WBDatabase
 public class BaseBall extends Database {
   public static final BaseBall db = new BaseBall();
 

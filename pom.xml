@@ -11,6 +11,8 @@
   <modules>
     <module>core</module>
     <module>example</module>
+    <module>annotation</module>
+    <module>annotation-processor</module>
   </modules>
   <repositories>
     <repository>
