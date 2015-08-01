@@ -9,12 +9,12 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>example</artifactId>
+  <artifactId>workerbee-example</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>com.workerbee</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>workerbee-core</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

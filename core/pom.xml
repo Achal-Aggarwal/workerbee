@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>core</artifactId>
+  <artifactId>workerbee-core</artifactId>
 
   <properties>
     <hadoop.version>2.5.0</hadoop.version>
