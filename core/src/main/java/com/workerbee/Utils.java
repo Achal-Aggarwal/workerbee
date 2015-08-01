@@ -72,7 +72,10 @@ public class Utils {
       result.append(o.toString()).append(separator);
     }
 
-    result.delete(result.lastIndexOf(separator), result.length());
+    int i = result.lastIndexOf(separator);
+    if (i >=0){
+      result.delete(i, result.length());
+    }
 
     return result.toString();
   }
