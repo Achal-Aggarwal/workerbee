@@ -16,6 +16,10 @@ import static com.workerbee.dr.SelectFunctionGenerator.max;
 public class BaseBall extends Database {
   public static final BaseBall db = new BaseBall();
 
+  static {
+    db.havingTable(Batting.tb);
+  }
+
   private BaseBall() {
     super("BaseBall", "BaseBall database");
   }
@@ -52,7 +56,6 @@ public class BaseBall extends Database {
       return;
     }
 
-    Table t = Batting.tb;
     MigrationGenerator.generateFilesFor(BaseBall.db, migrationDirectory);
   }
 }
