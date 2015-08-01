@@ -5,6 +5,7 @@ import com.workerbee.Row;
 import com.workerbee.Table;
 import com.workerbee.example.baseball.Batting;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,26 +22,28 @@ public class BaseBallTest {
   public static final String PLAYER_1_ID = "PLAYER1_ID";
   public static final String PLAYER_2_ID = "PLAYER2_ID";
   public static final String PLAYER_3_ID = "PLAYER3_ID";
-  private Repository repo;
-  private Row<Batting> lowestRun
+  private static Repository repo;
+
+  private static Row<Batting> lowestRun
     = Batting.tb.getNewRow()
     .set(Batting.playerId, PLAYER_1_ID)
     .set(Batting.year, 1990)
     .set(Batting.runs, 10);
 
-  private Row<Batting> mediumRuns
+  private static Row<Batting> mediumRuns
     = Batting.tb.getNewRow()
     .set(Batting.playerId, PLAYER_2_ID)
     .set(Batting.year, 1990)
     .set(Batting.runs, 100);
 
-  private Row<Batting> maximumRun
+  private static Row<Batting> maximumRun
     = Batting.tb.getNewRow()
     .set(Batting.playerId, PLAYER_3_ID)
     .set(Batting.year, 2000)
     .set(Batting.runs, 50);
 
-  public BaseBallTest() throws IOException, SQLException {
+  @BeforeClass
+  public static void BeforeClass() throws IOException, SQLException {
     repo = Repository.TemporaryRepository();
     repo.execute(create(BaseBall.db).ifNotExist());
   }
