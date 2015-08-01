@@ -5,10 +5,15 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
+import static com.workerbee.QueryGenerator.create;
+import static com.workerbee.QueryGenerator.drop;
+import static com.workerbee.QueryGenerator.recover;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
@@ -21,20 +26,29 @@ public class MigrationGenerator {
 
     Table[] tables = database.getTables();
 
-    HashSet<MigrationVersion> migrationVersions = getExistingMigrationVersions(baseDir);
+    HashSet<MigrationVersion> existingMigrations = getExistingMigrationVersions(baseDir);
 
     for (Table table : tables) {
-      MigrationVersion migrationVersion = new MigrationVersion(new Date().getTime(), table);
+      MigrationVersion migration = new MigrationVersion(new Date().getTime(), table);
 
-      if (!migrationVersions.contains(migrationVersion)){
-        String filename = migrationVersion.getFileName();
+      if (!existingMigrations.contains(migration)){
+        String filename = migration.getFileName();
         File file = new File(baseDir, filename);
         LOGGER.info("Writing migration for table : " + table.getName() + " at " + file.getAbsolutePath());
-        FileUtils.writeStringToFile(file, table.migration());
+        FileUtils.writeStringToFile(file, tableMigrationStatements(table));
       } else {
         LOGGER.info("Table : " + table.getName() + " doesn't require to be migrated.");
       }
     }
+  }
+
+  private static String tableMigrationStatements(final Table table){
+    ArrayList list = new ArrayList<String>() {{
+      add(drop(table).ifExist().generate());
+      add(create(table).generate());
+      add(recover(table).generate());
+    }};
+    return Utils.joinList(list, " ");
   }
 
   private static HashSet<MigrationVersion> getExistingMigrationVersions(File baseDir) {
@@ -66,7 +80,7 @@ public class MigrationGenerator {
     public static MigrationVersion fromFile(File file) {
       String fileName = Utils.rtrim(file.getName(), ".hql");
 
-      String[] parts = fileName.split("_");
+      String[] parts = fileName.split("_", 3);
       return new MigrationVersion(parts[0], Long.parseLong(parts[1]), parts[2]);
     }
 

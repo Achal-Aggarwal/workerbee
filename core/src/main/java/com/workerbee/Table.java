@@ -189,10 +189,6 @@ public class Table<T extends Table> {
     return new Text(generateRecordFor(row));
   }
 
-  public String migration() {
-    return new TableCreator(this).ifNotExist().generate();
-  }
-
   public static Table<Table> DUAL = new Table<>(Database.DEFAULT, "Dual")
     .havingColumn("dummy", STRING);
 }
