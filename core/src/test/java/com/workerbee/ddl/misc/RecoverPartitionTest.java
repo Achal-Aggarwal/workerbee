@@ -17,7 +17,7 @@ public class RecoverPartitionTest {
   @Test
   public void shouldGenerateCorrectBasicCreateHql(){
     assertThat(recover(new Table(new Database(DATABASE_NAME), TABLE_NAME)).generate(), is(
-      "USE " + DATABASE_NAME + " ;MSCK REPAIR TABLE " + TABLE_NAME + " ;"
+      "USE " + DATABASE_NAME + " ; MSCK REPAIR TABLE " + TABLE_NAME + " ;"
     ));
   }
 }

@@ -12,6 +12,6 @@ public class RecoverPartition implements Query {
 
   @Override
   public String generate() {
-    return String.format("USE %s ;MSCK REPAIR TABLE %s ;", table.getDatabaseName(), table.getName());
+    return String.format("USE %s ; MSCK REPAIR TABLE %s ;", table.getDatabaseName(), table.getName());
   }
 }
