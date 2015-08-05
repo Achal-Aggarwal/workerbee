@@ -22,14 +22,19 @@ With baseball statistics like bats man name, runs scored, the year for years 187
 
 **Setting up project:**
 
-I. Clone the repo and build with mvn install
-
+I. Add sonatype repository
+```xml
+<repository>
+  <id>sonatype</id>
+  <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+</repository>
+```
 II. Add dependency 
 ```xml
 <dependency>
-   <groupId>net.achalaggarwal.workerbee</groupId>
-   <artifactId>workerbee-core</artifactId>
-   <version>1.0-SNAPSHOT</version>
+  <groupId>net.achalaggarwal.workerbee</groupId>
+  <artifactId>workerbee-core</artifactId>
+  <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 III. Add env variable HADOOP_HOME which points to your hadoop location.
