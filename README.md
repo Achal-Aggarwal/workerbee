@@ -6,7 +6,7 @@ It’s a bee that could be used to perform various task with Apache Hive. Inspir
 Workerbee enables you to define schema of database and tables along side of Map - Reduce programs. Once written they can be managed by changing java code. Using MigrationGenerator, migrations can generated which can be run against the database that need to migrate.
 
 ### Query Builder at disposal
-Workerbee comes with basic query builder that comes handy when you don’t want to commit any typos while writing queries. No need to remember or lookup tables and their schema just to check column's order and type.
+Workerbee comes with basic query builder that comes handy when you don’t want to commit any typos while writing queries. No need to remember or lookup table's schema just to check column's order and type.
 
 ### Go with TDD
 TDD is a wonderful approach to write minimal code required to do the work at hand. Workerbee allows you to write tests using unit test frameworks like JUnit. Using it you can formulate test for each case scenario and run it against setup data. Using data objects, created for each row of concerning table, more explicit assertions can made to get better assertion message on test failure.
@@ -27,7 +27,7 @@ I. Clone the repo and build with mvn install
 II. Add dependency 
 ```xml
 <dependency>
-   <groupId>com.workerbee</groupId>
+   <groupId>net.achalaggarwal.workerbee</groupId>
    <artifactId>workerbee-core</artifactId>
    <version>1.0-SNAPSHOT</version>
 </dependency>
