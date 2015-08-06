@@ -12,9 +12,16 @@
   <artifactId>workerbee-core</artifactId>
 
   <properties>
-    <hadoop.version>2.5.0</hadoop.version>
-    <hive.version>0.13.1</hive.version>
+    <hadoop.version>2.5.0-cdh5.3.3</hadoop.version>
+    <hive.version>0.13.1-cdh5.3.3</hive.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>cloudera</id>
+      <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
