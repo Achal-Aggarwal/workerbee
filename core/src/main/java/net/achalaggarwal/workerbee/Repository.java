@@ -112,7 +112,7 @@ public class Repository implements AutoCloseable {
 
     for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
       if (sqlStatement.length() > 0) {
-        LOGGER.info("Executing query : " + sqlStatement);
+        LOGGER.fine("Executing query : " + sqlStatement);
         statement.execute(sqlStatement);
       }
     }
@@ -124,7 +124,7 @@ public class Repository implements AutoCloseable {
     Statement statement = connection.createStatement();
 
     String selectHQL = rtrim(selectQuery.generate());
-    LOGGER.info("Executing query : " + selectHQL);
+    LOGGER.fine("Executing query : " + selectHQL);
 
     List<Row<Table>> rows = new ArrayList<>();
     ResultSet resultSet = statement.executeQuery(selectHQL);
