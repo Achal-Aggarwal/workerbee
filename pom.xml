@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>net.achalaggarwal.workerbee</groupId>
   <artifactId>workerbee</artifactId>
   <packaging>pom</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
 
   <name>Workerbee</name>
   <description>A worker bee for your hive.</description>
@@ -28,6 +26,7 @@
   <scm>
     <url>git@github.com:Achal-Aggarwal/workerbee.git</url>
     <connection>scm:git:git@github.com:Achal-Aggarwal/workerbee.git</connection>
+    <tag>workerbee-1.1</tag>
   </scm>
 
   <developers>
