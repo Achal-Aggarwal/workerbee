@@ -3,8 +3,10 @@ package net.achalaggarwal.workerbee.example;
 import net.achalaggarwal.workerbee.Repository;
 import net.achalaggarwal.workerbee.Row;
 import net.achalaggarwal.workerbee.Table;
+import net.achalaggarwal.workerbee.dr.SelectFunction;
 import net.achalaggarwal.workerbee.example.baseball.Batting;
 import net.achalaggarwal.workerbee.QueryGenerator;
+import net.achalaggarwal.workerbee.example.baseball.Player;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.max;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -85,5 +88,24 @@ public class BaseBallTest {
     assertThat(years.get(1).getString(Batting.playerId), is(PLAYER_3_ID));
     assertThat(years.get(1).getInt(Batting.year), is(2000));
     assertThat(years.get(1).getInt(Batting.runs), is(50));
+  }
+
+  @Test
+  public void shouldInsertPlayerWithTotalRunsOverAllYearsCorrectly() throws IOException, SQLException {
+    repo.setUp(Batting.tb)
+      .setUp(Batting.tb, lowestRun, lowestRun, maximumRun)
+      .setUp(Player.tb);
+
+    repo.execute(BaseBall.insertPlayerWithTotalRunsOverAllYears());
+
+    List<Row<Player>> rows = repo.getRowsOf(Player.tb);
+
+    assertThat(rows.size(), is(2));
+
+    assertThat(rows.get(0).getString(Player.playerId), is(PLAYER_1_ID));
+    assertThat(rows.get(0).getInt(Player.totalRuns), is(20));
+
+    assertThat(rows.get(1).getString(Player.playerId), is(PLAYER_3_ID));
+    assertThat(rows.get(1).getInt(Player.totalRuns), is(50));
   }
 }

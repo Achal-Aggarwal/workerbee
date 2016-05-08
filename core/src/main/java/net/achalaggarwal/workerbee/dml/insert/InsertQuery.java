@@ -6,6 +6,7 @@ import net.achalaggarwal.workerbee.Table;
 import net.achalaggarwal.workerbee.Utils;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ public class InsertQuery implements Query {
   private Table<? extends Table> table;
   private SelectQuery selectQuery;
   private Map<Column, Object> partitionMap;
+  private File directory;
 
   public InsertQuery intoTable(Table<? extends Table> table) {
     this.table = table;
@@ -27,6 +29,12 @@ public class InsertQuery implements Query {
     for (Column column : table.getPartitions()) {
       partitionMap.put(column, null);
     }
+
+    return this;
+  }
+
+  public InsertQuery directory(File path){
+    this.directory = path;
 
     return this;
   }
@@ -61,12 +69,16 @@ public class InsertQuery implements Query {
       result.append(" INTO");
     }
 
-    result.append(" TABLE ");
+    if(directory == null) {
+      result.append(" TABLE ");
 
-    result.append(fqTableName(table));
+      result.append(fqTableName(table));
 
-    if (!partitionMap.isEmpty()){
-      partitionPart(result);
+      if (!partitionMap.isEmpty()) {
+        partitionPart(result);
+      }
+    } else {
+      result.append(" DIRECTORY '").append(directory.getAbsolutePath()).append("'");
     }
 
     result.append(" " + selectQuery.generate());

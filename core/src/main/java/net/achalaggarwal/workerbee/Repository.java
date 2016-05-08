@@ -1,5 +1,6 @@
 package net.achalaggarwal.workerbee;
 
+import com.google.common.io.Files;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
@@ -7,21 +8,27 @@ import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFileFilter;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import static net.achalaggarwal.workerbee.Database.DEFAULT;
+import static net.achalaggarwal.workerbee.QueryGenerator.*;
+import static net.achalaggarwal.workerbee.QueryGenerator.select;
 import static net.achalaggarwal.workerbee.Utils.getRandomPositiveNumber;
 import static net.achalaggarwal.workerbee.Utils.rtrim;
 import static java.lang.String.valueOf;
+import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
 
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
@@ -112,7 +119,7 @@ public class Repository implements AutoCloseable {
 
     for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
       if (sqlStatement.length() > 0) {
-        LOGGER.fine("Executing query : " + sqlStatement);
+        LOGGER.info("Executing query : " + sqlStatement);
         statement.execute(sqlStatement);
       }
     }
@@ -124,12 +131,39 @@ public class Repository implements AutoCloseable {
     Statement statement = connection.createStatement();
 
     String selectHQL = rtrim(selectQuery.generate());
-    LOGGER.fine("Executing query : " + selectHQL);
+    LOGGER.info("Executing query : " + selectHQL);
 
     List<Row<Table>> rows = new ArrayList<>();
     ResultSet resultSet = statement.executeQuery(selectHQL);
     while (resultSet.next()) {
       rows.add(new Row<>(selectQuery.table(), resultSet));
+    }
+
+    return rows;
+  }
+
+  public <T extends Table> List<Row<T>> getRowsOf(Table<T> table) throws SQLException, IOException {
+    Statement statement = connection.createStatement();
+
+    File tempDirectoryPath = Files.createTempDir();
+
+    String insertHQL = insert().overwrite().directory(tempDirectoryPath).using(select(star()).from(table)).generate();
+    LOGGER.info("Executing query : " + insertHQL);
+    statement.execute(insertHQL);
+
+    List<Row<T>> rows = new ArrayList<>();
+
+    File[] files = tempDirectoryPath.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        return !pathname.isHidden();
+      }
+    });
+
+    for (File file : files) {
+      for (String record : FileUtils.readLines(file)) {
+        rows.add(table.parseRecordUsing(record));
+      }
     }
 
     return rows;
