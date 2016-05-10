@@ -1,6 +1,8 @@
 package net.achalaggarwal.workerbee;
 
 import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
+import org.apache.avro.Schema;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.hadoop.io.Text;
 
 import java.sql.ResultSet;
@@ -29,6 +31,11 @@ public class Row<T extends Table> {
     this.map = parseRecordUsing(table, record);
   }
 
+  public Row(Table<T> table, SpecificRecord record, Object... partitions){
+    this.table = table;
+    this.map = parseRecordUsing(table, record, partitions);
+  }
+
   public Row(Table<T> table, Text record){
     this(table, record.toString());
   }
@@ -50,6 +57,21 @@ public class Row<T extends Table> {
       new RecordParser(record, table.getColumnSeparator(), table.getHiveNull()),
       ZERO_BASED
     );
+  }
+  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, SpecificRecord record, Object... partitions) {
+    Map<Column, Object> map = new HashMap<>(table.getColumns().size());
+
+    Schema schema = record.getSchema();
+    for (Column column : table.getColumns()) {
+      map.put(column, record.get(schema.getField(column.getName()).pos()));
+    }
+
+    int index = 0;
+    for (Column column : table.getPartitions()) {
+      map.put(column, partitions[index++]);
+    }
+
+    return map;
   }
 
   private static Map<Column, Object> parseRecordUsing(

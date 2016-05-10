@@ -2,12 +2,31 @@ package net.achalaggarwal.workerbee;
 
 import net.achalaggarwal.workerbee.dr.SelectFunction;
 import lombok.Getter;
+import org.apache.avro.Schema;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class Column extends SelectFunction {
+  public static Type getType(Schema schema) {
+
+    switch (schema.getType()) {
+      case STRING:
+        return Type.STRING;
+      case INT:
+        return Type.INT;
+      case FLOAT:
+        return Type.FLOAT;
+      case DOUBLE:
+        return Type.DOUBLE;
+      case UNION:
+        return getType(schema.getTypes().get(1));
+    }
+
+    return null;
+  }
+
   public static enum Type {
     INT {
       @Override

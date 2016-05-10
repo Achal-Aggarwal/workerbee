@@ -1,6 +1,7 @@
 package net.achalaggarwal.workerbee;
 
 import lombok.Getter;
+import org.apache.avro.Schema;
 import org.apache.hadoop.io.Text;
 
 import java.nio.file.Path;
@@ -61,6 +62,14 @@ public class Table<T extends Table> {
     if (isNotTemporary()) {
       this.database.havingTable(this);
     }
+  }
+
+  public Table<T> havingColumnsFromSchema(Schema schema){
+    for (Schema.Field field : schema.getFields()) {
+      havingColumn(field.name(), Column.getType(field.schema()));
+    }
+
+    return this;
   }
 
   public Table<T> havingColumn(Column column){
