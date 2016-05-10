@@ -7,8 +7,8 @@ import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -142,7 +141,7 @@ public class Repository implements AutoCloseable {
     return rows;
   }
 
-  public <T extends Table> List<Row<T>> getRowsOf(Table<T> table) throws SQLException, IOException {
+  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table) throws SQLException, IOException {
     Statement statement = connection.createStatement();
 
     File tempDirectoryPath = Files.createTempDir();
@@ -167,6 +166,10 @@ public class Repository implements AutoCloseable {
     }
 
     return rows;
+  }
+
+  public <T extends Table, A extends SpecificRecord> List<A> getSpecificRecordsOf(Table<T> table) throws SQLException, IOException {
+    return Row.getSpecificRecords(getTextRecordsOf(table));
   }
 
   @Override

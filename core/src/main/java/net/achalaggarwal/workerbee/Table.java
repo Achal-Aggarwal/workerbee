@@ -2,6 +2,7 @@ package net.achalaggarwal.workerbee;
 
 import lombok.Getter;
 import org.apache.avro.Schema;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.hadoop.io.Text;
 
 import java.nio.file.Path;
@@ -27,6 +28,9 @@ public class Table<T extends Table> {
 
   @Getter
   private boolean external = false;
+
+  @Getter
+  private Class<? extends SpecificRecord> klass;
 
   HashMap<String, String> properties = new HashMap<>();
 
@@ -64,8 +68,16 @@ public class Table<T extends Table> {
     }
   }
 
-  public Table<T> havingColumnsFromSchema(Schema schema){
-    for (Schema.Field field : schema.getFields()) {
+  public Table<T> havingColumnsFromSchema(Class<? extends SpecificRecord> klass){
+    this.klass = klass;
+
+    SpecificRecord specificRecord = null;
+    try {
+      specificRecord = klass.newInstance();
+    } catch (Exception e) {
+      new RuntimeException(e);
+    }
+    for (Schema.Field field : specificRecord.getSchema().getFields()) {
       havingColumn(field.name(), Column.getType(field.schema()));
     }
 
@@ -141,7 +153,11 @@ public class Table<T extends Table> {
   }
 
   public Column getColumn(Column column) {
-    return columns.get(column.getName());
+    return getColumn(column.getName());
+  }
+
+  public Column getColumn(String columnName) {
+    return columns.get(columnName);
   }
 
   public List<Column> getColumns() {

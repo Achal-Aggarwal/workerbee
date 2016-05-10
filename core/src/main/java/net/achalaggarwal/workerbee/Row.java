@@ -156,4 +156,31 @@ public class Row<T extends Table> {
 
     return constants.toArray(new Constant[constants.size()]);
   }
+
+  public static <T extends Table<T>, A extends SpecificRecord> List<A> getSpecificRecords(List<Row<T>> rows){
+    List<A> records = new ArrayList<>(rows.size());
+
+    for (Row<? extends Table> row : rows) {
+      records.add(row.<A>getSpecificRecord());
+    }
+
+    return records;
+  }
+
+  public <A extends SpecificRecord> A getSpecificRecord(){
+    Class<? extends SpecificRecord> klass = table.getKlass();
+
+    A specificRecord = null;
+    try {
+      specificRecord = (A) klass.newInstance();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    for (Schema.Field field : specificRecord.getSchema().getFields()) {
+      specificRecord.put(field.pos(), get(table.getColumn(field.name())));
+    }
+
+    return specificRecord;
+  }
 }
