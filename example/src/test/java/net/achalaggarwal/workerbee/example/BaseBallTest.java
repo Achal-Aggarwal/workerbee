@@ -53,13 +53,14 @@ public class BaseBallTest {
 
   @Before
   public void setUp() throws IOException, SQLException {
-    repo.setUp(BattingTable.tb);
+    repo
+      .create(BattingTable.tb)
+      .create(PlayerTable.tb);
   }
 
   @Test
   public void shouldReturnHighestScoreForEachYear() throws IOException, SQLException {
-    repo.setUp(BattingTable.tb)
-      .setUp(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
+    repo.load(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
 
     List<Row<Table>> years = repo.execute(BaseBall.highestScoreForEachYear());
 
@@ -74,8 +75,7 @@ public class BaseBallTest {
 
   @Test
   public void shouldReturnPlayerWithHighestScoreForEachYear() throws IOException, SQLException {
-    repo.setUp(BattingTable.tb)
-      .setUp(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
+    repo.load(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
 
     List<Row<Table>> years = repo.execute(BaseBall.playerWithHighestScoreForEachYear());
 
@@ -92,9 +92,7 @@ public class BaseBallTest {
 
   @Test
   public void shouldInsertPlayerWithTotalRunsOverAllYearsCorrectly() throws IOException, SQLException {
-    repo.setUp(BattingTable.tb)
-      .setUp(BattingTable.tb, lowestRun, lowestRun, maximumRun)
-      .setUp(PlayerTable.tb);
+    repo.load(BattingTable.tb, lowestRun, lowestRun, maximumRun);
 
     repo.execute(BaseBall.insertPlayerWithTotalRunsOverAllYears());
 

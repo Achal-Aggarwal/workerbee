@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -59,22 +60,25 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Initializing repository at : " + ROOT_DIR);
 
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
-    setUp(Table.DUAL);
-    setUp(Table.DUAL, new Row<>(Table.DUAL, "X"));
+    create(Table.DUAL);
+    load(Table.DUAL, new Row<>(Table.DUAL, "X"));
   }
 
-  public Repository setUp(Table<? extends Table> table, Row... rows) throws SQLException, IOException {
-    if (rows.length < 1) {
-      execute(new TableCreator(table).ifNotExist().generate());
-      clear(table);
+  public Repository create(Table<? extends Table> table) throws SQLException, IOException {
+    execute(new TableCreator(table).ifNotExist().generate());
+    clear(table);
 
-      return this;
-    }
+    return this;
+  }
 
+  public Repository load(Table<? extends Table> table, Row firstRow, Row... rows) throws SQLException, IOException {
     LoadData loadData = new LoadData();
 
+    Path tableDirPath = Utils.writeAtTempFile(table, firstRow);
+    execute(loadData.data(firstRow).fromLocal(tableDirPath).into(table).generate());
+
     for (Row row : rows) {
-      Path tableDirPath = Utils.writeAtTempFile(table, row);
+      tableDirPath = Utils.writeAtTempFile(table, row);
       execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
     }
 
