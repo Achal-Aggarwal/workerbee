@@ -12,6 +12,8 @@ public class BattingTable extends Table<BattingTable> {
   public static final Column year     = HavingColumn(tb, "year",      Column.Type.INT);
   public static final Column runs     = HavingColumn(tb, "runs",      Column.Type.INT);
 
+  public static final Column timestamp = PartitionedOnColumn(tb, "timestamp", Column.Type.INT);
+
   private BattingTable() {
     super(BaseBall.db, "Batting", "Batting table", 1);
   }

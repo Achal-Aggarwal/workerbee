@@ -98,6 +98,9 @@ public class Column extends SelectFunction {
   @Getter
   private final String comment;
 
+  @Getter
+  private Object value;
+
   private final Table belongsTo;
 
   public Column(Table belongsTo, String name, Type type) {
@@ -168,5 +171,11 @@ public class Column extends SelectFunction {
     Column column = (Column) obj;
 
     return getName().equals(column.getName()) && getType() == column.getType();
+  }
+
+  public Column withValue(Object value) {
+    Column column = new Column(belongsTo, name, type);
+    column.value = value;
+    return column;
   }
 }

@@ -31,19 +31,22 @@ public class BaseBallTest {
     = BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_1_ID)
     .set(BattingTable.year, 1990)
-    .set(BattingTable.runs, 10);
+    .set(BattingTable.runs, 10)
+    .set(BattingTable.timestamp, 0);
 
   private static Row<BattingTable> mediumRuns
     = BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_2_ID)
     .set(BattingTable.year, 1990)
-    .set(BattingTable.runs, 100);
+    .set(BattingTable.runs, 100)
+    .set(BattingTable.timestamp, 0);
 
   private static Row<BattingTable> maximumRun
     = BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_3_ID)
     .set(BattingTable.year, 2000)
-    .set(BattingTable.runs, 50);
+    .set(BattingTable.runs, 50)
+    .set(BattingTable.timestamp, 0);
 
   @BeforeClass
   public static void BeforeClass() throws IOException, SQLException {
@@ -96,7 +99,7 @@ public class BaseBallTest {
 
     repo.execute(BaseBall.insertPlayerWithTotalRunsOverAllYears());
 
-    List<Player> players = repo.getSpecificRecordsOf(PlayerTable.tb);
+    List<Player> players = repo.getSpecificRecordsOf(PlayerTable.tb, PlayerTable.timestamp.withValue(0));
 
     assertThat(players.size(), is(2));
 

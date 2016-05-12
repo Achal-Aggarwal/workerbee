@@ -7,6 +7,8 @@ import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
+import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
+import net.achalaggarwal.workerbee.expression.BooleanExpression;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.io.FileUtils;
 
@@ -17,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import static net.achalaggarwal.workerbee.Utils.getRandomPositiveNumber;
 import static net.achalaggarwal.workerbee.Utils.rtrim;
 import static java.lang.String.valueOf;
 import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
+import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
 
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
@@ -145,12 +147,18 @@ public class Repository implements AutoCloseable {
     return rows;
   }
 
-  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table) throws SQLException, IOException {
+  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
     Statement statement = connection.createStatement();
 
     File tempDirectoryPath = Files.createTempDir();
 
-    String insertHQL = insert().overwrite().directory(tempDirectoryPath).using(select(star()).from(table)).generate();
+    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
+    for (Column partition : partitions) {
+      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
+    }
+
+    String insertHQL = insert().overwrite().directory(tempDirectoryPath)
+      .using(select(star()).from(table).where(expression)).generate();
     LOGGER.info("Executing query : " + insertHQL);
     statement.execute(insertHQL);
 
@@ -172,8 +180,8 @@ public class Repository implements AutoCloseable {
     return rows;
   }
 
-  public <T extends Table, A extends SpecificRecord> List<A> getSpecificRecordsOf(Table<T> table) throws SQLException, IOException {
-    return Row.getSpecificRecords(getTextRecordsOf(table));
+  public <T extends Table, A extends SpecificRecord> List<A> getSpecificRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
+    return Row.getSpecificRecords(getTextRecordsOf(table, partitions));
   }
 
   @Override

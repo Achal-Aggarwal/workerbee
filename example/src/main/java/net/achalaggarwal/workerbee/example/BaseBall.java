@@ -51,6 +51,7 @@ public class BaseBall extends Database {
   public static InsertQuery insertPlayerWithTotalRunsOverAllYears() {
     return insert()
       .intoTable(PlayerTable.tb)
+      .partitionOn(PlayerTable.timestamp, 0)
       .using(
         select(BattingTable.playerId, sum(BattingTable.runs)).from(BattingTable.tb).groupBy(BattingTable.playerId)
       );

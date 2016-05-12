@@ -57,6 +57,20 @@ public class InsertQuery implements Query {
     return this;
   }
 
+  public InsertQuery partitionOn(List<Column> partitions) {
+    for (Column partition : partitions) {
+      partitionOn(partition, partition.getValue());
+    }
+
+    return this;
+  }
+
+  public InsertQuery partitionOn(Column partition) {
+    partitionOn(partition, partition.getValue());
+
+    return this;
+  }
+
   @Override
   public String generate() {
     StringBuilder result = new StringBuilder();
