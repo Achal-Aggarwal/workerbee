@@ -1,7 +1,7 @@
 package net.achalaggarwal.workerbee.example;
 
 import net.achalaggarwal.workerbee.Database;
-import net.achalaggarwal.workerbee.MigrationGenerator;
+import net.achalaggarwal.workerbee.tools.MigrationGenerator;
 import net.achalaggarwal.workerbee.Table;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.example.baseball.BattingTable;

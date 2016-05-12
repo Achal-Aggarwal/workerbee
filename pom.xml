@@ -50,6 +50,7 @@
 
   <modules>
     <module>core</module>
+    <module>tools</module>
     <module>example</module>
   </modules>
 
