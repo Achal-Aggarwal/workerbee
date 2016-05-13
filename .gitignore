@@ -3,3 +3,6 @@ target
 .idea/
 *.iml
 settings.xml
+dependency-reduced-pom.xml
+metastore_db
+derby.log
