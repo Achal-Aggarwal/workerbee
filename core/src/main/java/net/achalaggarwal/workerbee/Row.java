@@ -31,7 +31,7 @@ public class Row<T extends Table> {
     this.map = parseRecordUsing(table, record);
   }
 
-  public Row(Table<T> table, SpecificRecord record, Object... partitions){
+  public Row(Table<? extends Table> table, SpecificRecord record, Column... partitions){
     this.table = table;
     this.map = parseRecordUsing(table, record, partitions);
   }
@@ -58,7 +58,7 @@ public class Row<T extends Table> {
       ZERO_BASED
     );
   }
-  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, SpecificRecord record, Object... partitions) {
+  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, SpecificRecord record, Column... partitions) {
     Map<Column, Object> map = new HashMap<>(table.getColumns().size());
 
     Schema schema = record.getSchema();
@@ -66,9 +66,14 @@ public class Row<T extends Table> {
       map.put(column, record.get(schema.getField(column.getName()).pos()));
     }
 
-    int index = 0;
+    Map<Column, Object> partitionValueMap = new HashMap<>();
+
+    for (Column partition : partitions) {
+      partitionValueMap.put(partition, partition.getValue());
+    }
+
     for (Column column : table.getPartitions()) {
-      map.put(column, partitions[index++]);
+      map.put(column, partitionValueMap.get(column));
     }
 
     return map;
@@ -170,7 +175,7 @@ public class Row<T extends Table> {
   public <A extends SpecificRecord> A getSpecificRecord(){
     Class<? extends SpecificRecord> klass = table.getKlass();
 
-    A specificRecord = null;
+    A specificRecord;
     try {
       specificRecord = (A) klass.newInstance();
     } catch (Exception e) {
