@@ -59,7 +59,8 @@ public class RecordParser implements ResultSet {
 
   @Override
   public boolean getBoolean(int columnIndex) throws SQLException {
-    throw new SQLException("Method not supported");
+    String value = at(columnIndex);
+    return isValid(value) && Boolean.parseBoolean(value);
   }
 
   @Override

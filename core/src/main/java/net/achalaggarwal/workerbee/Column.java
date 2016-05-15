@@ -14,6 +14,8 @@ public class Column extends SelectFunction {
     switch (schema.getType()) {
       case STRING:
         return Type.STRING;
+      case BOOLEAN:
+        return Type.BOOLEAN;
       case INT:
         return Type.INT;
       case FLOAT:
@@ -28,6 +30,17 @@ public class Column extends SelectFunction {
   }
 
   public static enum Type {
+    BOOLEAN {
+      @Override
+      public Boolean parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getBoolean(index);
+      }
+
+      @Override
+      public Boolean convert(Object value) {
+        return value == null ? null : Boolean.parseBoolean(String.valueOf(value));
+      }
+    },
     INT {
       @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {

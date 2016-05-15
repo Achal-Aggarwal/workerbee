@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 public class TableTest {
@@ -109,10 +110,13 @@ public class TableTest {
 
   @Test
   public void shouldGetNewRowOfTable(){
-    Column column = new Column(table, COLUMN_NAME, Column.Type.STRING);
-    table.havingColumn(column);
+    Column strColumn = new Column(table, STRING_COLUMN_NAME, Column.Type.STRING);
+    Column booleanColumn = new Column(table, COLUMN_NAME, Column.Type.BOOLEAN);
+    table.havingColumn(strColumn);
+    table.havingColumn(booleanColumn);
     Row newRow = table.getNewRow();
-    assertThat(newRow.get(column), nullValue());
+    assertThat(newRow.get(strColumn), nullValue());
+    assertFalse((Boolean) newRow.get(booleanColumn));
   }
 
   @Test

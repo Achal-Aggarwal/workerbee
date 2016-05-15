@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 
 public class ColumnTest {
   public static final String COLUMN_NAME = "COLUMN_NAME";
+  public static final Boolean BOOL_VALUE = true;
   public static final Integer INT_VALUE = 1;
   public static final int INDEX = 0;
   public static final String STRING_VALUE = "STRING_VALUE";
@@ -26,6 +27,18 @@ public class ColumnTest {
     assertThat(column, instanceOf(Column.class));
     assertThat(column.getName(), is(COLUMN_NAME));
     assertThat(column.getType(), Matchers.is(Column.Type.INT));
+  }
+
+  @Test
+  public void shouldParseBooleanValueUsingRecordParser() throws SQLException {
+    Column column = new Column(null, COLUMN_NAME, Column.Type.BOOLEAN);
+    RecordParser mockRecordParser = mock(RecordParser.class);
+
+    when(mockRecordParser.getBoolean(INDEX)).thenReturn(BOOL_VALUE);
+
+    assertThat((Boolean) column.parseValueUsing(mockRecordParser, INDEX), is(BOOL_VALUE));
+
+    verify(mockRecordParser).getBoolean(INDEX);
   }
 
   @Test
