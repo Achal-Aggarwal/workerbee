@@ -1,10 +1,14 @@
 package net.achalaggarwal.workerbee;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -97,5 +101,30 @@ public class Utils {
     Files.write(tableDataFile, generateRecords, Charset.defaultCharset());
 
     return tableDataFile;
+  }
+
+  public static String[] head(String first, String... other){
+    Object[] objects = _row(first, other);
+    return Arrays.copyOf(objects, objects.length, String[].class);
+  }
+
+  public static Object[] _row(Object first, Object... other){
+    List<Object> values = Lists.asList(first, other);
+    return values.toArray(new Object[values.size()]);
+  }
+
+  public static <T extends Table> Pair<Table<T>, List<Row<T>>> table(Table<T> table, String[] head, Object[]... rowValues){
+    List<Row<T>> rows = new ArrayList<>();
+
+    for (Object[] rowValue : rowValues) {
+      Row<T> newRow = table.getNewRow();
+      for (int i = 0; i < head.length; i++) {
+        newRow.set(table.getColumn(head[i]), rowValue[i]);
+      }
+
+      rows.add(newRow);
+    }
+
+    return Pair.of(table, rows);
   }
 }

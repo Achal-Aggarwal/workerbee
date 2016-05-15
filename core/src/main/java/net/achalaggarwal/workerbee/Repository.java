@@ -11,6 +11,7 @@ import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
 import net.achalaggarwal.workerbee.expression.BooleanExpression;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -70,6 +71,18 @@ public class Repository implements AutoCloseable {
     execute(new TableCreator(table).ifNotExist().generate());
     clear(table);
 
+    return this;
+  }
+
+  public <T extends Table>  Repository load(Pair<Table<T>, List<Row<T>>> tableData) throws SQLException, IOException {
+    LoadData loadData = new LoadData();
+
+    Table<T> table = tableData.getLeft();
+
+    for (Row<T> row : tableData.getRight()) {
+      Path tableDirPath = Utils.writeAtTempFile(table, row);
+      execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
+    }
     return this;
   }
 

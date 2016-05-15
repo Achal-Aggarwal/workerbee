@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.achalaggarwal.workerbee.Utils.fqTableName;
+import static net.achalaggarwal.workerbee.Utils.joinList;
+
 public class Row<T extends Table> {
   private static final int ZERO_BASED = 0;
   private static final int ONE_BASED = 1;
@@ -51,13 +54,6 @@ public class Row<T extends Table> {
     }
   }
 
-  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
-    return parseRecordUsing(
-      table,
-      new RecordParser(record, table.getColumnSeparator(), table.getHiveNull()),
-      ZERO_BASED
-    );
-  }
   private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, SpecificRecord record, Column... partitions) {
     Map<Column, Object> map = new HashMap<>(table.getColumns().size());
 
@@ -77,6 +73,14 @@ public class Row<T extends Table> {
     }
 
     return map;
+  }
+
+  private static Map<Column, Object> parseRecordUsing(Table<? extends Table> table, String record) {
+    return parseRecordUsing(
+      table,
+      new RecordParser(record, table.getColumnSeparator(), table.getHiveNull()),
+      ZERO_BASED
+    );
   }
 
   private static Map<Column, Object> parseRecordUsing(
@@ -141,7 +145,7 @@ public class Row<T extends Table> {
       result.add(value == null ? table.getHiveNull() : value.toString());
     }
 
-    return Utils.joinList(result, table.getColumnSeparator());
+    return joinList(result, table.getColumnSeparator());
   }
 
   public Constant getC(Column column) {
@@ -187,5 +191,35 @@ public class Row<T extends Table> {
     }
 
     return specificRecord;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Row<?> row = (Row<?>) o;
+
+    if (!map.equals(row.map)) return false;
+    return table.equals(row.table);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = map.hashCode();
+    result = 31 * result + table.hashCode();
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    List<String> sb = new ArrayList<>();
+
+    for (Column column : map.keySet()) {
+      sb.add(column.getName() + ":" + map.get(column));
+    }
+
+    return fqTableName(table) + "@{" + joinList(sb, ", ") + '}';
   }
 }

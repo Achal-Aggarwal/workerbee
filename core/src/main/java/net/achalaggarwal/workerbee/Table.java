@@ -157,7 +157,8 @@ public class Table<T extends Table> {
   }
 
   public Column getColumn(String columnName) {
-    return columns.get(columnName);
+    Column column = columns.get(columnName);
+    return column == null ? partitionedOn.get(columnName) : column;
   }
 
   public List<Column> getColumns() {
