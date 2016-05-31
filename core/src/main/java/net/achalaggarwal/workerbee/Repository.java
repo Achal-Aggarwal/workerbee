@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static net.achalaggarwal.workerbee.Database.DEFAULT;
@@ -30,6 +28,7 @@ import static net.achalaggarwal.workerbee.QueryGenerator.select;
 import static net.achalaggarwal.workerbee.Utils.getRandomPositiveNumber;
 import static net.achalaggarwal.workerbee.Utils.rtrim;
 import static java.lang.String.valueOf;
+import static net.achalaggarwal.workerbee.Utils.variableSubstituter;
 import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
 import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
 
@@ -37,6 +36,8 @@ public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
   private static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
   private static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
+
+  private Map<String, String> hiveVarMap = new HashMap<>();
 
   private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
 
@@ -49,7 +50,7 @@ public class Repository implements AutoCloseable {
     );
   }
 
-  private Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
+  public Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
     try {
       Class.forName(DRIVER_NAME);
     } catch (ClassNotFoundException e) {
@@ -102,13 +103,14 @@ public class Repository implements AutoCloseable {
 
   private Repository clear(Table<? extends Table> table) throws SQLException {
     if (table.isExternal()){
-      return execute("DFS -RMR " + table.getLocation());
+      return execute("dfs -rmr " + table.getLocation());
     }
 
     return execute(new TruncateTable(table).generate());
   }
 
   public Repository hiveVar(String var, String val) throws SQLException {
+    hiveVarMap.put(var, val);
     return execute("SET hivevar:" + var + "=" + val);
   }
 
@@ -161,21 +163,7 @@ public class Repository implements AutoCloseable {
   }
 
   public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
-    Statement statement = connection.createStatement();
-
-    File tempDirectoryPath = Files.createTempDir();
-
-    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
-    for (Column partition : partitions) {
-      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
-    }
-
-    String insertHQL = insert().overwrite().directory(tempDirectoryPath)
-      .using(select(star()).from(table).where(expression)).generate();
-    LOGGER.info("Executing query : " + insertHQL);
-    statement.execute(insertHQL);
-
-    List<Row<T>> rows = new ArrayList<>();
+    File tempDirectoryPath = takeoutRecordsInFile(table, partitions);
 
     File[] files = tempDirectoryPath.listFiles(new FileFilter() {
       @Override
@@ -184,6 +172,7 @@ public class Repository implements AutoCloseable {
       }
     });
 
+    List<Row<T>> rows = new ArrayList<>();
     for (File file : files) {
       for (String record : FileUtils.readLines(file)) {
         rows.add(table.parseRecordUsing(record));
@@ -191,6 +180,22 @@ public class Repository implements AutoCloseable {
     }
 
     return rows;
+  }
+
+  private <T extends Table> File takeoutRecordsInFile(Table<T> table, Column[] partitions) throws SQLException {
+    File tempDirectoryPath = Files.createTempDir();
+
+    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
+    for (Column partition : partitions) {
+      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
+    }
+
+    execute("USE " + table.getDatabaseName() + "; MSCK REPAIR TABLE " + table.getName());
+
+    execute(insert().overwrite().directory(tempDirectoryPath)
+      .using(select(star()).from(table).where(expression)));
+
+    return tempDirectoryPath;
   }
 
   public <T extends Table, A extends SpecificRecord> List<A> getSpecificRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {

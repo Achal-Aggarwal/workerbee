@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -126,5 +123,12 @@ public class Utils {
     }
 
     return Pair.of(table, rows);
+  }
+
+  public static String variableSubstituter(String value, Map<String, String> variables){
+    for (String var : variables.keySet()) {
+      value = value.replaceAll("\\$\\{"+var+"\\}", variables.get(var));
+    }
+    return value;
   }
 }
