@@ -4,6 +4,7 @@ import net.achalaggarwal.workerbee.dr.SelectFunction;
 import lombok.Getter;
 import org.apache.avro.Schema;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -94,6 +95,17 @@ public class Column extends SelectFunction {
       @Override
       public Timestamp convert(Object value) {
         return value == null ? null : (Timestamp) (value);
+      }
+    },
+    BIGDECIMAL{
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getBigDecimal(index);
+      }
+
+      @Override
+      public BigDecimal convert(Object value) {
+        return value == null ? null : (BigDecimal) (value);
       }
     };
 

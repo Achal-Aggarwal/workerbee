@@ -3,6 +3,7 @@ package net.achalaggarwal.workerbee;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
@@ -20,6 +21,7 @@ public class ColumnTest {
   public static final float FLOAT_VALUE = 2.3f;
   public static final double DOUBLE_VALUE = 5.4d;
   public static final Timestamp TIMESTAMP_VALUE = new Timestamp(0);
+  public static final BigDecimal BIG_DECIMAL_VALUE = new BigDecimal(0);
   Column column = new Column(null, COLUMN_NAME, Column.Type.INT);
 
   @Test
@@ -98,6 +100,18 @@ public class ColumnTest {
     assertThat((Timestamp) column.parseValueUsing(mockRecordParser, INDEX), is(TIMESTAMP_VALUE));
 
     verify(mockRecordParser).getTimestamp(INDEX);
+  }
+
+  @Test
+  public void shouldParseBigDecimalValueUsingRecordParser() throws SQLException {
+    Column column = new Column(null, COLUMN_NAME, Column.Type.BIGDECIMAL);
+    RecordParser mockRecordParser = mock(RecordParser.class);
+
+    when(mockRecordParser.getBigDecimal(INDEX)).thenReturn(BIG_DECIMAL_VALUE);
+
+    assertThat((BigDecimal) column.parseValueUsing(mockRecordParser, INDEX), is(BIG_DECIMAL_VALUE));
+
+    verify(mockRecordParser).getBigDecimal(INDEX);
   }
 
   @Test(expected = RuntimeException.class)
