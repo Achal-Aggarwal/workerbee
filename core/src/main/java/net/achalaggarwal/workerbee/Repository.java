@@ -139,8 +139,10 @@ public class Repository implements AutoCloseable {
 
     for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
       if (sqlStatement.length() > 0) {
-        LOGGER.info("Executing query : " + sqlStatement);
-        statement.execute(sqlStatement);
+        LOGGER.info("Executing query [Before interpolation]: " + sqlStatement);
+        String interpolatedStatement = variableSubstituter(sqlStatement, hiveVarMap);
+        LOGGER.info("Executing query [After interpolation]: " + interpolatedStatement);
+        statement.execute(interpolatedStatement);
       }
     }
 

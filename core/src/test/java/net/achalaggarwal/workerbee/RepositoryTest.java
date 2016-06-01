@@ -97,9 +97,8 @@ public class RepositoryTest {
     whenNew(Row.class).withArguments(Table.DUAL, "X")
       .thenReturn(mockRow);
 
-    mockStatic(Utils.class);
     Path dualTempPath = mock(Path.class);
-    PowerMockito.when(Utils.writeAtTempFile(Table.DUAL, mockRow)).thenReturn(dualTempPath);
+    PowerMockito.stub(PowerMockito.method(Utils.class, "writeAtTempFile")).toReturn(dualTempPath);
 
     mockStatic(LoadData.class);
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
@@ -152,8 +151,6 @@ public class RepositoryTest {
   public void shouldExecuteSelectQueryAndReturnSomeResultRows() throws Exception {
     SelectQuery mockSelectQuery = mock(SelectQuery.class);
     when(mockSelectQuery.generate()).thenReturn(SELECT_SQL);
-
-    PowerMockito.when(Utils.rtrim(SELECT_SQL)).thenReturn(SELECT_SQL);
 
     Table mockTable = mock(Table.class);
     when(mockSelectQuery.table()).thenReturn(mockTable);
