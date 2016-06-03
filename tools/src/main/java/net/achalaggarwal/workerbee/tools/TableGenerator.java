@@ -1,14 +1,12 @@
 package net.achalaggarwal.workerbee.tools;
 
+import net.achalaggarwal.workerbee.Column;
 import net.achalaggarwal.workerbee.Utils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +14,7 @@ import java.util.regex.Pattern;
 public class TableGenerator {
 
   public static final Pattern COLUMN_PATTERN = Pattern.compile(
-    "(?:\\s*(?:`([a-zA-Z]+)` ([\\w\\d_]+))( COMMENT 'from deserializer')?,?)"
+    "(?:\\s*(?:`([\\w\\d_]+)` ([\\w\\d_]+)(\\([\\d,]+\\))?)( COMMENT 'from deserializer')?,?)"
   );
   public static final Pattern TABLE_NAME_PATTERN = Pattern.compile(
     "(?:CREATE(?: EXTERNAL)? TABLE `([\\w\\d_]+)`)"
@@ -27,11 +25,11 @@ public class TableGenerator {
   public static String generateTable(String packageName, String databaseName, String schemaStr){
     String[] schemaParts = schemaStr.split("PARTITIONED BY");
 
-    LinkedHashMap<String, String> columns = extractColumnsAsMap(schemaParts[0]);
-    LinkedHashMap<String, String> partitions =
+    List<Column> columns = extractColumnsAsMap(schemaParts[0]);
+    List<Column> partitions =
       schemaParts.length > 1
       ? extractColumnsAsMap(schemaParts[1])
-      : new LinkedHashMap<String, String>();
+      : new ArrayList<Column>();
 
 
     String tableName = extractTableName(schemaStr);
@@ -45,8 +43,8 @@ public class TableGenerator {
 
   private static String tableTemplate(
     String packageName, String databaseName, String tableName,
-    LinkedHashMap<String, String> columns,
-    LinkedHashMap<String, String> partitions
+    List<Column> columns,
+    List<Column> partitions
   ){
     String className = snakeCaseToFirstUpperCase(tableName) + "Table";
     return
@@ -69,42 +67,27 @@ public class TableGenerator {
       ;
   }
 
-  private static String columnSectionTemplate(String method, LinkedHashMap<String, String> columns){
+  private static String columnSectionTemplate(String method, List<Column> columns){
     StringBuilder sb = new StringBuilder();
 
-    for (Map.Entry<String, String> colEntry : columns.entrySet()) {
+    for (Column colEntry : columns) {
       sb.append("  ")
-        .append(columnTemplate(method, colEntry.getKey(), colEntry.getValue()))
+        .append(columnTemplate(method, colEntry))
         .append("\n");
     }
 
     return sb.toString();
   }
 
-  private static String columnTemplate(String method, String name, String type) {
+  private static String columnTemplate(String method, Column column) {
     return "public static final " +
-      "Column " + name + " = " + method + "(" +
-      "tb, \"" + name + "\", " + getColumnType(type) +
-      ");";
-  }
-
-  private static String getColumnType(String type){
-    switch (type.toLowerCase()){
-      case "string":
-        return "Column.Type.STRING";
-      case "int":
-        return "Column.Type.INT";
-      case "float":
-        return "Column.Type.FLOAT";
-      case "double":
-        return "Column.Type.DOUBLE";
-      case "boolean":
-        return "Column.Type.BOOLEAN";
-      case "timestamp":
-        return "Column.Type.TIMESTAMP";
-    }
-
-    return null;
+      "Column " + column.getName() + " = "
+      + method + "(" +
+        "tb, \""
+        + column.getName() + "\"" +
+        ", Column.Type." + column.getType().name() + ")"
+      + (column.getParams() == null ? "" : ".withParams(\"" + column.getParams() + "\")")
+      + ";";
   }
 
   private static String snakeCaseToFirstUpperCase(String snakeCaseStr){
@@ -125,12 +108,18 @@ public class TableGenerator {
     return matcher.group(1);
   }
 
-  private static LinkedHashMap<String, String> extractColumnsAsMap(String schemaPart) {
-    LinkedHashMap<String, String> columns = new LinkedHashMap<>();
+  private static List<Column> extractColumnsAsMap(String schemaPart) {
+    ArrayList<Column> columns = new ArrayList<>();
 
     Matcher matcher = COLUMN_PATTERN.matcher(schemaPart);
     while(matcher.find()) {
-        columns.put(matcher.group(1), matcher.group(2));
+      columns.add(
+        new Column(
+          null,
+          matcher.group(1),
+          Column.Type.valueOf(matcher.group(2).toUpperCase())
+        ).withParams(matcher.group(3))
+      );
     }
     return columns;
   }

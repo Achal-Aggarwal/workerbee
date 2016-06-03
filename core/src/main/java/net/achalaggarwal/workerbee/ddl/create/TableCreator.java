@@ -89,7 +89,7 @@ public class TableCreator implements Query {
     List<String> columnsDef = new ArrayList<>(table.getColumns().size());
 
     for (Column column : table.getColumns()) {
-      columnsDef.add(column.getName() + " " + column.getType());
+      columnsDef.add(column.getName() + " " + column.getTypeRepresentation());
     }
 
     result.append(joinList(columnsDef, ", "));

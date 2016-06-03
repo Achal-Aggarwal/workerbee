@@ -264,7 +264,8 @@ public class RecordParser implements ResultSet {
 
   @Override
   public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-    throw new SQLException("Method not supported");
+    String value = at(columnIndex);
+    return isValid(value) ? new BigDecimal(String.valueOf(value)) : BigDecimal.ZERO;
   }
 
   @Override

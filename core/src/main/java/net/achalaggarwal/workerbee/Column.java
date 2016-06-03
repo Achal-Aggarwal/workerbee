@@ -1,5 +1,6 @@
 package net.achalaggarwal.workerbee;
 
+import lombok.Setter;
 import net.achalaggarwal.workerbee.dr.SelectFunction;
 import lombok.Getter;
 import org.apache.avro.Schema;
@@ -8,6 +9,8 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Column extends SelectFunction {
   public static Type getType(Schema schema) {
@@ -51,6 +54,17 @@ public class Column extends SelectFunction {
       @Override
       public Integer convert(Object value) {
         return value == null ? null : Integer.parseInt(String.valueOf(value));
+      }
+    },
+    BIGINT {
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getBigDecimal(index);
+      }
+
+      @Override
+      public BigDecimal convert(Object value) {
+        return value == null ? null : new BigDecimal(String.valueOf(value));
       }
     },
     FLOAT {
@@ -125,6 +139,9 @@ public class Column extends SelectFunction {
 
   @Getter
   private Object value;
+
+  @Getter
+  private String params;
 
   private final Table belongsTo;
 
@@ -203,5 +220,14 @@ public class Column extends SelectFunction {
     Column column = new Column(belongsTo, name, type);
     column.value = value;
     return column;
+  }
+
+  public Column withParams(String params){
+    this.params = params;
+    return this;
+  }
+
+  public String getTypeRepresentation(){
+    return type.name() + (params == null ? "" : params);
   }
 }

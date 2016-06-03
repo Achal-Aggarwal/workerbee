@@ -104,7 +104,7 @@ public class ColumnTest {
 
   @Test
   public void shouldParseBigDecimalValueUsingRecordParser() throws SQLException {
-    Column column = new Column(null, COLUMN_NAME, Column.Type.BIGDECIMAL);
+    Column column = new Column(null, COLUMN_NAME, Column.Type.DECIMAL);
     RecordParser mockRecordParser = mock(RecordParser.class);
 
     when(mockRecordParser.getBigDecimal(INDEX)).thenReturn(BIG_DECIMAL_VALUE);
