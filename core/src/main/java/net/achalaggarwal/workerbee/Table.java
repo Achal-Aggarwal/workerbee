@@ -85,11 +85,11 @@ public class Table<T extends Table> {
   }
 
   public Table<T> havingColumn(Column column){
-    if (columns.containsKey(column.getName())) {
+    if (columns.containsKey(column.getName().toLowerCase())) {
       throw new RuntimeException("Table " + getName() + " already has a column with name " + column.getName());
     }
 
-    columns.put(column.getName(), column);
+    columns.put(column.getName().toLowerCase(), column);
     return this;
   }
 
@@ -116,7 +116,7 @@ public class Table<T extends Table> {
   }
 
   public Table partitionedOnColumn(Column column){
-    partitionedOn.put(column.getName(), column);
+    partitionedOn.put(column.getName().toLowerCase(), column);
     return this;
   }
 
@@ -157,8 +157,8 @@ public class Table<T extends Table> {
   }
 
   public Column getColumn(String columnName) {
-    Column column = columns.get(columnName);
-    return column == null ? partitionedOn.get(columnName) : column;
+    Column column = columns.get(columnName.toLowerCase());
+    return column == null ? partitionedOn.get(columnName.toLowerCase()) : column;
   }
 
   public List<Column> getColumns() {

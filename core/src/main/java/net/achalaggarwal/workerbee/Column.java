@@ -94,10 +94,10 @@ public class Column extends SelectFunction {
 
       @Override
       public Timestamp convert(Object value) {
-        return value == null ? null : (Timestamp) (value);
+        return value == null ? null : Timestamp.valueOf(String.valueOf(value));
       }
     },
-    BIGDECIMAL{
+    DECIMAL{
       @Override
       public Object parseValue(ResultSet resultSet, int index) throws SQLException {
         return resultSet.getBigDecimal(index);
@@ -105,7 +105,7 @@ public class Column extends SelectFunction {
 
       @Override
       public BigDecimal convert(Object value) {
-        return value == null ? null : (BigDecimal) (value);
+        return value == null ? null : new BigDecimal(String.valueOf(value));
       }
     };
 
@@ -195,7 +195,8 @@ public class Column extends SelectFunction {
 
     Column column = (Column) obj;
 
-    return getName().equals(column.getName()) && getType() == column.getType();
+    return getName().toLowerCase().equals(column.getName().toLowerCase())
+      && getType() == column.getType();
   }
 
   public Column withValue(Object value) {
