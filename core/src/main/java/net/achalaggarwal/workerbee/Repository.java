@@ -1,6 +1,7 @@
 package net.achalaggarwal.workerbee;
 
 import com.google.common.io.Files;
+import lombok.Getter;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
@@ -35,7 +36,8 @@ import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
 public class Repository implements AutoCloseable {
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
   private static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
-  private static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
+
+  public static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
 
   private Map<String, String> hiveVarMap = new HashMap<>();
 
@@ -44,9 +46,14 @@ public class Repository implements AutoCloseable {
   private Connection connection;
 
   public static Repository TemporaryRepository() throws IOException, SQLException {
+    return TemporaryRepository(ROOT_DIR);
+  }
+
+  public static Repository TemporaryRepository(Path rootDir) throws IOException, SQLException {
+    LOGGER.info("Initializing repository at : " + rootDir);
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
-      getHiveConfiguration(ROOT_DIR)
+      getHiveConfiguration(rootDir)
     );
   }
 
@@ -60,8 +67,6 @@ public class Repository implements AutoCloseable {
 
     LOGGER.info("Connecting to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
-
-    LOGGER.info("Initializing repository at : " + ROOT_DIR);
 
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
     create(Table.DUAL);
@@ -147,6 +152,13 @@ public class Repository implements AutoCloseable {
     }
 
     return this;
+  }
+
+  public ResultSet executeForResult(String query) throws SQLException {
+    LOGGER.info("Executing query [Before interpolation]: " + query);
+    String interpolatedStatement = variableSubstituter(query, hiveVarMap);
+    LOGGER.info("Executing query [After interpolation]: " + interpolatedStatement);
+    return connection.createStatement().executeQuery(interpolatedStatement);
   }
 
   public List<Row<Table>> execute(SelectQuery selectQuery) throws SQLException {
