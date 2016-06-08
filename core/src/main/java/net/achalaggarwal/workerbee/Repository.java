@@ -1,7 +1,6 @@
 package net.achalaggarwal.workerbee;
 
 import com.google.common.io.Files;
-import lombok.Getter;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
@@ -171,7 +170,7 @@ public class Repository implements AutoCloseable {
     return rows;
   }
 
-  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
+  public <T extends Table> List<Row<T>> unload(Table<T> table, Column... partitions) throws SQLException, IOException {
     File tempDirectoryPath = takeoutRecordsInFile(table, partitions);
 
     File[] files = tempDirectoryPath.listFiles(new FileFilter() {
@@ -189,6 +188,11 @@ public class Repository implements AutoCloseable {
     }
 
     return rows;
+  }
+
+  @Deprecated
+  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
+    return unload(table, partitions);
   }
 
   private <T extends Table> File takeoutRecordsInFile(Table<T> table, Column[] partitions) throws SQLException {
