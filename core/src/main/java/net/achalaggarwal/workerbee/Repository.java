@@ -92,18 +92,12 @@ public class Repository implements AutoCloseable {
     return this;
   }
 
-  public Repository load(Table<? extends Table> table, Row firstRow, Row... rows) throws SQLException, IOException {
-    LoadData loadData = new LoadData();
-
-    Path tableDirPath = Utils.writeAtTempFile(table, firstRow);
-    execute(loadData.data(firstRow).fromLocal(tableDirPath).into(table).generate());
-
-    for (Row row : rows) {
-      tableDirPath = Utils.writeAtTempFile(table, row);
-      execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
-    }
-
-    return this;
+  @SafeVarargs
+  public final <T extends Table> Repository load(Table<T> table, Row<T> firstRow, Row<T>... rows) throws SQLException, IOException {
+    List<Row<T>> rowList = new ArrayList<>();
+    rowList.add(firstRow);
+    rowList.addAll(Arrays.asList(rows));
+    return load(Pair.of(table, rowList));
   }
 
   private Repository clear(Table<? extends Table> table) throws SQLException {
@@ -144,10 +138,7 @@ public class Repository implements AutoCloseable {
 
     for (String sqlStatement : query.split("[\\s]*;[\\s]*")) {
       if (sqlStatement.length() > 0) {
-        LOGGER.info("Executing query [Before interpolation]: " + sqlStatement);
-        String interpolatedStatement = variableSubstituter(sqlStatement, hiveVarMap);
-        LOGGER.info("Executing query [After interpolation]: " + interpolatedStatement);
-        statement.execute(interpolatedStatement);
+        statement.execute(interpolateQuery(sqlStatement));
       }
     }
 
@@ -155,10 +146,14 @@ public class Repository implements AutoCloseable {
   }
 
   public ResultSet executeForResult(String query) throws SQLException {
+    return connection.createStatement().executeQuery(interpolateQuery(query));
+  }
+
+  private String interpolateQuery(String query) {
     LOGGER.info("Executing query [Before interpolation]: " + query);
     String interpolatedStatement = variableSubstituter(query, hiveVarMap);
     LOGGER.info("Executing query [After interpolation]: " + interpolatedStatement);
-    return connection.createStatement().executeQuery(interpolatedStatement);
+    return interpolatedStatement;
   }
 
   public List<Row<Table>> execute(SelectQuery selectQuery) throws SQLException {
