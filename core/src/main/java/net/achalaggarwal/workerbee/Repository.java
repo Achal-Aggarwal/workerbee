@@ -1,8 +1,9 @@
 package net.achalaggarwal.workerbee;
 
 import com.google.common.io.Files;
+import net.achalaggarwal.workerbee.TextTable.Dual;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
-import net.achalaggarwal.workerbee.ddl.create.TableCreator;
+import net.achalaggarwal.workerbee.ddl.create.TextTableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
@@ -11,7 +12,6 @@ import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
 import net.achalaggarwal.workerbee.expression.BooleanExpression;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -25,10 +25,8 @@ import java.util.logging.Logger;
 import static net.achalaggarwal.workerbee.Database.DEFAULT;
 import static net.achalaggarwal.workerbee.QueryGenerator.*;
 import static net.achalaggarwal.workerbee.QueryGenerator.select;
-import static net.achalaggarwal.workerbee.Utils.getRandomPositiveNumber;
-import static net.achalaggarwal.workerbee.Utils.rtrim;
 import static java.lang.String.valueOf;
-import static net.achalaggarwal.workerbee.Utils.variableSubstituter;
+import static net.achalaggarwal.workerbee.Utils.*;
 import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
 import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
 
@@ -68,38 +66,55 @@ public class Repository implements AutoCloseable {
     connection = DriverManager.getConnection(connectionUrl, properties);
 
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
-    create(Table.DUAL);
-    load(Table.DUAL, new Row<>(Table.DUAL, "X"));
+    create(Dual.tb);
+    load(Dual.tb, Arrays.asList(new Row<>(Dual.tb, "X")));
+
+    hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, Files.createTempDir().getAbsolutePath());
   }
 
-  public Repository create(Table<? extends Table> table) throws SQLException, IOException {
-    execute(new TableCreator(table).ifNotExist().generate());
+  public Repository create(TextTable table) throws SQLException, IOException {
+    execute(table.create().ifNotExist().generate());
     clear(table);
 
     return this;
   }
 
-  public <T extends Table>  Repository load(Pair<Table<T>, List<Row<T>>> tableData) throws SQLException, IOException {
-    LoadData loadData = new LoadData();
+  public Repository create(AvroTable table) throws SQLException, IOException {
+    FileUtils.writeStringToFile(
+      new File(hiveVarMap.get(AvroTable.AVRO_SCHEMA_URL_PATH), table.getName() + ".avsc"),
+      table.getSchema().toString(true)
+    );
+    execute(table.create().ifNotExist().generate());
+    clear(table);
 
-    Table<T> table = tableData.getLeft();
+    return this;
+  }
 
-    for (Row<T> row : tableData.getRight()) {
-      Path tableDirPath = Utils.writeAtTempFile(table, row);
-      execute(loadData.data(row).fromLocal(tableDirPath).into(table).generate());
+  public <T extends TextTable>  Repository load(T table, List<Row<T>> rows) throws SQLException, IOException {
+    for (Row<T> row : rows) {
+      execute(new LoadData()
+        .data(row)
+        .fromLocal(Utils.writeAtTempFile(table, row))
+        .into(table)
+        .generate()
+      );
     }
     return this;
   }
 
-  @SafeVarargs
-  public final <T extends Table> Repository load(Table<T> table, Row<T> firstRow, Row<T>... rows) throws SQLException, IOException {
-    List<Row<T>> rowList = new ArrayList<>();
-    rowList.add(firstRow);
-    rowList.addAll(Arrays.asList(rows));
-    return load(Pair.of(table, rowList));
+  public <T extends AvroTable>  Repository load(T table, List<Row<T>> rows) throws SQLException, IOException {
+    for (Row<T> row : rows) {
+      execute(new LoadData()
+        .data(row)
+        .fromLocal(Utils.writeAtTempFile(table, row))
+        .into(table)
+        .generate()
+      );
+    }
+    return this;
   }
 
-  private Repository clear(Table<? extends Table> table) throws SQLException {
+  private Repository clear(Table table) throws SQLException {
     if (table.isExternal()){
       return execute("dfs -rmr " + table.getLocation());
     }
@@ -116,7 +131,7 @@ public class Repository implements AutoCloseable {
     return execute(databaseCreator.generate());
   }
 
-  public Repository execute(TableCreator tableCreator) throws SQLException {
+  public Repository execute(TextTableCreator tableCreator) throws SQLException {
     return execute(tableCreator.generate());
   }
 
@@ -155,23 +170,51 @@ public class Repository implements AutoCloseable {
     return interpolatedStatement;
   }
 
-  public List<Row<Table>> execute(SelectQuery selectQuery) throws SQLException {
+  public <T extends TextTable> List<Row<T>> execute(SelectQuery selectQuery) throws SQLException {
     Statement statement = connection.createStatement();
 
     String selectHQL = rtrim(selectQuery.generate());
     LOGGER.info("Executing query : " + selectHQL);
 
-    List<Row<Table>> rows = new ArrayList<>();
+    List<Row<T>> rows = new ArrayList<>();
     ResultSet resultSet = statement.executeQuery(selectHQL);
     while (resultSet.next()) {
-      rows.add(new Row<>(selectQuery.table(), resultSet));
+      rows.add(new Row<>((T)selectQuery.table(), resultSet));
     }
 
     return rows;
   }
 
-  public <T extends Table> List<Row<T>> unload(Table<T> table, Column... partitions) throws SQLException, IOException {
-    File tempDirectoryPath = takeoutRecordsInFile(table, partitions);
+  public <T extends TextTable> List<Row<T>> unload(T table, Column... partitions) throws SQLException, IOException {
+    List<Row<T>> rows = new ArrayList<>();
+    for (String record : takeoutRecordsAsString(table, partitions)) {
+      rows.add(table.parseRecordUsing(record));
+    }
+
+    return rows;
+  }
+
+  public <T extends AvroTable> List<Row<T>> unload(T table, Column... partitions) throws SQLException, IOException {
+    List<Row<T>> rows = new ArrayList<>();
+    for (String record : takeoutRecordsAsString(table, partitions)) {
+        rows.add(table.parseRecordUsing(record));
+    }
+
+    return rows;
+  }
+
+  private List<String> takeoutRecordsAsString(Table table, Column[] partitions) throws SQLException, IOException {
+    File tempDirectoryPath = Files.createTempDir();
+
+    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
+    for (Column partition : partitions) {
+      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
+    }
+
+    execute(recover(table).generate());
+
+    execute(insert().overwrite().directory(tempDirectoryPath)
+      .using(select(star()).from(table).where(expression)));
 
     File[] files = tempDirectoryPath.listFiles(new FileFilter() {
       @Override
@@ -180,39 +223,18 @@ public class Repository implements AutoCloseable {
       }
     });
 
-    List<Row<T>> rows = new ArrayList<>();
+    List<String> rows = new ArrayList<>();
     for (File file : files) {
       for (String record : FileUtils.readLines(file)) {
-        rows.add(table.parseRecordUsing(record));
+        rows.add(record);
       }
     }
 
     return rows;
   }
 
-  @Deprecated
-  public <T extends Table> List<Row<T>> getTextRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
-    return unload(table, partitions);
-  }
-
-  private <T extends Table> File takeoutRecordsInFile(Table<T> table, Column[] partitions) throws SQLException {
-    File tempDirectoryPath = Files.createTempDir();
-
-    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
-    for (Column partition : partitions) {
-      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
-    }
-
-    execute("USE " + table.getDatabaseName() + "; MSCK REPAIR TABLE " + table.getName());
-
-    execute(insert().overwrite().directory(tempDirectoryPath)
-      .using(select(star()).from(table).where(expression)));
-
-    return tempDirectoryPath;
-  }
-
-  public <T extends Table, A extends SpecificRecord> List<A> getSpecificRecordsOf(Table<T> table, Column... partitions) throws SQLException, IOException {
-    return Row.getSpecificRecords(getTextRecordsOf(table, partitions));
+  public <T extends AvroTable, A extends SpecificRecord> List<A> getSpecificRecordsOf(AvroTable<T> table, Column... partitions) throws SQLException, IOException {
+    return RowUtils.getSpecificRecords(unload(table, partitions));
   }
 
   @Override

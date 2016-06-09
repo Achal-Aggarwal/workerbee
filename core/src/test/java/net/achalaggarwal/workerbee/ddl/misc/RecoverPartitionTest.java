@@ -3,6 +3,7 @@ package net.achalaggarwal.workerbee.ddl.misc;
 import net.achalaggarwal.workerbee.Database;
 import net.achalaggarwal.workerbee.Table;
 import net.achalaggarwal.workerbee.QueryGenerator;
+import net.achalaggarwal.workerbee.TextTable;
 import org.junit.Test;
 
 import static net.achalaggarwal.workerbee.QueryGenerator.create;
@@ -15,7 +16,7 @@ public class RecoverPartitionTest {
 
   @Test
   public void shouldGenerateCorrectBasicCreateHql(){
-    assertThat(QueryGenerator.recover(new Table(new Database(DATABASE_NAME), TABLE_NAME)).generate(), is(
+    assertThat(QueryGenerator.recover(new TextTable(new Database(DATABASE_NAME), TABLE_NAME)).generate(), is(
       "USE " + DATABASE_NAME + " ; MSCK REPAIR TABLE " + TABLE_NAME + " ;"
     ));
   }

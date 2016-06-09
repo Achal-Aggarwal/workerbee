@@ -29,7 +29,7 @@ public class QueryGeneratorTest {
   @Test
   public void shouldReturnTableCreatorObjectForTableObjectOnCreate() {
     assertThat(
-      QueryGenerator.drop(new Table(new Database("DatabaseName"), "TableName")),
+      QueryGenerator.drop(new TextTable(new Database("DatabaseName"), "TableName")),
       instanceOf(TableDropper.class)
     );
   }
@@ -37,7 +37,7 @@ public class QueryGeneratorTest {
   @Test
   public void shouldReturnRecoverPartitionObjectForTableObjectOnRecover() {
     assertThat(
-      QueryGenerator.recover(new Table(new Database("DatabaseName"), "TableName")),
+      QueryGenerator.recover(new TextTable(new Database("DatabaseName"), "TableName")),
       instanceOf(RecoverPartition.class)
     );
   }
@@ -45,7 +45,7 @@ public class QueryGeneratorTest {
   @Test
   public void shouldReturnTableDropperObjectForTableObjectOnCreate() {
     assertThat(
-      QueryGenerator.create(new Table(new Database("DatabaseName"), "TableName")),
+      QueryGenerator.create(new TextTable(new Database("DatabaseName"), "TableName")),
       instanceOf(TableCreator.class)
     );
   }

@@ -1,6 +1,7 @@
 package net.achalaggarwal.workerbee.example;
 
 import net.achalaggarwal.workerbee.Database;
+import net.achalaggarwal.workerbee.TextTable;
 import net.achalaggarwal.workerbee.tools.MigrationGenerator;
 import net.achalaggarwal.workerbee.Table;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
@@ -39,7 +40,7 @@ public class BaseBall extends Database {
   public static SelectQuery playerWithHighestScoreForEachYear() {
     SelectQuery selectQuery = highestScoreForEachYear().as("MaxRunsForEachYear");
 
-    Table<Table> maxRunsForEachYear = selectQuery.table();
+    TextTable<TextTable> maxRunsForEachYear = selectQuery.table();
 
     return select(BattingTable.playerId, BattingTable.year, BattingTable.runs).from(BattingTable.tb)
       .join(selectQuery)

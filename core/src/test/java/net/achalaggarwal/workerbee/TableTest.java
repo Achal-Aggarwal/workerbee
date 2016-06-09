@@ -28,11 +28,11 @@ public class TableTest {
   public static final String INT_COLUMN_NAME = "INT_COLUMN_NAME";
   public static final String STRING_COLUMN_NAME = "STRING_COLUMN_NAME";
 
-  private Table table;
+  private TextTable table;
 
   @Before
   public void setup(){
-    table = new Table(TABLE_NAME);
+    table = new TextTable(TABLE_NAME);
   }
 
   @Test
@@ -44,7 +44,7 @@ public class TableTest {
 
   @Test
   public void shouldCreateTableWithNameAndDatabase(){
-    Table table = new Table(new Database(DATABASE_NAME), TABLE_NAME);
+    Table table = new TextTable(new Database(DATABASE_NAME), TABLE_NAME);
     assertThat(table, instanceOf(Table.class));
     assertThat(table.getDatabaseName(), is(DATABASE_NAME));
     assertThat(table.isNotTemporary(), is(true));
@@ -124,7 +124,8 @@ public class TableTest {
     Column integer = new Column(table, INT_COLUMN_NAME, Column.Type.INT);
     Column string = new Column(table, STRING_COLUMN_NAME, Column.Type.STRING);
 
-    table.havingColumns(Arrays.asList(integer, string));
+    table.havingColumn(integer);
+    table.havingColumn(string);
 
     Row row = table.parseRecordUsing("1" + table.getColumnSeparator() + "ASD");
     assertThat((Integer) row.get(integer), is(1));

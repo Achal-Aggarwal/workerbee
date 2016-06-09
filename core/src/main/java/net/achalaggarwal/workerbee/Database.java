@@ -18,7 +18,7 @@ public class Database {
 
   private HashMap<String, String> properties = new HashMap<>();
 
-  private HashSet<Table<? extends Table>> tables = new HashSet<>();
+  private HashSet<Table> tables = new HashSet<>();
 
   public Database(String name) {
     this(name, null);
@@ -34,7 +34,7 @@ public class Database {
     return this;
   }
 
-  public Database havingTable(Table<? extends Table> table) {
+  public Database havingTable(Table table) {
     tables.add(table);
 
     return this;

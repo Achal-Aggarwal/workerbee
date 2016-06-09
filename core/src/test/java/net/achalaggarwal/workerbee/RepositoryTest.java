@@ -1,7 +1,7 @@
 package net.achalaggarwal.workerbee;
 
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
-import net.achalaggarwal.workerbee.ddl.create.TableCreator;
+import net.achalaggarwal.workerbee.ddl.create.TextTableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
@@ -37,11 +37,12 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
   Repository.class,
   DriverManager.class,
   DatabaseCreator.class,
-  TableCreator.class,
+  TextTableCreator.class,
   LoadData.class,
   TruncateTable.class,
   Utils.class,
-  Row.class
+  Row.class,
+  TextTable.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class RepositoryTest {
@@ -78,33 +79,38 @@ public class RepositoryTest {
     when(mockStatement.execute(DEFAULT_DATABASE_CREATE_SQL)).thenReturn(false);
 
 
-    mockStatic(TableCreator.class);
-    TableCreator mockTableCreator = mock(TableCreator.class, Mockito.RETURNS_DEEP_STUBS);
-    PowerMockito.whenNew(TableCreator.class)
-      .withArguments(Table.DUAL).thenReturn(mockTableCreator);
+    mockStatic(TextTableCreator.class);
+    TextTableCreator mockTableCreator = mock(TextTableCreator.class, Mockito.RETURNS_DEEP_STUBS);
+    PowerMockito.whenNew(TextTableCreator.class)
+      .withArguments(TextTable.Dual.tb).thenReturn(mockTableCreator);
     when(mockTableCreator.ifNotExist().generate()).thenReturn(DUAL_TABLE_CREATE_SQL);
     when(mockStatement.execute(DUAL_TABLE_CREATE_SQL)).thenReturn(false);
 
 
     mockStatic(TruncateTable.class);
     TruncateTable mockTruncateTable = mock(TruncateTable.class);
-    PowerMockito.whenNew(TruncateTable.class).withArguments(Table.DUAL).thenReturn(mockTruncateTable);
+    PowerMockito.whenNew(TruncateTable.class).withArguments(TextTable.Dual.tb).thenReturn(mockTruncateTable);
     when(mockTruncateTable.generate()).thenReturn(TRUNCATE_DUAL_TABLE);
 
 
     mockStatic(Row.class);
     Row mockRow = mock(Row.class);
-    whenNew(Row.class).withArguments(Table.DUAL, "X")
+    whenNew(Row.class).withArguments(TextTable.Dual.tb, "X")
       .thenReturn(mockRow);
 
     Path dualTempPath = mock(Path.class);
-    PowerMockito.stub(PowerMockito.method(Utils.class, "writeAtTempFile")).toReturn(dualTempPath);
+    PowerMockito.stub(PowerMockito.method(
+      Utils.class,
+      "writeAtTempFile",
+      net.achalaggarwal.workerbee.TextTable.class,
+      net.achalaggarwal.workerbee.Row.class
+    )).toReturn(dualTempPath);
 
     mockStatic(LoadData.class);
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(LoadData.class)
       .withNoArguments().thenReturn(mockLoadData);
-    when(mockLoadData.data(mockRow).fromLocal(dualTempPath).into(Table.DUAL).generate()).thenReturn(LOAD_DUAL_SQL);
+    when(mockLoadData.data(mockRow).fromLocal(dualTempPath).into(TextTable.Dual.tb).generate()).thenReturn(LOAD_DUAL_SQL);
     when(mockStatement.execute(LOAD_DUAL_SQL)).thenReturn(false);
 
     repository = Repository.TemporaryRepository();
@@ -131,7 +137,7 @@ public class RepositoryTest {
 
   @Test
   public void shouldExecuteTableCreateQuery() throws Exception {
-    TableCreator mockTableCreator = mock(TableCreator.class);
+    TextTableCreator mockTableCreator = mock(TextTableCreator.class);
     when(mockTableCreator.generate()).thenReturn(TABLE_CREATE_SQL);
     when(mockStatement.execute(TABLE_CREATE_SQL)).thenReturn(false);
 
@@ -152,7 +158,7 @@ public class RepositoryTest {
     SelectQuery mockSelectQuery = mock(SelectQuery.class);
     when(mockSelectQuery.generate()).thenReturn(SELECT_SQL);
 
-    Table mockTable = mock(Table.class);
+    TextTable mockTable = mock(TextTable.class);
     when(mockSelectQuery.table()).thenReturn(mockTable);
 
     ResultSet mockResultSet = mock(ResultSet.class);
@@ -163,7 +169,7 @@ public class RepositoryTest {
     whenNew(Row.class).withArguments(mockTable, mockResultSet)
     .thenReturn(mockRow);
 
-    List<Row<Table>> resultRows = repository.execute(mockSelectQuery);
+    List<Row<TextTable>> resultRows = repository.execute(mockSelectQuery);
 
     assertThat(resultRows.size(), is(1));
     assertThat(resultRows.get(0), is(mockRow));

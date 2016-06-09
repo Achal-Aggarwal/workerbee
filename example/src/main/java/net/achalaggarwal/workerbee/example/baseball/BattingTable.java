@@ -1,11 +1,12 @@
 package net.achalaggarwal.workerbee.example.baseball;
 
 
+import net.achalaggarwal.workerbee.TextTable;
 import net.achalaggarwal.workerbee.example.BaseBall;
 import net.achalaggarwal.workerbee.Column;
 import net.achalaggarwal.workerbee.Table;
 
-public class BattingTable extends Table<BattingTable> {
+public class BattingTable extends TextTable<BattingTable> {
   public static final BattingTable tb = new BattingTable();
 
   public static final Column playerId = HavingColumn(tb, "player_id", Column.Type.STRING);

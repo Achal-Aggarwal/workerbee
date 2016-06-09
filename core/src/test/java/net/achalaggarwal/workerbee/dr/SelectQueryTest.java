@@ -1,10 +1,7 @@
 package net.achalaggarwal.workerbee.dr;
 
-import net.achalaggarwal.workerbee.Column;
-import net.achalaggarwal.workerbee.Database;
-import net.achalaggarwal.workerbee.Table;
+import net.achalaggarwal.workerbee.*;
 import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
-import net.achalaggarwal.workerbee.QueryGenerator;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,12 +18,12 @@ public class SelectQueryTest {
   public static final int LIMIT = 5;
   public static final String GENERATED_TABLE_NAME = "GENERATED_TABLE_NAME";
 
-  private Table table;
+  private TextTable table;
   private Column column;
 
   @Before
   public void setup(){
-    table = new Table(new Database(DATABASE_NAME), TABLE_NAME);
+    table = new TextTable(new Database(DATABASE_NAME), TABLE_NAME);
     column = new Column(table, COLUMN_NAME, INT);
     table.havingColumn(column);
   }

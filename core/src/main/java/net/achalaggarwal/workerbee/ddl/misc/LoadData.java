@@ -15,7 +15,7 @@ public class LoadData implements Query {
   private boolean pathType;
   private Path filePath;
   private boolean overwrite = false;
-  private Table<? extends Table> table;
+  private Table table;
   private Row<? extends Table> row;
 
   public LoadData data(Row<? extends Table> row) {
@@ -35,7 +35,7 @@ public class LoadData implements Query {
     return this;
   }
 
-  public LoadData into(Table<? extends Table> table) {
+  public LoadData into(Table table) {
     this.table = table;
     return this;
   }

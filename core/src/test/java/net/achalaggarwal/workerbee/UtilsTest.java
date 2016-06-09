@@ -28,10 +28,10 @@ public class UtilsTest {
   @Test
   public void shouldReturnFullyQualifiedTableName(){
     assertThat(Utils.fqTableName(
-        new Table(new Database(DATABASE_NAME), TABLE_NAME)),
+        new TextTable(new Database(DATABASE_NAME), TABLE_NAME)),
       is(DATABASE_NAME + "." + TABLE_NAME));
 
-    assertThat(Utils.fqTableName(new Table(TABLE_NAME)), is(TABLE_NAME));
+    assertThat(Utils.fqTableName(new TextTable(TABLE_NAME)), is(TABLE_NAME));
   }
 
   @Test
@@ -39,7 +39,7 @@ public class UtilsTest {
     Column aColumn = new Column(null, COLUMN_NAME, Column.Type.STRING);
 
     assertThat(Utils.fqColumnName(null, aColumn), is(COLUMN_NAME));
-    assertThat(Utils.fqColumnName(new Table(TABLE_NAME), aColumn), is(TABLE_NAME + "." + COLUMN_NAME));
+    assertThat(Utils.fqColumnName(new TextTable(TABLE_NAME), aColumn), is(TABLE_NAME + "." + COLUMN_NAME));
   }
 
   @Test

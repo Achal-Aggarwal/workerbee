@@ -1,5 +1,5 @@
 package net.achalaggarwal.workerbee;
 
 public interface Query {
-  public String generate();
+  String generate();
 }

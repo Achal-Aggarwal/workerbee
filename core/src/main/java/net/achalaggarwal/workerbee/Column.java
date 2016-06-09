@@ -1,16 +1,13 @@
 package net.achalaggarwal.workerbee;
 
-import lombok.Setter;
-import net.achalaggarwal.workerbee.dr.SelectFunction;
 import lombok.Getter;
+import net.achalaggarwal.workerbee.dr.SelectFunction;
 import org.apache.avro.Schema;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Column extends SelectFunction {
   public static Type getType(Schema schema) {
@@ -33,7 +30,7 @@ public class Column extends SelectFunction {
     return null;
   }
 
-  public static enum Type {
+  public enum Type {
     BOOLEAN {
       @Override
       public Boolean parseValue(ResultSet resultSet, int index) throws SQLException {

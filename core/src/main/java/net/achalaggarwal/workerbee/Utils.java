@@ -1,8 +1,13 @@
 package net.achalaggarwal.workerbee;
 
 import com.google.common.collect.Lists;
+import org.apache.avro.file.DataFileWriter;
+import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -87,14 +92,13 @@ public class Utils {
     return (random.nextInt() & Integer.MAX_VALUE);
   }
 
-  public static Path writeAtTempFile(Table<? extends Table> table, Row... rows) throws IOException {
-    Path tableDataFile = Files.createTempFile(table.getName(), null);
-
+  public static <T extends TextTable> Path writeAtTempFile(T table, Row... rows) throws IOException {
     List<String> generateRecords = new ArrayList<>(rows.length);
     for (Row row : rows) {
       generateRecords.add(row.generateRecord());
     }
 
+    Path tableDataFile = Files.createTempFile(table.getName(), null);
     Files.write(tableDataFile, generateRecords, Charset.defaultCharset());
 
     return tableDataFile;
@@ -110,7 +114,7 @@ public class Utils {
     return values.toArray(new Object[values.size()]);
   }
 
-  public static <T extends Table> Pair<Table<T>, List<Row<T>>> table(Table<T> table, String[] head, Object[]... rowValues){
+  public static <T extends Table> List<Row<T>> table(T table, String[] head, Object[]... rowValues){
     List<Row<T>> rows = new ArrayList<>();
 
     for (Object[] rowValue : rowValues) {
@@ -122,7 +126,7 @@ public class Utils {
       rows.add(newRow);
     }
 
-    return Pair.of(table, rows);
+    return rows;
   }
 
   public static String variableSubstituter(String value, Map<String, String> variables){
@@ -130,5 +134,16 @@ public class Utils {
       value = value.replaceAll("\\$\\{"+var+"\\}", variables.get(var));
     }
     return value;
+  }
+
+  public static <T extends AvroTable> Path writeAtTempFile(T table, Row<T> row) throws IOException {
+    Path tableDataFile = Files.createTempFile(table.getName(), null);
+    try(DataFileWriter<SpecificRecord> writer =
+          new DataFileWriter<>(new SpecificDatumWriter<SpecificRecord>(table.getSchema()))){
+      writer.create(table.getSchema(), new FileOutputStream(tableDataFile.toFile()));
+
+      writer.append(RowUtils.getSpecificRecord(row));
+    }
+    return tableDataFile;
   }
 }

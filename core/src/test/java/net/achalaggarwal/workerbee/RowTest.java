@@ -15,7 +15,7 @@ public class RowTest {
   private final Column column = new Column(null, "COLUMN_NAME", Column.Type.INT);
   @Before
   public void setup(){
-    row = new Row<Table>(new Table("TABLE_NAME").havingColumn(column), "1");
+    row = new Row<>(new TextTable("TABLE_NAME").havingColumn(column), "1");
   }
 
   @Test

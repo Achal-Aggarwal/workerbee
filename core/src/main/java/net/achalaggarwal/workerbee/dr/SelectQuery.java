@@ -7,10 +7,10 @@ import net.achalaggarwal.workerbee.*;
 import java.util.*;
 
 public class SelectQuery implements Query {
-  private Table<? extends Table> table;
+  private Table table;
   private List<SelectFunction> selectFunctions = new ArrayList<>();
   private String alias;
-  private Table<? extends Table> joinTable;
+  private Table joinTable;
   private BooleanExpression onBooleanExpression;
   private Integer limit;
   private List<ColumnOrder> orderBy = new ArrayList<>();
@@ -26,7 +26,7 @@ public class SelectQuery implements Query {
     this(Arrays.asList(selectFunctions));
   }
 
-  public SelectQuery from(Table<? extends Table> table){
+  public SelectQuery from(Table table){
     this.table = table;
 
     as(table.isNotTemporary()
@@ -37,7 +37,7 @@ public class SelectQuery implements Query {
     return this;
   }
 
-  public SelectQuery join(Table<? extends Table> table) {
+  public SelectQuery join(Table table) {
     joinTable = table;
     return this;
   }
@@ -88,8 +88,8 @@ public class SelectQuery implements Query {
     return orderBy(column, ColumnOrder.ASC_ORDER);
   }
 
-  public Table<Table> table(Database database){
-    Table<Table> table = new Table<>(database, alias);
+  public TextTable<TextTable> table(Database database){
+    TextTable<TextTable> table = new TextTable<>(database, alias);
 
     for (SelectFunction selectFunction : selectFunctions) {
       if (selectFunction instanceof AllStarSF){
@@ -107,7 +107,7 @@ public class SelectQuery implements Query {
     return table;
   }
 
-  public Table<Table> table(){
+  public TextTable<TextTable> table(){
     return table(null);
   }
 

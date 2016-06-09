@@ -1,12 +1,10 @@
 package net.achalaggarwal.workerbee.example;
 
-import net.achalaggarwal.workerbee.Repository;
-import net.achalaggarwal.workerbee.Row;
-import net.achalaggarwal.workerbee.Table;
+import net.achalaggarwal.workerbee.*;
 import net.achalaggarwal.workerbee.example.baseball.BattingTable;
-import net.achalaggarwal.workerbee.QueryGenerator;
 import net.achalaggarwal.workerbee.example.baseball.PlayerTable;
 import net.achalaggarwal.workerbee.example.baseball.domain.Player;
+import org.apache.avro.specific.SpecificRecord;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -15,6 +13,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -27,22 +26,25 @@ public class BaseBallTest {
   public static final String PLAYER_3_ID = "PLAYER3_ID";
   private static Repository repo;
 
+  @SuppressWarnings("unchecked")
   private static Row<BattingTable> lowestRun
-    = BattingTable.tb.getNewRow()
+    = (Row<BattingTable>) BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_1_ID)
     .set(BattingTable.year, 1990)
     .set(BattingTable.runs, 10)
     .set(BattingTable.timestamp, 0);
 
+  @SuppressWarnings("unchecked")
   private static Row<BattingTable> mediumRuns
-    = BattingTable.tb.getNewRow()
+    = (Row<BattingTable>) BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_2_ID)
     .set(BattingTable.year, 1990)
     .set(BattingTable.runs, 100)
     .set(BattingTable.timestamp, 0);
 
+  @SuppressWarnings("unchecked")
   private static Row<BattingTable> maximumRun
-    = BattingTable.tb.getNewRow()
+    = (Row<BattingTable>) BattingTable.tb.getNewRow()
     .set(BattingTable.playerId, PLAYER_3_ID)
     .set(BattingTable.year, 2000)
     .set(BattingTable.runs, 50)
@@ -63,9 +65,9 @@ public class BaseBallTest {
 
   @Test
   public void shouldReturnHighestScoreForEachYear() throws IOException, SQLException {
-    repo.load(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
+    repo.load(BattingTable.tb, Arrays.asList(lowestRun, mediumRuns, maximumRun));
 
-    List<Row<Table>> years = repo.execute(BaseBall.highestScoreForEachYear());
+    List<Row<TextTable>> years = repo.execute(BaseBall.highestScoreForEachYear());
 
     assertThat(years.size(), is(2));
 
@@ -78,9 +80,9 @@ public class BaseBallTest {
 
   @Test
   public void shouldReturnPlayerWithHighestScoreForEachYear() throws IOException, SQLException {
-    repo.load(BattingTable.tb, lowestRun, mediumRuns, maximumRun);
+    repo.load(BattingTable.tb, Arrays.asList(lowestRun, mediumRuns, maximumRun));
 
-    List<Row<Table>> years = repo.execute(BaseBall.playerWithHighestScoreForEachYear());
+    List<Row<TextTable>> years = repo.execute(BaseBall.playerWithHighestScoreForEachYear());
 
     assertThat(years.size(), is(2));
 
@@ -95,7 +97,7 @@ public class BaseBallTest {
 
   @Test
   public void shouldInsertPlayerWithTotalRunsOverAllYearsCorrectly() throws IOException, SQLException {
-    repo.load(BattingTable.tb, lowestRun, lowestRun, maximumRun);
+    repo.load(BattingTable.tb, Arrays.asList(lowestRun, lowestRun, maximumRun));
 
     repo.execute(BaseBall.insertPlayerWithTotalRunsOverAllYears());
 

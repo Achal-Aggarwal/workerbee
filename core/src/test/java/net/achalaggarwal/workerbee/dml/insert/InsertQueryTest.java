@@ -2,6 +2,7 @@ package net.achalaggarwal.workerbee.dml.insert;
 
 import net.achalaggarwal.workerbee.Column;
 import net.achalaggarwal.workerbee.Table;
+import net.achalaggarwal.workerbee.TextTable;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class InsertQueryTest {
 
   @Before
   public void setup(){
-    table = new Table(TABLE_NAME);
+    table = new TextTable(TABLE_NAME);
     selectQuery = mock(SelectQuery.class);
     when(selectQuery.generate()).thenReturn(SELECT_QUERY_GENERATE);
   }

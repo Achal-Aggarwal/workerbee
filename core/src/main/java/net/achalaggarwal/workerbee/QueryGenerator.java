@@ -20,15 +20,15 @@ public class QueryGenerator {
     return new DatabaseDropper(database);
   }
 
-  public static TableCreator create(Table<? extends Table> table){
-    return new TableCreator(table);
+  public static TableCreator create(Table table){
+    return table.create();
   }
 
   public static TableDropper drop(Table table) {
     return new TableDropper(table);
   }
 
-  public static RecoverPartition recover(Table<? extends Table> table) {
+  public static RecoverPartition recover(Table table) {
     return new RecoverPartition(table);
   }
 
@@ -40,15 +40,15 @@ public class QueryGenerator {
     return new InsertQuery();
   }
 
-  public static InsertQuery insert(Row<? extends Table> row) {
-    return new InsertQuery().using(select(row.getConstants()).from(Table.DUAL));
+  public static InsertQuery insert(Row row) {
+    return new InsertQuery().using(select(row.getConstants()).from(TextTable.Dual.tb));
   }
 
   public static LoadData loadData() {
     return new LoadData();
   }
 
-  public static TruncateTable truncate(Table<? extends Table> table) {
+  public static TruncateTable truncate(Table table) {
     return new TruncateTable(table);
   }
 }

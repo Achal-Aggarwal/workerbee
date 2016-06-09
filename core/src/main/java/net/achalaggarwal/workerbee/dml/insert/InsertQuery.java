@@ -1,9 +1,6 @@
 package net.achalaggarwal.workerbee.dml.insert;
 
-import net.achalaggarwal.workerbee.Column;
-import net.achalaggarwal.workerbee.Query;
-import net.achalaggarwal.workerbee.Table;
-import net.achalaggarwal.workerbee.Utils;
+import net.achalaggarwal.workerbee.*;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 
 import java.io.File;
@@ -17,12 +14,12 @@ import static net.achalaggarwal.workerbee.Utils.joinList;
 
 public class InsertQuery implements Query {
   private boolean overwrite = false;
-  private Table<? extends Table> table;
+  private Table table;
   private SelectQuery selectQuery;
   private Map<Column, Object> partitionMap;
   private File directory;
 
-  public InsertQuery intoTable(Table<? extends Table> table) {
+  public InsertQuery intoTable(Table table) {
     this.table = table;
 
     partitionMap = new HashMap<>(table.getPartitions().size());

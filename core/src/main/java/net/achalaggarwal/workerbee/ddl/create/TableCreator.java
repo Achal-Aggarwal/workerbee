@@ -8,16 +8,15 @@ import net.achalaggarwal.workerbee.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.achalaggarwal.workerbee.Utils.fqTableName;
 import static net.achalaggarwal.workerbee.Utils.joinList;
 import static net.achalaggarwal.workerbee.Utils.quoteString;
 
-public class TableCreator implements Query {
-  private Table<? extends Table> table;
-  private boolean overwrite = true;
-  private Database database;
+abstract public class TableCreator implements Query {
+  protected Table table;
+  protected boolean overwrite = true;
+  protected Database database;
 
-  public TableCreator(Table<? extends Table> table) {
+  public TableCreator(Table table) {
     this.table = table;
   }
 
@@ -32,50 +31,7 @@ public class TableCreator implements Query {
     return this;
   }
 
-  @Override
-  public String generate() {
-    StringBuilder result = new StringBuilder();
-
-    result.append("CREATE");
-
-    if(table.isExternal()){
-      result.append(" EXTERNAL");
-    }
-
-    result.append(" TABLE");
-
-    if (!overwrite) {
-      result.append(" IF NOT EXISTS");
-    }
-
-    result.append(" ").append(fqTableName(table, database));
-
-    if (!table.getColumns().isEmpty()){
-      columnDefPart(result);
-    }
-
-    if (table.getComment() != null){
-      result.append(" COMMENT " + quoteString(table.getComment()));
-    }
-
-    if (!table.getPartitions().isEmpty()){
-      partitionedByPart(result);
-    }
-
-    if(table.getLocation() != null){
-      result.append(" LOCATION " + quoteString(table.getLocation()));
-    }
-
-    if(!table.getProperties().isEmpty()){
-      tablePropertiesPart(result);
-    }
-
-    result.append(" ;");
-
-    return result.toString();
-  }
-
-  private void tablePropertiesPart(StringBuilder result) {
+  protected void tablePropertiesPart(StringBuilder result) {
     result.append(" TBLPROPERTIES ( ");
     for (String property : table.getProperties()) {
       result.append(quoteString(property) + " = " + quoteString(table.getProperty(property)) + ", ");
@@ -84,7 +40,7 @@ public class TableCreator implements Query {
     result.append(" )");
   }
 
-  private void columnDefPart(StringBuilder result) {
+  protected void columnDefPart(StringBuilder result) {
     result.append(" ( ");
     List<String> columnsDef = new ArrayList<>(table.getColumns().size());
 
@@ -96,7 +52,7 @@ public class TableCreator implements Query {
     result.append(" )");
   }
 
-  private void partitionedByPart(StringBuilder result) {
+  protected void partitionedByPart(StringBuilder result) {
     result.append(" PARTITIONED BY ( ");
     List<String> columnsDef = new ArrayList<>(table.getPartitions().size());
 

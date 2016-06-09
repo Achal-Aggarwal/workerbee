@@ -1,8 +1,10 @@
 package net.achalaggarwal.workerbee;
 
 import lombok.Getter;
+import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificRecord;
+import org.apache.commons.collections.ListUtils;
 import org.apache.hadoop.io.Text;
 
 import java.nio.file.Path;
@@ -10,7 +12,7 @@ import java.util.*;
 
 import static net.achalaggarwal.workerbee.Column.Type.STRING;
 
-public class Table<T extends Table> {
+public abstract class Table {
   @Getter
   private Database database;
 
@@ -29,18 +31,16 @@ public class Table<T extends Table> {
   @Getter
   private boolean external = false;
 
-  @Getter
-  private Class<? extends SpecificRecord> klass;
+  private HashMap<String, String> properties = new HashMap<>();
 
-  HashMap<String, String> properties = new HashMap<>();
+  private Map<String, Column> columns = new LinkedHashMap<>();
 
-  Map<String, Column> columns = new LinkedHashMap<>();
-
-  Map<String, Column> partitionedOn = new LinkedHashMap<>();
+  private Map<String, Column> partitionedOn = new LinkedHashMap<>();
 
   public Table(String name) {
     this(null, name, null, 0);
   }
+
   public Table(String name, long version) {
     this(null, name, null, version);
   }
@@ -68,50 +68,12 @@ public class Table<T extends Table> {
     }
   }
 
-  public Table<T> havingColumnsFromSchema(Class<? extends SpecificRecord> klass){
-    this.klass = klass;
-
-    SpecificRecord specificRecord = null;
-    try {
-      specificRecord = klass.newInstance();
-    } catch (Exception e) {
-      new RuntimeException(e);
-    }
-    for (Schema.Field field : specificRecord.getSchema().getFields()) {
-      havingColumn(field.name(), Column.getType(field.schema()));
-    }
-
-    return this;
-  }
-
-  public Table<T> havingColumn(Column column){
+  protected Table havingColumn(Column column){
     if (columns.containsKey(column.getName().toLowerCase())) {
       throw new RuntimeException("Table " + getName() + " already has a column with name " + column.getName());
     }
 
     columns.put(column.getName().toLowerCase(), column);
-    return this;
-  }
-
-  public static Column HavingColumn(Table table, String name, Column.Type type) {
-    Column column = new Column(table, name, type);
-    table.havingColumn(column);
-    return column;
-  }
-
-  public Table<T> havingColumn(String name, Column.Type type, String comment){
-    return havingColumn(new Column(this, name, type, comment));
-  }
-
-  public Table<T> havingColumn(String name, Column.Type type){
-    return havingColumn(name, type, null);
-  }
-
-  public Table havingColumns(List<Column> columns) {
-    for (Column column : columns) {
-      havingColumn(column);
-    }
-
     return this;
   }
 
@@ -185,6 +147,8 @@ public class Table<T extends Table> {
     return database != null;
   }
 
+  public abstract TableCreator create();
+
   public String getHiveNull() {
     return "\\N";
   }
@@ -193,26 +157,11 @@ public class Table<T extends Table> {
     return "\1";
   }
 
-  public Row<T> getNewRow(){
+  public Row getNewRow(){
     return parseRecordUsing("");
   }
 
-  public Row<T> parseRecordUsing(String record) {
+  public Row parseRecordUsing(String record) {
     return new Row<>(this, record);
   }
-
-  public Row<T> parseTextRecordUsing(Text record) {
-    return parseRecordUsing(record.toString());
-  }
-
-  public String generateRecordFor(Row<T> row) {
-    return Row.generateRecordFor(this, row);
-  }
-
-  public Text generateTextRecordFor(Row<T> row) {
-    return new Text(generateRecordFor(row));
-  }
-
-  public static Table<Table> DUAL = new Table<>(Database.DEFAULT, "Dual")
-    .havingColumn("dummy", STRING);
 }

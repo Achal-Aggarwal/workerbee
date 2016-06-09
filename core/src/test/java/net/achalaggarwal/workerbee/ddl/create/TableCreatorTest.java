@@ -1,9 +1,6 @@
 package net.achalaggarwal.workerbee.ddl.create;
 
-import net.achalaggarwal.workerbee.Column;
-import net.achalaggarwal.workerbee.Database;
-import net.achalaggarwal.workerbee.Table;
-import net.achalaggarwal.workerbee.QueryGenerator;
+import net.achalaggarwal.workerbee.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,11 +18,11 @@ public class TableCreatorTest {
   public static final String COLUMN_NAME = "COLUMN_NAME";
   public static final String NEW_DATABASE_NAME = "NEW_DATABASE_NAME";
 
-  Table table;
+  TextTable table;
 
   @Before
   public void setup(){
-    table = new Table(new Database(DATABASE_NAME), TABLE_NAME);
+    table = new TextTable(new Database(DATABASE_NAME), TABLE_NAME);
   }
 
   @Test
@@ -51,7 +48,7 @@ public class TableCreatorTest {
 
   @Test
   public void shouldGenerateCorrectCreateHqlOfTemporaryTable(){
-    assertThat(QueryGenerator.create(new Table(TABLE_NAME)).generate(), is(
+    assertThat(QueryGenerator.create(new TextTable<>(TABLE_NAME)).generate(), is(
       "CREATE TABLE "  + TABLE_NAME + " ;"
     ));
   }
