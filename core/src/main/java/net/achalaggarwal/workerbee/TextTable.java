@@ -11,7 +11,7 @@ public class TextTable<T extends TextTable> extends Table {
 
     private Dual() {
       super(Database.DEFAULT, "Dual");
-      Dual dummy = havingColumn("dummy", STRING);
+      havingColumn("dummy", STRING);
     }
   }
 

@@ -5,6 +5,7 @@ import net.achalaggarwal.workerbee.example.baseball.BattingTable;
 import net.achalaggarwal.workerbee.example.baseball.PlayerTable;
 import net.achalaggarwal.workerbee.example.baseball.domain.Player;
 import org.apache.avro.specific.SpecificRecord;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -52,7 +54,7 @@ public class BaseBallTest {
 
   @BeforeClass
   public static void BeforeClass() throws IOException, SQLException {
-    repo = Repository.TemporaryRepository();
+    repo = localHs2Repo();
     repo.execute(QueryGenerator.create(BaseBall.db).ifNotExist());
   }
 
@@ -110,5 +112,18 @@ public class BaseBallTest {
 
     assertThat(players.get(1).getPlayerId(), is(PLAYER_3_ID));
     assertThat(players.get(1).getTotalRuns(), is(new BigDecimal(50)));
+  }
+
+  private static Repository localHs2Repo() throws SQLException, IOException {
+    return new Repository(
+      "jdbc:hive2://localhost:20103/default",
+      new Properties(){{
+        put("user", "user");
+        put("password", "pass");
+      }},
+      new Configuration(){{
+        set("fs.defaultFS", "hdfs://localhost:20112");
+      }}
+    );
   }
 }

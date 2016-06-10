@@ -13,9 +13,11 @@ public class BattingTable extends TextTable<BattingTable> {
   public static final Column year     = HavingColumn(tb, "year",      Column.Type.INT);
   public static final Column runs     = HavingColumn(tb, "runs",      Column.Type.INT);
 
-  public static final Column timestamp = PartitionedOnColumn(tb, "timestamp", Column.Type.INT);
+  public static final Column timestamp = PartitionedOnColumn(tb, "tstamp", Column.Type.INT);
 
   private BattingTable() {
     super(BaseBall.db, "Batting", "Batting table", 1);
+    external().onLocation("/batting");
   }
+
 }

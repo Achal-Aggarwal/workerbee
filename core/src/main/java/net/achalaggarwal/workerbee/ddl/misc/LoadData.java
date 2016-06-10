@@ -13,7 +13,7 @@ public class LoadData implements Query {
   private static final boolean LOCAL = true;
 
   private boolean pathType;
-  private Path filePath;
+  private String filePath;
   private boolean overwrite = false;
   private Table table;
   private Row<? extends Table> row;
@@ -24,8 +24,14 @@ public class LoadData implements Query {
   }
 
   public LoadData fromLocal(Path filePath) {
-    this.filePath = filePath;
+    this.filePath = filePath.toAbsolutePath().toString();
     pathType = LOCAL;
+
+    return this;
+  }
+
+  public LoadData from(String hdfsPath) {
+    this.filePath = hdfsPath;
 
     return this;
   }
@@ -46,9 +52,9 @@ public class LoadData implements Query {
 
     result.append("LOAD DATA");
 
-    result.append(pathType ? " LOCAL INPATH " : "INPATH ");
+    result.append(pathType ? " LOCAL INPATH " : " INPATH ");
 
-    result.append(Utils.quoteString(filePath.toAbsolutePath().toString()));
+    result.append(Utils.quoteString(filePath));
 
     if (overwrite) {
       result.append(" OVERWRITE");

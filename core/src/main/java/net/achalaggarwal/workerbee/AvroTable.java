@@ -5,6 +5,8 @@ import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificRecord;
 
+import static java.lang.String.format;
+
 public class AvroTable<T extends AvroTable> extends Table {
   public static final String AVRO_SCHEMA_URL_PATH = "avro.schema.url.path";
   private Class<? extends SpecificRecord> klass;
@@ -33,8 +35,12 @@ public class AvroTable<T extends AvroTable> extends Table {
     super(database, name, comment, version);
     havingProperty(
       "avro.schema.url",
-      "${" + AVRO_SCHEMA_URL_PATH + "}/" + getName() + ".avsc"
+      getSchemaPath("${" + AVRO_SCHEMA_URL_PATH + "}")
     );
+  }
+
+  public String getSchemaPath(String avroSchemaPath) {
+    return format("%s/%s-%s.avsc", avroSchemaPath, getDatabaseName(), getName());
   }
 
   public AvroTable<T> readSchema(Class<? extends SpecificRecord> klass){

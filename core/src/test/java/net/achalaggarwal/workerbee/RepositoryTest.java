@@ -1,11 +1,13 @@
 package net.achalaggarwal.workerbee;
 
+import net.achalaggarwal.workerbee.TextTable.Dual;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TextTableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
 import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
+import org.apache.hadoop.fs.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +17,6 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.nio.file.Path;
 import java.sql.*;
 import java.util.List;
 import java.util.Properties;
@@ -42,7 +43,8 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
   TruncateTable.class,
   Utils.class,
   Row.class,
-  TextTable.class
+  TextTable.class,
+  FSOperation.class
 })
 @PowerMockIgnore({"javax.management.*"})
 public class RepositoryTest {
@@ -71,6 +73,11 @@ public class RepositoryTest {
     mockStatement = mock(Statement.class);
     when(mockConnection.createStatement()).thenReturn(mockStatement);
 
+    mockStatic(FSOperation.class);
+    FSOperation mockFSO = mock(FSOperation.class);
+    PowerMockito.whenNew(FSOperation.class)
+      .withAnyArguments().thenReturn(mockFSO);
+
     mockStatic(DatabaseCreator.class);
     DatabaseCreator mockDatabaseCreator = mock(DatabaseCreator.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(DatabaseCreator.class)
@@ -82,35 +89,33 @@ public class RepositoryTest {
     mockStatic(TextTableCreator.class);
     TextTableCreator mockTableCreator = mock(TextTableCreator.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(TextTableCreator.class)
-      .withArguments(TextTable.Dual.tb).thenReturn(mockTableCreator);
+      .withArguments(Dual.tb).thenReturn(mockTableCreator);
     when(mockTableCreator.ifNotExist().generate()).thenReturn(DUAL_TABLE_CREATE_SQL);
     when(mockStatement.execute(DUAL_TABLE_CREATE_SQL)).thenReturn(false);
 
 
     mockStatic(TruncateTable.class);
     TruncateTable mockTruncateTable = mock(TruncateTable.class);
-    PowerMockito.whenNew(TruncateTable.class).withArguments(TextTable.Dual.tb).thenReturn(mockTruncateTable);
+    PowerMockito.whenNew(TruncateTable.class).withArguments(Dual.tb).thenReturn(mockTruncateTable);
     when(mockTruncateTable.generate()).thenReturn(TRUNCATE_DUAL_TABLE);
 
 
     mockStatic(Row.class);
     Row mockRow = mock(Row.class);
-    whenNew(Row.class).withArguments(TextTable.Dual.tb, "X")
+    whenNew(Row.class).withArguments(Dual.tb, "X")
       .thenReturn(mockRow);
 
     Path dualTempPath = mock(Path.class);
-    PowerMockito.stub(PowerMockito.method(
-      Utils.class,
-      "writeAtTempFile",
-      net.achalaggarwal.workerbee.TextTable.class,
-      net.achalaggarwal.workerbee.Row.class
-    )).toReturn(dualTempPath);
+    Mockito.when(mockFSO.writeTextRow(Dual.tb, mockRow))
+      .thenReturn(dualTempPath);
+
 
     mockStatic(LoadData.class);
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(LoadData.class)
       .withNoArguments().thenReturn(mockLoadData);
-    when(mockLoadData.data(mockRow).fromLocal(dualTempPath).into(TextTable.Dual.tb).generate()).thenReturn(LOAD_DUAL_SQL);
+    when(mockLoadData.data(mockRow).from(dualTempPath.toString()).into(Dual.tb).generate())
+      .thenReturn(LOAD_DUAL_SQL);
     when(mockStatement.execute(LOAD_DUAL_SQL)).thenReturn(false);
 
     repository = Repository.TemporaryRepository();

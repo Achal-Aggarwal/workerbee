@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecord;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -92,18 +94,6 @@ public class Utils {
     return (random.nextInt() & Integer.MAX_VALUE);
   }
 
-  public static <T extends TextTable> Path writeAtTempFile(T table, Row... rows) throws IOException {
-    List<String> generateRecords = new ArrayList<>(rows.length);
-    for (Row row : rows) {
-      generateRecords.add(row.generateRecord());
-    }
-
-    Path tableDataFile = Files.createTempFile(table.getName(), null);
-    Files.write(tableDataFile, generateRecords, Charset.defaultCharset());
-
-    return tableDataFile;
-  }
-
   public static String[] head(String first, String... other){
     Object[] objects = _row(first, other);
     return Arrays.copyOf(objects, objects.length, String[].class);
@@ -134,16 +124,5 @@ public class Utils {
       value = value.replaceAll("\\$\\{"+var+"\\}", variables.get(var));
     }
     return value;
-  }
-
-  public static <T extends AvroTable> Path writeAtTempFile(T table, Row<T> row) throws IOException {
-    Path tableDataFile = Files.createTempFile(table.getName(), null);
-    try(DataFileWriter<SpecificRecord> writer =
-          new DataFileWriter<>(new SpecificDatumWriter<SpecificRecord>(table.getSchema()))){
-      writer.create(table.getSchema(), new FileOutputStream(tableDataFile.toFile()));
-
-      writer.append(RowUtils.getSpecificRecord(row));
-    }
-    return tableDataFile;
   }
 }

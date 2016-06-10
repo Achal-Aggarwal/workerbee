@@ -17,7 +17,7 @@ public class InsertQuery implements Query {
   private Table table;
   private SelectQuery selectQuery;
   private Map<Column, Object> partitionMap;
-  private File directory;
+  private String directory;
 
   public InsertQuery intoTable(Table table) {
     this.table = table;
@@ -30,7 +30,7 @@ public class InsertQuery implements Query {
     return this;
   }
 
-  public InsertQuery directory(File path){
+  public InsertQuery directory(String path){
     this.directory = path;
 
     return this;
@@ -89,7 +89,7 @@ public class InsertQuery implements Query {
         partitionPart(result);
       }
     } else {
-      result.append(" DIRECTORY '").append(directory.getAbsolutePath()).append("'");
+      result.append(" DIRECTORY '").append(directory).append("'");
     }
 
     result.append(" " + selectQuery.generate());

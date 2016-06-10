@@ -1,6 +1,5 @@
 package net.achalaggarwal.workerbee;
 
-import com.google.common.io.Files;
 import net.achalaggarwal.workerbee.TextTable.Dual;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TextTableCreator;
@@ -12,9 +11,9 @@ import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
 import net.achalaggarwal.workerbee.expression.BooleanExpression;
 import org.apache.avro.specific.SpecificRecord;
 import org.apache.commons.io.FileUtils;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,6 +40,7 @@ public class Repository implements AutoCloseable {
   private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
 
   private Connection connection;
+  private FSOperation fso;
 
   public static Repository TemporaryRepository() throws IOException, SQLException {
     return TemporaryRepository(ROOT_DIR);
@@ -50,11 +50,12 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Initializing repository at : " + rootDir);
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
-      getHiveConfiguration(rootDir)
+      getHiveConfiguration(rootDir),
+      new Configuration()
     );
   }
 
-  public Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
+  public Repository(String connectionUrl, Properties properties, Configuration conf) throws SQLException, IOException {
     try {
       Class.forName(DRIVER_NAME);
     } catch (ClassNotFoundException e) {
@@ -64,12 +65,12 @@ public class Repository implements AutoCloseable {
 
     LOGGER.info("Connecting to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
+    fso = new FSOperation(conf);
 
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
     create(Dual.tb);
     load(Dual.tb, Arrays.asList(new Row<>(Dual.tb, "X")));
-
-    hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, Files.createTempDir().getAbsolutePath());
+    hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, fso.getAvroSchemaBasePath());
   }
 
   public Repository create(TextTable table) throws SQLException, IOException {
@@ -80,10 +81,7 @@ public class Repository implements AutoCloseable {
   }
 
   public Repository create(AvroTable table) throws SQLException, IOException {
-    FileUtils.writeStringToFile(
-      new File(hiveVarMap.get(AvroTable.AVRO_SCHEMA_URL_PATH), table.getName() + ".avsc"),
-      table.getSchema().toString(true)
-    );
+    fso.writeTableSchema(table);
     execute(table.create().ifNotExist().generate());
     clear(table);
 
@@ -94,9 +92,8 @@ public class Repository implements AutoCloseable {
     for (Row<T> row : rows) {
       execute(new LoadData()
         .data(row)
-        .fromLocal(Utils.writeAtTempFile(table, row))
+        .from(fso.writeTextRow(table, row).toString())
         .into(table)
-        .generate()
       );
     }
     return this;
@@ -106,9 +103,8 @@ public class Repository implements AutoCloseable {
     for (Row<T> row : rows) {
       execute(new LoadData()
         .data(row)
-        .fromLocal(Utils.writeAtTempFile(table, row))
+        .from(fso.writeAvroRow(table, row).toString())
         .into(table)
-        .generate()
       );
     }
     return this;
@@ -204,33 +200,19 @@ public class Repository implements AutoCloseable {
   }
 
   private List<String> takeoutRecordsAsString(Table table, Column[] partitions) throws SQLException, IOException {
-    File tempDirectoryPath = Files.createTempDir();
 
     BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
     for (Column partition : partitions) {
       expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
     }
 
-    execute(recover(table).generate());
+    String tempDirectoryPath = fso.createTempDir();
 
+    execute(recover(table).generate());
     execute(insert().overwrite().directory(tempDirectoryPath)
       .using(select(star()).from(table).where(expression)));
 
-    File[] files = tempDirectoryPath.listFiles(new FileFilter() {
-      @Override
-      public boolean accept(File pathname) {
-        return !pathname.isHidden();
-      }
-    });
-
-    List<String> rows = new ArrayList<>();
-    for (File file : files) {
-      for (String record : FileUtils.readLines(file)) {
-        rows.add(record);
-      }
-    }
-
-    return rows;
+    return fso.readRecords(tempDirectoryPath);
   }
 
   public <T extends AvroTable, A extends SpecificRecord> List<A> getSpecificRecordsOf(AvroTable<T> table, Column... partitions) throws SQLException, IOException {
