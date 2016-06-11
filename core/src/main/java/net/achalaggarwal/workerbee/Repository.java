@@ -50,9 +50,12 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Initializing repository at : " + rootDir);
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
-      getHiveConfiguration(rootDir),
-      new Configuration()
+      getHiveConfiguration(rootDir)
     );
+  }
+
+  public Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
+    this(connectionUrl, properties, new Configuration());
   }
 
   public Repository(String connectionUrl, Properties properties, Configuration conf) throws SQLException, IOException {
