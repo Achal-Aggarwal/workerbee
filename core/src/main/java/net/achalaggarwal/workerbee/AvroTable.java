@@ -6,10 +6,12 @@ import org.apache.avro.Schema;
 import org.apache.avro.specific.SpecificRecord;
 
 import static java.lang.String.format;
+import static net.achalaggarwal.workerbee.Utils.getRandomPositiveNumber;
 
 public class AvroTable<T extends AvroTable> extends Table {
   public static final String AVRO_SCHEMA_URL_PATH = "avro.schema.url.path";
   private Class<? extends SpecificRecord> klass;
+  private String avroSchemaPath = format("%s-%s.avsc", getName(), getRandomPositiveNumber());
 
   public AvroTable(String name) {
     this(null, name, null, 0);
@@ -39,8 +41,8 @@ public class AvroTable<T extends AvroTable> extends Table {
     );
   }
 
-  public String getSchemaPath(String avroSchemaPath) {
-    return format("%s/%s-%s.avsc", avroSchemaPath, getDatabaseName(), getName());
+  public String getSchemaPath(String basePath) {
+    return format("%s/%s", basePath, avroSchemaPath);
   }
 
   public AvroTable<T> readSchema(Class<? extends SpecificRecord> klass){
