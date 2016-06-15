@@ -2,7 +2,9 @@ package net.achalaggarwal.workerbee.ddl.misc;
 
 import net.achalaggarwal.workerbee.*;
 
+import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +12,12 @@ import static net.achalaggarwal.workerbee.Utils.fqTableName;
 import static net.achalaggarwal.workerbee.Utils.joinList;
 
 public class LoadData implements Query {
-  private static final boolean LOCAL = true;
+  private enum PathType {
+    LOCAL, HDFS
+  }
 
-  private boolean pathType;
-  private String filePath;
+  private PathType pathType;
+  private Path filePath;
   private boolean overwrite = false;
   private Table table;
   private Row<? extends Table> row;
@@ -23,15 +27,9 @@ public class LoadData implements Query {
     return this;
   }
 
-  public LoadData fromLocal(Path filePath) {
-    this.filePath = filePath.toAbsolutePath().toString();
-    pathType = LOCAL;
-
-    return this;
-  }
-
-  public LoadData from(String hdfsPath) {
-    this.filePath = hdfsPath;
+  public LoadData from(URI file) {
+    this.filePath = Paths.get(file);
+    pathType = file.getScheme().equalsIgnoreCase("file") ? PathType.LOCAL : PathType.HDFS;
 
     return this;
   }
@@ -52,9 +50,9 @@ public class LoadData implements Query {
 
     result.append("LOAD DATA");
 
-    result.append(pathType ? " LOCAL INPATH " : " INPATH ");
+    result.append(pathType == PathType.LOCAL ? " LOCAL INPATH " : "INPATH ");
 
-    result.append(Utils.quoteString(filePath));
+    result.append(Utils.quoteString(filePath.toString()));
 
     if (overwrite) {
       result.append(" OVERWRITE");

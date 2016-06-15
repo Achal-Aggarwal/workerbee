@@ -4,6 +4,8 @@ import net.achalaggarwal.workerbee.*;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -14,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class LoadDataTest {
   public static final String DATABASE_NAME = "DATABASE_NAME";
   public static final String TABLE_NAME = "TABLE_NAME";
-  public static final String PATH = "PATH";
+  public static final String PATH = "/PATH";
   public static final String PAT_COL_VALUE = "PAT_COL_VALUE";
   public static final String PAT_COL_NAME = "PAT_COL_NAME";
 
@@ -24,29 +26,35 @@ public class LoadDataTest {
   static {
     when(path.toAbsolutePath().toString())
       .thenReturn(PATH);
+    try {
+      when(path.toUri())
+        .thenReturn(new URI("file:///PATH"));
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test
   public void shouldGenerateCorrectStatementForTemporaryTable(){
     assertThat(
-      new LoadData().into(new TextTable<>(TABLE_NAME)).fromLocal(path).generate(),
-      is("LOAD DATA LOCAL INPATH 'PATH' INTO TABLE TABLE_NAME ;")
+      new LoadData().into(new TextTable<>(TABLE_NAME)).from(path.toUri()).generate(),
+      is("LOAD DATA LOCAL INPATH '/PATH' INTO TABLE TABLE_NAME ;")
     );
   }
 
   @Test
   public void shouldGenerateCorrectStatementForLocalPath(){
     assertThat(
-      new LoadData().into((TextTable<? extends TextTable>) table).fromLocal(path).generate(),
-      is("LOAD DATA LOCAL INPATH 'PATH' INTO TABLE DATABASE_NAME.TABLE_NAME ;")
+      new LoadData().into(table).from(path.toUri()).generate(),
+      is("LOAD DATA LOCAL INPATH '/PATH' INTO TABLE DATABASE_NAME.TABLE_NAME ;")
     );
   }
 
   @Test
   public void shouldGenerateCorrectStatementWithOverwrite(){
     assertThat(
-      new LoadData().into((TextTable<? extends TextTable>) table).overwrite().fromLocal(path).generate(),
-      is("LOAD DATA LOCAL INPATH 'PATH' OVERWRITE INTO TABLE DATABASE_NAME.TABLE_NAME ;")
+      new LoadData().into(table).overwrite().from(path.toUri()).generate(),
+      is("LOAD DATA LOCAL INPATH '/PATH' OVERWRITE INTO TABLE DATABASE_NAME.TABLE_NAME ;")
     );
   }
 
@@ -61,9 +69,9 @@ public class LoadDataTest {
         .data(partitionedTable.getNewRow().set(column, PAT_COL_VALUE))
         .into(partitionedTable)
         .overwrite()
-        .fromLocal(path)
+        .from(path.toUri())
         .generate(),
-      is("LOAD DATA LOCAL INPATH 'PATH' OVERWRITE INTO TABLE TABLE_NAME PARTITION ( PAT_COL_NAME = 'PAT_COL_VALUE' ) ;")
+      is("LOAD DATA LOCAL INPATH '/PATH' OVERWRITE INTO TABLE TABLE_NAME PARTITION ( PAT_COL_NAME = 'PAT_COL_VALUE' ) ;")
     );
   }
 }

@@ -97,7 +97,7 @@ public class FSOperation {
     return lines;
   }
 
-  private Path writeString(String path, String content) throws IOException {
+  public Path writeString(String path, String content) throws IOException {
     FileSystem fileSystem = FileSystem.get(conf);
 
     Path hdfsPath = new Path(path);

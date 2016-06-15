@@ -13,6 +13,7 @@ import org.apache.hadoop.conf.Configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -27,27 +28,24 @@ import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
 import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
 
 public class Repository implements AutoCloseable {
+  private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
   private static final String DRIVER_NAME = "org.apache.hive.jdbc.HiveDriver";
-  private static final String JDBC_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
-
+  private static final String LOCAL_HIVE2_EMBEDDED_MODE_URL = "jdbc:hive2://";
   public static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
 
   private Map<String, String> hiveVarMap = new HashMap<>();
-
-  private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
-
   private Connection connection;
   private FSOperation fso;
 
-  public static Repository TemporaryRepository() throws IOException, SQLException {
+  public static Repository TemporaryRepository() throws IOException, SQLException, URISyntaxException {
     return TemporaryRepository(ROOT_DIR);
   }
 
-  public static Repository TemporaryRepository(Path rootDir) throws IOException, SQLException {
+  public static Repository TemporaryRepository(Path rootDir) throws IOException, SQLException, URISyntaxException {
     LOGGER.info("Initializing repository at : " + rootDir);
     return new Repository(
-      JDBC_HIVE2_EMBEDDED_MODE_URL,
-      getHiveConfiguration(rootDir)
+      LOCAL_HIVE2_EMBEDDED_MODE_URL,
+      getLocalHiveConfiguration(rootDir)
     ).create();
   }
 
@@ -95,7 +93,7 @@ public class Repository implements AutoCloseable {
     for (Row<T> row : rows) {
       execute(new LoadData()
         .data(row)
-        .from(fso.writeTextRow(table, row).toString())
+        .from(fso.writeTextRow(table, row).toUri())
         .into(table)
       );
     }
@@ -106,7 +104,7 @@ public class Repository implements AutoCloseable {
     for (Row<T> row : rows) {
       execute(new LoadData()
         .data(row)
-        .from(fso.writeAvroRow(table, row).toString())
+        .from(fso.writeAvroRow(table, row).toUri())
         .into(table)
       );
     }
@@ -117,8 +115,7 @@ public class Repository implements AutoCloseable {
     if (table.isExternal()){
       return execute("dfs -rmr " + table.getLocation());
     }
-
-    return execute(new TruncateTable(table).generate());
+    return execute(new TruncateTable(table));
   }
 
   public Repository hiveVar(String var, String val) throws SQLException {
@@ -231,7 +228,7 @@ public class Repository implements AutoCloseable {
     connection.close();
   }
 
-  private static Properties getHiveConfiguration(Path baseDir) {
+  private static Properties getLocalHiveConfiguration(Path baseDir) {
     final String basePath = baseDir.toAbsolutePath().toString();
     return new Properties(){{
       setProperty("hiveconf:fs.default.name", "file://" + basePath);
