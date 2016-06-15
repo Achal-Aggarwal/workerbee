@@ -112,6 +112,7 @@ public class Row<T extends Table> {
     return constants.toArray(new Constant[constants.size()]);
   }
 
+  @SuppressWarnings({"SimplifiableConditionalExpression", "SimplifiableIfStatement"})
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -120,8 +121,10 @@ public class Row<T extends Table> {
     Row row = (Row) o;
 
     if (!map.equals(row.map)) return false;
-    return table.equals(row.table);
 
+    return table.isNotTemporary() && row.table.isNotTemporary()
+      ? table.equals(row.table)
+      : true;
   }
 
   @Override
