@@ -171,17 +171,28 @@ public class Repository implements AutoCloseable {
 
   public <T extends TextTable> List<Row<T>> execute(SelectQuery selectQuery) throws SQLException {
     Statement statement = connection.createStatement();
-
     String selectHQL = rtrim(selectQuery.generate());
-    LOGGER.info("Executing query : " + selectHQL);
 
     List<Row<T>> rows = new ArrayList<>();
-    ResultSet resultSet = statement.executeQuery(selectHQL);
+    ResultSet resultSet = statement.executeQuery(interpolateQuery(selectHQL));
     while (resultSet.next()) {
       rows.add(new Row<>((T)selectQuery.table(), resultSet));
     }
 
     return rows;
+  }
+
+  public <T extends TextTable> List<Row<T>> unload(Table table, String[] columnNames, Column... partitions) throws SQLException {
+    Column[] columnsToSelect = new Column[columnNames.length];
+
+    int i = 0;
+    for (String columnName : columnNames) {
+      columnsToSelect[i++] = table.getColumn(columnName);
+    }
+
+    return execute(
+      select(columnsToSelect).from(table).where(getAndBooleanExpression(partitions))
+    );
   }
 
   public <T extends TextTable> List<Row<T>> unload(T table, Column... partitions) throws SQLException, IOException {
@@ -204,10 +215,7 @@ public class Repository implements AutoCloseable {
 
   private List<String> takeoutRecordsAsString(Table table, Column[] partitions) throws SQLException, IOException {
 
-    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
-    for (Column partition : partitions) {
-      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
-    }
+    BooleanExpression expression = getAndBooleanExpression(partitions);
 
     String tempDirectoryPath = fso.createTempDir();
 
@@ -216,6 +224,14 @@ public class Repository implements AutoCloseable {
       .using(select(star()).from(table).where(expression)));
 
     return fso.readRecords(tempDirectoryPath);
+  }
+
+  private BooleanExpression getAndBooleanExpression(Column[] partitions) {
+    BooleanExpression expression = new BooleanExpression(new Constant(1), EQUALS, new Constant(1));
+    for (Column partition : partitions) {
+      expression = expression.and(new BooleanExpression(partition, EQUALS, new Constant(partition.getValue())));
+    }
+    return expression;
   }
 
   public <T extends AvroTable, A extends SpecificRecord> List<A> getSpecificRecordsOf(AvroTable<T> table, Column... partitions) throws SQLException, IOException {
