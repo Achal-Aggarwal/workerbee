@@ -1,12 +1,10 @@
 package net.achalaggarwal.workerbee.example;
 
-import net.achalaggarwal.workerbee.QueryGenerator;
-import net.achalaggarwal.workerbee.Repository;
-import net.achalaggarwal.workerbee.Row;
-import net.achalaggarwal.workerbee.TextTable;
+import net.achalaggarwal.workerbee.*;
 import net.achalaggarwal.workerbee.example.baseball.BattingTable;
 import net.achalaggarwal.workerbee.example.baseball.PlayerTable;
 import net.achalaggarwal.workerbee.example.baseball.domain.Player;
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Before;
 import org.junit.BeforeClass;

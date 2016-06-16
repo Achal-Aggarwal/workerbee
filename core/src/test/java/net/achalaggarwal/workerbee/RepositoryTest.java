@@ -114,7 +114,7 @@ public class RepositoryTest {
     LoadData mockLoadData = mock(LoadData.class, Mockito.RETURNS_DEEP_STUBS);
     PowerMockito.whenNew(LoadData.class)
       .withNoArguments().thenReturn(mockLoadData);
-    when(mockLoadData.data(mockRow).from(dualTempPath.toUri()).into(Dual.tb).generate())
+    when(mockLoadData.data(mockRow).from(dualTempPath.toString()).into(Dual.tb).generate())
       .thenReturn(LOAD_DUAL_SQL);
     when(mockStatement.execute(LOAD_DUAL_SQL)).thenReturn(false);
 

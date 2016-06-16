@@ -5,14 +5,13 @@ import net.achalaggarwal.workerbee.Repository;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class LocalWBRepoClient {
-  public static void main(String[] args) throws IOException, SQLException, URISyntaxException {
+  public static void main(String[] args) throws IOException, SQLException {
     Repository repo = Repository.TemporaryRepository(Paths.get(args[0]));
 
     String query;
