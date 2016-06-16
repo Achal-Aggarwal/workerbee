@@ -26,6 +26,7 @@ public class Row<T extends Table> {
 
   public Row(T table){
     this.table = table;
+    this.map = new HashMap<>();
   }
 
   public Row(T table, ResultSet resultSet){
