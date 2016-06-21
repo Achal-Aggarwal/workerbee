@@ -113,9 +113,9 @@ public class Repository implements AutoCloseable {
     return this;
   }
 
-  private Repository clear(Table table) throws SQLException {
+  public Repository clear(Table table) throws SQLException {
     if (table.isExternal()){
-      return execute("dfs -rmr " + table.getLocation());
+      return execute("dfs -rmr -f " + table.getLocation() + "/*");
     }
 
     return execute(new TruncateTable(table).generate());
