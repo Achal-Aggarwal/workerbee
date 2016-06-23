@@ -2,10 +2,8 @@ package net.achalaggarwal.workerbee;
 
 import net.achalaggarwal.workerbee.TextTable.Dual;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
-import net.achalaggarwal.workerbee.ddl.create.TextTableCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
-import net.achalaggarwal.workerbee.dml.insert.InsertQuery;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
 import net.achalaggarwal.workerbee.expression.BooleanExpression;
@@ -21,10 +19,9 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.lang.String.valueOf;
 import static net.achalaggarwal.workerbee.Database.DEFAULT;
 import static net.achalaggarwal.workerbee.QueryGenerator.*;
-import static net.achalaggarwal.workerbee.QueryGenerator.select;
-import static java.lang.String.valueOf;
 import static net.achalaggarwal.workerbee.Utils.*;
 import static net.achalaggarwal.workerbee.dr.SelectFunctionGenerator.star;
 import static net.achalaggarwal.workerbee.expression.BooleanExpression.EQUALS;
@@ -51,7 +48,7 @@ public class Repository implements AutoCloseable {
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
       getHiveConfiguration(rootDir)
-    );
+    ).create();
   }
 
   public Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
@@ -69,11 +66,14 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Connecting to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
     fso = new FSOperation(conf);
+  }
 
+  private Repository create() throws SQLException, IOException {
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
     create(Dual.tb);
     load(Dual.tb, Arrays.asList(new Row<>(Dual.tb, "X")));
     hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, fso.getAvroSchemaBasePath());
+    return this;
   }
 
   public Repository create(TextTable table) throws SQLException, IOException {
@@ -113,9 +113,9 @@ public class Repository implements AutoCloseable {
     return this;
   }
 
-  private Repository clear(Table table) throws SQLException {
+  public Repository clear(Table table) throws SQLException {
     if (table.isExternal()){
-      return execute("dfs -rmr " + table.getLocation());
+      return execute("dfs -rmr -f " + table.getLocation() + "/*");
     }
 
     return execute(new TruncateTable(table).generate());
@@ -126,19 +126,7 @@ public class Repository implements AutoCloseable {
     return execute("SET hivevar:" + var + "=" + val);
   }
 
-  public Repository execute(DatabaseCreator databaseCreator) throws SQLException {
-    return execute(databaseCreator.generate());
-  }
-
-  public Repository execute(TextTableCreator tableCreator) throws SQLException {
-    return execute(tableCreator.generate());
-  }
-
-  public Repository execute(InsertQuery insertQuery) throws SQLException {
-    return execute(insertQuery.generate());
-  }
-
-  public Repository execute(LoadData loadDataQuery) throws SQLException {
+  public Repository execute(Query loadDataQuery) throws SQLException {
     return execute(loadDataQuery.generate());
   }
 
