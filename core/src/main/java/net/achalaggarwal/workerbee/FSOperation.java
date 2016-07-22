@@ -15,6 +15,7 @@ public class FSOperation {
   public static final boolean OVERWRITE = true;
   public static final boolean NOT_RECURSIVE = false;
   private final Configuration conf;
+  private final FileSystem fileSystem;
 
   @Getter
   private final String tempPath;
@@ -23,8 +24,9 @@ public class FSOperation {
     return getTempPath() + "/avro-schema";
   }
 
-  public FSOperation(Configuration conf) {
+  public FSOperation(Configuration conf) throws IOException {
     this.conf = conf;
+    this.fileSystem = FileSystem.get(conf);
     this.tempPath = conf.get("hadoop.tmp.dir") + "/workerbee/" + Utils.getRandomPositiveNumber();
   }
 
@@ -46,8 +48,6 @@ public class FSOperation {
   }
 
   public <T extends AvroTable> Path writeAvroRow(T table, Row... rows) throws IOException {
-    FileSystem fileSystem = FileSystem.get(conf);
-
     Path hdfsPath = new Path(createTempFile());
     fileSystem.mkdirs(hdfsPath.getParent());
 
@@ -70,7 +70,6 @@ public class FSOperation {
   }
 
   public List<String> readRecords(String path) throws IOException {
-    FileSystem fileSystem = FileSystem.get(conf);
     Path hdfsPath = new Path(path);
 
     List<String> rows = new ArrayList<>();
@@ -84,7 +83,6 @@ public class FSOperation {
   }
 
   private List<String> readFile(Path hdfsPath) throws IOException {
-    FileSystem fileSystem = FileSystem.get(conf);
     List<String> lines = new ArrayList<>();
 
     String line;
@@ -98,8 +96,6 @@ public class FSOperation {
   }
 
   private Path writeString(String path, String content) throws IOException {
-    FileSystem fileSystem = FileSystem.get(conf);
-
     Path hdfsPath = new Path(path);
     fileSystem.mkdirs(hdfsPath.getParent());
 
@@ -109,5 +105,12 @@ public class FSOperation {
     }
 
     return hdfsPath;
+  }
+
+  public boolean clear(Table table) throws IOException {
+    Path tablePath = new Path(table.getLocation());
+
+    return fileSystem.delete(tablePath, true)
+      && fileSystem.mkdirs(tablePath);
   }
 }
