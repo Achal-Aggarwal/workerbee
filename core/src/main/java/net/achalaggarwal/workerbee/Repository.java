@@ -209,11 +209,16 @@ public class Repository implements AutoCloseable {
 
     String tempDirectoryPath = fso.createTempDir();
 
+    doNotCompressOutput();
     execute(recover(table).generate());
     execute(insert().overwrite().directory(tempDirectoryPath)
       .using(select(star()).from(table).where(expression)));
 
     return fso.readRecords(tempDirectoryPath);
+  }
+
+  private Repository doNotCompressOutput() throws SQLException {
+    return execute("hive.exec.compress.output=false");
   }
 
   private BooleanExpression getAndBooleanExpression(Column[] partitions) {
