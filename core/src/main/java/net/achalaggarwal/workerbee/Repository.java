@@ -135,6 +135,7 @@ public class Repository implements AutoCloseable {
   }
 
   public Repository execute(File sqlScriptFile) throws IOException, SQLException {
+    LOGGER.info("Executing script: " + sqlScriptFile);
     return execute(FileUtils.readFileToString(sqlScriptFile));
   }
 
