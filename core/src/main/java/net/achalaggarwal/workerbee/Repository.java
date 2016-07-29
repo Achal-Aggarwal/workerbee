@@ -1,5 +1,6 @@
 package net.achalaggarwal.workerbee;
 
+import lombok.Getter;
 import net.achalaggarwal.workerbee.TextTable.Dual;
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
@@ -32,6 +33,7 @@ public class Repository implements AutoCloseable {
 
   public static final Path ROOT_DIR = Paths.get("/", "tmp", "workerbee", valueOf(getRandomPositiveNumber()));
 
+  @Getter
   private Map<String, String> hiveVarMap = new HashMap<>();
 
   private static Logger LOGGER = Logger.getLogger(Repository.class.getName());
