@@ -50,7 +50,7 @@ public class Repository implements AutoCloseable {
     return new Repository(
       JDBC_HIVE2_EMBEDDED_MODE_URL,
       getHiveConfiguration(rootDir)
-    ).create();
+    ).createDefaultAndDual();
   }
 
   public Repository(String connectionUrl, Properties properties) throws SQLException, IOException {
@@ -68,13 +68,15 @@ public class Repository implements AutoCloseable {
     LOGGER.info("Connecting to : " + connectionUrl);
     connection = DriverManager.getConnection(connectionUrl, properties);
     fso = new FSOperation(conf);
+
+    hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, fso.getAvroSchemaBasePath());
   }
 
-  private Repository create() throws SQLException, IOException {
+  private Repository createDefaultAndDual() throws SQLException, IOException {
     execute(new DatabaseCreator(DEFAULT).ifNotExist().generate());
     create(Dual.tb);
     load(Dual.tb, Arrays.asList(new Row<>(Dual.tb, "X")));
-    hiveVar(AvroTable.AVRO_SCHEMA_URL_PATH, fso.getAvroSchemaBasePath());
+
     return this;
   }
 
@@ -221,7 +223,7 @@ public class Repository implements AutoCloseable {
   }
 
   private Repository doNotCompressOutput() throws SQLException {
-    return execute("hive.exec.compress.output=false");
+    return execute("SET hive.exec.compress.output=false");
   }
 
   private BooleanExpression getAndBooleanExpression(Column[] partitions) {
