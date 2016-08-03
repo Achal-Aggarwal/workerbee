@@ -4,6 +4,7 @@ import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TableCreator;
 import net.achalaggarwal.workerbee.ddl.drop.DatabaseDropper;
 import net.achalaggarwal.workerbee.ddl.drop.TableDropper;
+import net.achalaggarwal.workerbee.ddl.misc.AlterPartitionTable;
 import net.achalaggarwal.workerbee.ddl.misc.LoadData;
 import net.achalaggarwal.workerbee.ddl.misc.RecoverPartition;
 import net.achalaggarwal.workerbee.ddl.misc.TruncateTable;
@@ -46,6 +47,10 @@ public class QueryGenerator {
 
   public static LoadData loadData() {
     return new LoadData();
+  }
+
+  public static AlterPartitionTable alter(Table table) {
+    return new AlterPartitionTable(table);
   }
 
   public static TruncateTable truncate(Table table) {
