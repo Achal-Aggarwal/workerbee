@@ -2,9 +2,6 @@ package net.achalaggarwal.workerbee;
 
 import lombok.Getter;
 import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
-import org.apache.avro.Schema;
-import org.apache.avro.specific.SpecificRecord;
-import org.apache.hadoop.io.Text;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;

@@ -20,6 +20,8 @@ public class Database {
 
   private HashSet<Table> tables = new HashSet<>();
 
+  private HashSet<View> views = new HashSet<>();
+
   public Database(String name) {
     this(name, null);
   }
@@ -36,6 +38,12 @@ public class Database {
 
   public Database havingTable(Table table) {
     tables.add(table);
+
+    return this;
+  }
+
+  public Database havingView(View view) {
+    views.add(view);
 
     return this;
   }

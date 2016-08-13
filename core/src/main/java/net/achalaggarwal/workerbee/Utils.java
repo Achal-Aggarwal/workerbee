@@ -57,6 +57,22 @@ public class Utils {
     return result.toString();
   }
 
+  public static String fqViewName(View view){
+    return fqViewName(view, null);
+  }
+
+  public static String fqViewName(View view, Database database){
+    StringBuilder result = new StringBuilder();
+
+    if (database != null) {
+      result.append(format("%s.%s", database.getName(), view.getName()));
+    } else {
+      result.append(format("%s.%s", view.getDatabaseName(), view.getName()));
+    }
+
+    return result.toString();
+  }
+
   public static String fqColumnName(Table table, Column column){
     StringBuilder result = new StringBuilder();
 

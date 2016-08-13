@@ -80,6 +80,12 @@ public class Repository implements AutoCloseable {
     return this;
   }
 
+  public Repository create(View view) throws SQLException, IOException {
+    execute(QueryGenerator.create(view).ifNotExist().generate());
+
+    return this;
+  }
+
   public Repository create(TextTable table) throws SQLException, IOException {
     execute(table.create().ifNotExist().generate());
     clear(table);
@@ -177,6 +183,10 @@ public class Repository implements AutoCloseable {
     return rows;
   }
 
+  public <T extends TextTable> List<Row<T>> unload(View view, String[] columnNames) throws SQLException {
+    return unload(view.getTable(), columnNames);
+  }
+
   public <T extends TextTable> List<Row<T>> unload(Table table, String[] columnNames, Column... partitions) throws SQLException {
     Column[] columnsToSelect = new Column[columnNames.length];
 
@@ -188,6 +198,10 @@ public class Repository implements AutoCloseable {
     return execute(
       select(columnsToSelect).from(table).where(getAndBooleanExpression(partitions))
     );
+  }
+
+  public List<Row<TextTable<TextTable>>> unload(View view, Column... partitions) throws SQLException, IOException {
+    return unload(view.getTable(), partitions);
   }
 
   public <T extends TextTable> List<Row<T>> unload(T table, Column... partitions) throws SQLException, IOException {
@@ -215,7 +229,11 @@ public class Repository implements AutoCloseable {
     String tempDirectoryPath = fso.createTempDir();
 
     doNotCompressOutput();
-    execute(recover(table).generate());
+
+    if (table.isNotTemporary()) {
+      execute(recover(table).generate());
+    }
+
     execute(insert().overwrite().directory(tempDirectoryPath)
       .using(select(star()).from(table).where(expression)));
 

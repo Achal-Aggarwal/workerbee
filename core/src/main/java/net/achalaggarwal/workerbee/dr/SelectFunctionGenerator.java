@@ -11,6 +11,10 @@ public class SelectFunctionGenerator {
     return new AllStarSF();
   }
 
+  public static SelectFunction star(String tableName){
+    return new AllStarSF();
+  }
+
   public static SelectFunction substr(Column column, int start, int end){
     return new SubStrSF(column, start, end);
   }

@@ -3,7 +3,6 @@ package net.achalaggarwal.workerbee.dml.insert;
 import net.achalaggarwal.workerbee.*;
 import net.achalaggarwal.workerbee.dr.SelectQuery;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

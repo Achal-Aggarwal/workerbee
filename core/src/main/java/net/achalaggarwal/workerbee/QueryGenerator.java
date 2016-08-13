@@ -2,6 +2,7 @@ package net.achalaggarwal.workerbee;
 
 import net.achalaggarwal.workerbee.ddl.create.DatabaseCreator;
 import net.achalaggarwal.workerbee.ddl.create.TableCreator;
+import net.achalaggarwal.workerbee.ddl.create.ViewCreator;
 import net.achalaggarwal.workerbee.ddl.drop.DatabaseDropper;
 import net.achalaggarwal.workerbee.ddl.drop.TableDropper;
 import net.achalaggarwal.workerbee.ddl.misc.AlterPartitionTable;
@@ -23,6 +24,10 @@ public class QueryGenerator {
 
   public static TableCreator create(Table table){
     return table.create();
+  }
+
+  public static ViewCreator create(View view){
+    return new ViewCreator(view);
   }
 
   public static TableDropper drop(Table table) {
