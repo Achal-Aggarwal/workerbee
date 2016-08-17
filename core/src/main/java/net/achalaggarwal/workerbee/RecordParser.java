@@ -14,6 +14,7 @@ import java.util.Map;
 import static java.lang.Double.parseDouble;
 import static java.lang.Float.parseFloat;
 import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
 public class RecordParser implements ResultSet {
   private List<String> values;
@@ -81,7 +82,8 @@ public class RecordParser implements ResultSet {
 
   @Override
   public long getLong(int columnIndex) throws SQLException {
-    throw new SQLException("Method not supported");
+    String value = at(columnIndex);
+    return isValid(value) ? parseLong(value) : 0;
   }
 
   @Override

@@ -19,6 +19,8 @@ public class Column extends SelectFunction {
         return Type.BOOLEAN;
       case INT:
         return Type.INT;
+      case LONG:
+        return Type.LONG;
       case FLOAT:
         return Type.FLOAT;
       case DOUBLE:
@@ -51,6 +53,17 @@ public class Column extends SelectFunction {
       @Override
       public Integer convert(Object value) {
         return value == null ? null : Integer.parseInt(String.valueOf(value));
+      }
+    },
+    LONG {
+      @Override
+      public Object parseValue(ResultSet resultSet, int index) throws SQLException {
+        return resultSet.getLong(index);
+      }
+
+      @Override
+      public Long convert(Object value) {
+        return value == null ? null : Long.parseLong(String.valueOf(value));
       }
     },
     BIGINT {
