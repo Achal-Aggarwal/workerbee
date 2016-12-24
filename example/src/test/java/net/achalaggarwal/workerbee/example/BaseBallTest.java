@@ -115,15 +115,6 @@ public class BaseBallTest {
   }
 
   private static Repository localHs2Repo() throws SQLException, IOException {
-    return new Repository(
-      "jdbc:hive2://localhost:20103/default",
-      new Properties(){{
-        put("user", "user");
-        put("password", "pass");
-      }},
-      new Configuration(){{
-        set("fs.defaultFS", "hdfs://localhost:20112");
-      }}
-    );
+    return Repository.TemporaryRepository();
   }
 }

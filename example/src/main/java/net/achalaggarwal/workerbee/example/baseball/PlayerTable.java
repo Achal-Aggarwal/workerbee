@@ -14,6 +14,5 @@ public class PlayerTable extends AvroTable<PlayerTable> {
   private PlayerTable() {
     super(BaseBall.db, "Player", "Player table", 1);
     readSchema(net.achalaggarwal.workerbee.example.baseball.domain.Player.class);
-    external().onLocation("/player");
   }
 }
