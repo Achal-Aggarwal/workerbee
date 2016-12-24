@@ -17,7 +17,6 @@ public class BattingTable extends TextTable<BattingTable> {
 
   private BattingTable() {
     super(BaseBall.db, "Batting", "Batting table", 1);
-    external().onLocation("/batting");
   }
 
 }
