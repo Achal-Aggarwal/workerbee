@@ -3,7 +3,7 @@
   <parent>
     <artifactId>workerbee</artifactId>
     <groupId>net.achalaggarwal.workerbee</groupId>
-    <version>3.1-hive1.2.1-hadoop2.7.1</version>
+    <version>3.1-hive2.2.1-hadoop2.7.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
