@@ -12,7 +12,9 @@ import java.sql.SQLException;
 
 public class LocalWBRepoClient {
   public static void main(String[] args) throws IOException, SQLException {
-    Repository repo = Repository.TemporaryRepository(Paths.get(args[0]));
+    Repository repo = args.length == 0
+      ? Repository.TemporaryRepository()
+      : Repository.TemporaryRepository(Paths.get(args[0]));
 
     String query;
     BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
