@@ -270,8 +270,8 @@ public class Repository implements AutoCloseable {
 
       setProperty("hiveconf:hive.exec.scratchdir", basePath + "/scratchdir");
       setProperty("hiveconf:hive.querylog.location", basePath + "/querylog");
-      setProperty("hiveconf:hive.metastore.warehouse.dir", basePath + "/warehouse");
-      setProperty("hiveconf:hive.metastore.local", "true");
+      setProperty("hiveconf:hive.metastore.warehouse.dir", "file://" + basePath + "/warehouse");
+      setProperty("hiveconf:hive.metastore.uris", "");
 
       setProperty("hiveconf:javax.jdo.option.ConnectionURL", "jdbc:derby:;databaseName=" + basePath + "/metastore_db;create=true");
       setProperty("hiveconf:javax.jdo.option.ConnectionDriverName", "org.apache.derby.jdbc.EmbeddedDriver");
