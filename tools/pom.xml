@@ -3,17 +3,11 @@
   <parent>
     <artifactId>workerbee</artifactId>
     <groupId>net.achalaggarwal.workerbee</groupId>
-    <version>3.1-SNAPSHOT</version>
+    <version>3.1-hive1.2.1-hadoop2.7.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>workerbee-tools</artifactId>
-
-  <properties>
-    <hadoop.version>2.5.0-cdh5.3.3</hadoop.version>
-    <hive.version>0.13.1-cdh5.3.3</hive.version>
-    <avro.version>1.7.7</avro.version>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -24,7 +18,7 @@
     <dependency>
       <groupId>net.achalaggarwal.workerbee</groupId>
       <artifactId>workerbee-core</artifactId>
-      <version>3.1-SNAPSHOT</version>
+      <version>3.1-hive1.2.1-hadoop2.7.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

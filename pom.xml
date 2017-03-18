@@ -5,7 +5,7 @@
   <groupId>net.achalaggarwal.workerbee</groupId>
   <artifactId>workerbee</artifactId>
   <packaging>pom</packaging>
-  <version>3.1-SNAPSHOT</version>
+  <version>3.1-hive1.2.1-hadoop2.7.1-SNAPSHOT</version>
 
   <name>Workerbee</name>
   <description>A worker bee for your hive.</description>
