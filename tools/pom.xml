@@ -10,7 +10,7 @@
   <artifactId>workerbee-tools</artifactId>
 
   <properties>
-    <hadoop-mini-cluster.version>0.1.11</hadoop-mini-cluster.version>
+    <hadoop-mini-cluster.version>0.1.8</hadoop-mini-cluster.version>
   </properties>
 
   <dependencies>
