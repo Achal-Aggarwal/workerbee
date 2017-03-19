@@ -3,14 +3,14 @@
   <parent>
     <artifactId>workerbee</artifactId>
     <groupId>net.achalaggarwal.workerbee</groupId>
-    <version>3.2.0-hive0.13.1-hadoop2.5.0</version>
+    <version>3.2.1-hive0.13.1-hadoop2.5.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>workerbee-tools</artifactId>
 
   <properties>
-    <hadoop-mini-cluster.version>0.1.11</hadoop-mini-cluster.version>
+    <hadoop-mini-cluster.version>0.1.8</hadoop-mini-cluster.version>
   </properties>
 
   <dependencies>
