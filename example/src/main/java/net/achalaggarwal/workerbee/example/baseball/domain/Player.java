@@ -29,7 +29,7 @@ public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   public Player(java.util.Map<String, Object> setterMap) {
   for (String keyName : setterMap.keySet()) {
-  put(keyName, setterMap.get(keyName));
+      put(getClassSchema().getField(keyName).pos(), setterMap.get(keyName));
   }
   }
 
