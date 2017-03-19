@@ -10,9 +10,7 @@
   <artifactId>workerbee-tools</artifactId>
 
   <properties>
-    <hadoop.version>2.5.0-cdh5.3.3</hadoop.version>
-    <hive.version>0.13.1-cdh5.3.3</hive.version>
-    <avro.version>1.7.7</avro.version>
+    <hadoop-mini-cluster.version>0.1.11</hadoop-mini-cluster.version>
   </properties>
 
   <dependencies>
@@ -21,6 +19,41 @@
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
+
+    <!-- ZookeeperLocalCluster -->
+    <dependency>
+      <groupId>com.github.sakserv</groupId>
+      <artifactId>hadoop-mini-clusters-zookeeper</artifactId>
+      <version>${hadoop-mini-cluster.version}</version>
+    </dependency>
+
+    <!-- HiveLocalMetaStore -->
+    <dependency>
+      <groupId>com.github.sakserv</groupId>
+      <artifactId>hadoop-mini-clusters-hivemetastore</artifactId>
+      <version>${hadoop-mini-cluster.version}</version>
+    </dependency>
+
+    <!-- HiveLocalMetaStore -->
+    <dependency>
+      <groupId>com.github.sakserv</groupId>
+      <artifactId>hadoop-mini-clusters-hiveserver2</artifactId>
+      <version>${hadoop-mini-cluster.version}</version>
+    </dependency>
+
+    <!-- Hadoop Mini Clusters Common -->
+    <dependency>
+      <groupId>com.github.sakserv</groupId>
+      <artifactId>hadoop-mini-clusters-common</artifactId>
+      <version>${hadoop-mini-cluster.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.sakserv</groupId>
+      <artifactId>property-parser</artifactId>
+      <version>0.0.2</version>
+    </dependency>
+
     <dependency>
       <groupId>net.achalaggarwal.workerbee</groupId>
       <artifactId>workerbee-core</artifactId>
