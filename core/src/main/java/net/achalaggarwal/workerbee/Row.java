@@ -4,10 +4,7 @@ import lombok.Getter;
 import net.achalaggarwal.workerbee.dr.selectfunction.Constant;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.achalaggarwal.workerbee.Utils.fqTableName;
 import static net.achalaggarwal.workerbee.Utils.joinList;
@@ -23,7 +20,7 @@ public class Row<T extends Table> {
 
   public Row(T table){
     this.table = table;
-    this.map = new HashMap<>();
+    this.map = new LinkedHashMap<>();
   }
 
   public Row(T table, ResultSet resultSet){
@@ -54,7 +51,7 @@ public class Row<T extends Table> {
   private Map<Column, Object> parseRecordUsing(
     ResultSet resultSet, int startingIndex
   ) {
-    Map<Column, Object> map = new HashMap<>(table.getColumns().size());
+    Map<Column, Object> map = new LinkedHashMap<>(table.getColumns().size());
     int index = startingIndex;
 
     for (Column column : table.getColumns()) {
